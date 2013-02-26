@@ -158,6 +158,7 @@ FILES += modules.c
 FILES += module-utils.c
 FILES += event.c
 FILES += conf-file.c
+FILES += cpu-features.c
 
 H_FILES  = perf-studio.h
 H_FILES += shared.h

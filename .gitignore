@@ -1,10 +1,15 @@
+core/perf-studio
+modules/*.so
+
 .*
 *.o
 *.o.*
 *.a
 !.gitignore
+
 cscope.*
 ncscope.*
+
 *.orig
 *~
 \#*#

@@ -46,12 +46,16 @@ struct screen {
 	GtkWidget *main_window;
 };
 
+/* forward declaration, see cpu-fueatures.{c,h) */
+struct cpu_features;
+
 struct ps {
 	gboolean screen_usable;
 	struct screen s;
 	/* CLI args */
 	struct args args;
 	struct conf conf;
+        struct cpu_features *cpu_features;
 
 	GSList *module_list;
 };
