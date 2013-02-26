@@ -46,6 +46,15 @@ struct screen {
 	GtkWidget *main_window;
 };
 
+struct project {
+	char *exec_path;
+	GSList *exec_args;
+	GSList *env;
+
+	/* current sha1 of executable */
+	unsigned long sha1;
+};
+
 /* forward declaration, see cpu-fueatures.{c,h) */
 struct cpu_features;
 
@@ -55,8 +64,10 @@ struct ps {
 	/* CLI args */
 	struct args args;
 	struct conf conf;
-        struct cpu_features *cpu_features;
+	struct cpu_features *cpu_features;
 
+	/* the current loaded/active project */
+	struct project *project;
 	GSList *module_list;
 };
 
@@ -67,6 +78,26 @@ struct ps {
 #define MODULE_NAME_MAX 32
 #define MODULE_DESC_MAX 128
 
+enum {
+	MODULE_GROUP_COMMON = 0,
+	MODULE_GROUP_THREAD_ANALYSE,
+};
+#define MODULE_GROUP_DEFAULT MODULE_GROUP_COMMON
+
+enum update_type {
+	UPDATE_TYPE_PERF_DATA_PATH,
+	/*
+	 * note that several path to perf.data files can
+	 * be provided. Just to do a more accurate event
+	 * sampling because of performance register pressure.
+	 * This decision is enforced by the core. E.g if two
+	 * other modules took seperate measurements. There is
+	 * no need to measure the data one more time just to
+	 * collect the data in one perf.data
+	 */
+	UPDATE_TYPE_PERF_DATA_PATHS,
+};
+
 struct module {
 
 	/* elements controlled by modules */
@@ -74,10 +105,31 @@ struct module {
 	char description[MODULE_DESC_MAX];
 	unsigned long version;
 
+	/* must be one of MODULE_GROUP_* */
+	unsigned int module_group;
+
 	/* list or registered events */
 	GSList *event_list;
 
+	/*
+	 * update receive data and should transform
+	 * data in a module specific format, just to
+	 * display the data as quick as possible
+	 */
+	int (*update)(struct module *m, enum update_type update_type, ...);
+
+	/*
+	 * Activate the gui element and start display.
+	 * If no data is available (update() wasn't called)
+	 * the a black screen MUST be displayed */
+	int (*activate)(struct module *m);
+	int (*deactive)(struct module *m);
 	void (*unregister_module)(struct ps *, struct module *);
+
+	/*
+	 * module private data - must be freed at
+	 * unregister_module() time
+	 */
 	void *data;
 
 	/* elements opaque to module. Controlled
@@ -85,7 +137,16 @@ struct module {
 	 */
 	void *dl_handle;
 	char *path_name;
+
+	/*
+	 * Back reference to ps, module is instance object (thus argument)
+	 * and ps pointer points to superclass element.
+	 */
+	struct ps *ps;
 };
+
+
+
 
 
 /* module specific section */
