@@ -14,6 +14,7 @@ FILES += cpu-features.c
 FILES += gui-amc.c
 FILES += gui-amn.c
 FILES += gui-apo.c
+FILES += project.c
 
 
 # Makefiles suck: This macro sets a default value of $(2) for the
@@ -70,7 +71,7 @@ bindir_SQ = $(subst ','\'',$(bindir))
 bindir_relative_SQ = $(subst ','\'',$(bindir_relative))
 module_dir_SQ = $(subst ','\'',$(module_dir))
 
-CFLAGS ?= -g -O0 -pipe
+CFLAGS ?= -g -pipe
 INSTALL = install
 
 ARCH ?= $(shell uname -m)
@@ -114,6 +115,7 @@ WARNINGS = -Wall \
 
 # use 64 bit off_t etc. even on 32 bit systems
 override CFLAGS += -D_FILE_OFFSET_BITS=64
+override CFLAGS += -D_GNU_SOURCE
 override CFLAGS += $(WARNINGS)
 override CFLAGS += -I../include
 override CFLAGS += $(BASIC_CFLAGS)
@@ -272,7 +274,7 @@ clean:
 	$(Q)$(do_clean)
 
 memcheck: $(TARGET)
-	valgrind --tool=memcheck ./$(TARGET)
+	G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=full --leak-resolution=high ./$(TARGET)
 
 cscope:
 	$(RM) cscope*

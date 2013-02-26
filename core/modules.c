@@ -1,5 +1,3 @@
-#define _GNU_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -41,7 +39,7 @@ void unregister_all_modules(struct ps *ps)
 		tmp = g_slist_next(tmp);
 	}
 
-	/* FIXME: GSlist must be destroyed too */
+	g_slist_free(ps->module_list);
 }
 
 
@@ -159,9 +157,9 @@ int register_available_modules(struct ps *ps)
 {
 	int ret;
         char *envdir;
-	gchar *path;
+	gchar *path, *cwd;
+	gchar **conf_tmp;
 	const gchar *home;
-	gchar *cwd;
 
 #ifdef MODULE_DIR
 	pr_info(ps, "search modules in: %s", MODULE_DIR);
@@ -180,6 +178,18 @@ int register_available_modules(struct ps *ps)
 			pr_error(ps, "failed to register plugins in %s", envdir);
 			return ret;
 		}
+	}
+
+	/* ~/.config/perf-studio/perf-studio.conf */
+	conf_tmp = ps->conf.module_paths;
+	while (conf_tmp && *conf_tmp) {
+		pr_info(ps, "search modules in: %s", *conf_tmp);
+		ret = register_modules_dir(ps, *conf_tmp);
+		if (ret != 0) {
+			pr_error(ps, "failed to register modules in %s", *conf_tmp);
+			return ret;
+		}
+		conf_tmp++;
 	}
 
 	home = g_getenv("HOME");
@@ -203,9 +213,11 @@ int register_available_modules(struct ps *ps)
 		ret = register_modules_dir(ps, cwd);
 		if (ret != 0) {
 			pr_error(ps, "failed to register plugins in %s", cwd);
+			free(cwd);
 			return ret;
 		}
 	}
+	free(cwd);
 
 	return 0;
 }

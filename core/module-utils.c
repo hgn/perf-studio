@@ -49,6 +49,7 @@ void module_set_description(struct module *m, const char *desc)
 	m->description[len - 1] = '\0';
 }
 
+
 char *module_get_description(struct module *m)
 {
 	return m->description;
@@ -77,8 +78,9 @@ void module_purge_all_events(struct module *m)
 		tmp = g_slist_next(tmp);
 	}
 
-	/* FIXME: event_list must be freed too */
+	g_slist_free(m->event_list);
 }
+
 
 void module_print_registered_events(struct ps *ps, struct module *module)
 {

@@ -12,6 +12,8 @@
 #include "shared.h"
 #include "modules.h"
 #include "conf-file.h"
+#include "project.h"
+#include "version.h"
 
 
 int parse_cli_options(struct ps *ps, int ac, char **av)
@@ -69,6 +71,13 @@ static struct ps *ps_new(void)
 }
 
 
+static void ps_conf_free(struct conf *conf)
+{
+	if (conf->perf_exec_path) g_free(conf->perf_exec_path);
+	if (conf->module_paths) g_strfreev(conf->module_paths);
+}
+
+
 static void ps_free(struct ps *ps)
 {
 	assert(ps);
@@ -76,8 +85,7 @@ static void ps_free(struct ps *ps)
 	if (ps->args.me)
 		g_free(ps->args.me);
 
-	if (ps->conf.module_paths)
-		g_strfreev(ps->conf.module_paths);
+	ps_conf_free(&ps->conf);
 
 	free(ps);
 }
@@ -90,7 +98,8 @@ int main (int ac, char **av)
 
 	ps = ps_new();
 
-	pr_info(ps, "perf-studio - 0.0.1");
+	pr_info(ps, "Perf-Studio (C)");
+	pr_info(ps, "Versio: %s", VERSION_STRING);
 
 	ret = parse_cli_options(ps, ac, av);
 	if (ret != 0) {
@@ -99,9 +108,16 @@ int main (int ac, char **av)
 		goto out;
 	}
 
-	ret = load_conf_file(ps);
+	ret = load_user_conf_file(ps);
 	if (ret != 0) {
 		err_msg(ps, "failed to parse configuration file");
+		ret = EXIT_FAILURE;
+		goto out;
+	}
+
+	ret = load_project_conf_file(ps);
+	if (ret != 0) {
+		err_msg(ps, "failed to load project configuration file");
 		ret = EXIT_FAILURE;
 		goto out;
 	}
@@ -129,6 +145,7 @@ int main (int ac, char **av)
 	ret = EXIT_SUCCESS;
 out:
 	unregister_all_modules(ps);
+	project_purge_all(ps);
 	ps_free(ps);
 	pr_info(ps, "bye");
 	return ret;

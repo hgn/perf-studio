@@ -39,6 +39,7 @@ struct args {
 };
 
 struct conf {
+	gchar *perf_exec_path;
 	gchar **module_paths;
 };
 
@@ -47,9 +48,9 @@ struct screen {
 };
 
 struct project {
+	/* values from .perf-studio/config */
 	char *exec_path;
 	GSList *exec_args;
-	GSList *env;
 
 	/* current sha1 of executable */
 	unsigned long sha1;
@@ -66,8 +67,13 @@ struct ps {
 	struct conf conf;
 	struct cpu_features *cpu_features;
 
-	/* the current loaded/active project */
+	/*
+	 * current loaded/active project, one
+	 * of project_list
+	 */
 	struct project *project;
+	/* list of all available projects */
+	GSList *project_list;
 
 	/* list of struct modules found in PATH, ... */
 	GSList *module_list;

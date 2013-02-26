@@ -1,19 +1,24 @@
 
-// structure
-.config/perf-studio/perf-studio.conf
+
+
+/*  foo/bar/project-foo/.perf-studio/config  */
 
 [common]
-        perf-path = /usr/src/linux/perf
+	name=a project new
+	description = a optional description
 
-[projects]
-        max_perf_data_per_project = 1GiB
+[times]
+	create-time = 12230.101
+	last-accessed = 12233.010
 
 
 
-.config/perf-studio/projects.conf
 
-.../.perf-studio/refs/2012-02-11-20:20.2949  # -> 32892250358
-.../.perf-studio/db/32892250358/db
+
+/*  foo/bar/project-foo/.perf-studio/refs/2012-02-11-20:20.2949  # -> 32892250358 */
+
+/*  foo/bar/project-foo/.perf-studio/db/32892250358/db */
+/*  foo/bar/project-foo/.perf-studio/db/32892250358/db/links */
 
 [cycles-10000sampling-us]
         path = "/home/pfeifer/programm/.perf-studio/db/32892250358/perf-00001.data"
