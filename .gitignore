@@ -1,5 +1,8 @@
 core/perf-studio
+core/version.h
+
 modules/*.so
+
 
 .*
 *.o

@@ -68,6 +68,8 @@ struct ps {
 
 	/* the current loaded/active project */
 	struct project *project;
+
+	/* list of struct modules found in PATH, ... */
 	GSList *module_list;
 };
 
