@@ -1,0 +1,10 @@
+.*
+*.o
+*.o.*
+*.a
+!.gitignore
+cscope.*
+ncscope.*
+*.orig
+*~
+\#*#
