@@ -1,0 +1,44 @@
+
+// structure
+.config/perf-studio/perf-studio.conf
+
+[common]
+        perf-path = /usr/src/linux/perf
+
+[projects]
+        max_perf_data_per_project = 1GiB
+
+
+
+.config/perf-studio/projects.conf
+
+.../.perf-studio/refs/2012-02-11-20:20.2949  # -> 32892250358
+.../.perf-studio/db/32892250358/db
+
+[cycles-10000sampling-us]
+        path = "/home/pfeifer/programm/.perf-studio/db/32892250358/perf-00001.data"
+
+[instructions-10000sampling-us]
+        path = "/home/pfeifer/programm/.perf-studio/db/32892250358/perf-00001.data"
+
+[instructions-10000sampling-us]
+        path = "/home/pfeifer/programm/.perf-studio/db/32892250358/perf-00002.data"
+
+[time]
+        path = "/home/pfeifer/programm/.perf-studio/db/32892250358/time-00001.data"
+
+
+.../.perf-studio/db/32892250358/perf-00001.data
+.../.perf-studio/db/32892250358/perf-00002.data
+
+
+// Readme
+
+pr_error() if something goes really wrong but the application
+must not be terminated. All components (core, modules) are aware
+of this kind of errors and handle the condition. But: some compnents
+may operate in a fallback mode or modules may dont start. etc. pp
+
+pr_criticial() ciritical error and the programm must abort. The
+programm may save some temporary files etc. pp. depending on the
+error path.
