@@ -159,6 +159,9 @@ FILES += module-utils.c
 FILES += event.c
 FILES += conf-file.c
 FILES += cpu-features.c
+FILES += gui-amc.c
+FILES += gui-amn.c
+FILES += gui-apo.c
 
 H_FILES  = perf-studio.h
 H_FILES += shared.h
