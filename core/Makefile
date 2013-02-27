@@ -11,11 +11,12 @@ FILES += module-utils.c
 FILES += event.c
 FILES += conf-file.c
 FILES += cpu-features.c
+FILES += project.c
+FILES += random.c
+FILES += gui-main.c
 FILES += gui-amc.c
 FILES += gui-amn.c
 FILES += gui-apo.c
-FILES += project.c
-FILES += random.c
 
 
 # Makefiles suck: This macro sets a default value of $(2) for the
