@@ -70,18 +70,6 @@ static struct ps *ps_new(void)
 	return ps;
 }
 
-static void rand_init(struct ps *ps)
-{
-	pr_info(ps, "initialize PRNG");
-
-	ps->rand = g_rand_new();
-}
-
-static void rand_free(struct ps *ps)
-{
-	g_rand_free(ps->rand);
-}
-
 
 static void ps_conf_free(struct conf *conf)
 {
