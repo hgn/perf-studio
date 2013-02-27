@@ -150,9 +150,10 @@ int load_project_conf_file(struct ps *ps)
 		groups_tmp++;
 	}
 
+	g_strfreev(groups);
 out:
 	g_free(full_path);
-	g_strfreev(groups);
 	g_key_file_free(keyfile);
+
 	return 0;
 }
