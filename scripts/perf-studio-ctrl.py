@@ -19,6 +19,12 @@ import difflib
 #
 # Fedora/RedHat
 #   python3-pyxdg
+#
+# Debian 7.0
+#   Add line in /etc/apt/sources.list:
+#     deb http://ftp.debian.org/debian experimental main
+#   apt-get install python3
+#   apt-get -t experimental install python3-xdg
 
 
 __programm__ = "perf-studio-control"
@@ -131,7 +137,7 @@ class ProjectCmd(Command):
 
 
 
-class CreateConfigCmd(Command):
+class ConfigCmd(Command):
 
     def initialize(self):
         parser = argparse.ArgumentParser(description='Process some integers.')
@@ -213,8 +219,8 @@ class CreateConfigCmd(Command):
 class PerfStudioControl:
 
     modes = {
-            "create-config":   [ "CreateConfigCmd",  "Create use globale configure file" ],
-            "project":         [ "ProjectCmd", "Create a new perf-studio project" ]
+            "config":   [ "ConfigCmd",  "Create use globale configure file" ],
+            "project":  [ "ProjectCmd", "Create a new perf-studio project" ]
             }
 
     def __init__(self):
