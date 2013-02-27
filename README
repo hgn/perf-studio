@@ -1,10 +1,6 @@
 Configuration
 =============
 
-XDG_CONFIG_HOME
-
-$HOME/.config/perf-studio/perf-studio.conf
-
 
 $HOME/.cache/perf-studio/projects/
 $HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/
@@ -28,6 +24,8 @@ There are two kinds of projects:
 
 Both kinds of projects are not really visible to the user. But there are some
 special abouts. So here we go:
+
+perf-studio-ctrl project --create common.exec-path=/usr/bin/ls common.name="ff fo" common.args="ffo;dood"
 
 Bare Projects
 -------------

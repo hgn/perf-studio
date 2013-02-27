@@ -30,7 +30,7 @@ __license__  = "GPLv3"
 CONFIG_HOME = os.path.join(xdg.BaseDirectory.xdg_config_home, "perf-studio")
 CONFIG_CONF = os.path.join(CONFIG_HOME, "config")
 
-DATA_HOME   = os.path.join(xdg.BaseDirectory.xdg_data_home, "perf-studio")
+CACHE_HOME   = os.path.join(xdg.BaseDirectory.xdg_cache_home, "perf-studio")
 
 
 class Command:
@@ -46,6 +46,89 @@ class Command:
 
     def run(self):
         pass
+
+
+class ProjectCmd(Command):
+
+    def initialize(self):
+        parser = argparse.ArgumentParser(description='Process some integers.')
+        parser.add_argument('-c', '--create', help='Create project', action="store_true")
+        parser.add_argument('-l', '--list', help='list all available projects', action="store_true")
+        parser.add_argument('args', nargs=argparse.REMAINDER)
+        self.args = parser.parse_args(sys.argv[2:])
+
+
+    def list_projects(self):
+        self.logger.warning("list all projects in %s" % (CACHE_HOME))
+        for root, dirs, files in os.walk(CACHE_HOME):
+            self.logger.warning("%s %s %s" % (root, dirs, files))
+
+
+    def create_project_conf(self, project_path):
+        conf_path = os.path.join(project_path, "conf")
+        self.logger.warning("Write config file to: %s" % (conf_path))
+
+        config = configparser.ConfigParser()
+        for argument in self.args.args:
+            (key, valval) = argument.split('=')
+            (group, val) = key.split('.')
+            if not group in config:
+                config[group] = {}
+            config[group]["\t%s" % (val)] = valval
+
+        with open(conf_path, 'w') as configfile:
+            config.write(configfile)
+
+    def create_project_dir_structure(self, project_path):
+        dir_path = os.path.join(project_path, "refs")
+        self.logger.warning("Create REFS directory: %s" % (dir_path))
+        os.mkdir(dir_path)
+
+        dir_path = os.path.join(project_path, "db")
+        self.logger.warning("Create DB   directory: %s" % (dir_path))
+        os.mkdir(dir_path)
+
+
+    def pick_free_id(self):
+        project_dirs = list()
+        for fn in os.listdir(CACHE_HOME):
+            if not os.path.isdir(fn):
+                next
+            project_dirs.append(fn)
+        project_dirs.sort()
+
+        i = 1
+        while True:
+            pid = "%04d" % (i)
+            if not pid in project_dirs:
+                break
+            i += 1
+        self.logger.debug("project_dirs %s, new pid %s" % (project_dirs, pid))
+        return pid
+
+
+    def create_project(self):
+        self.logger.warning("Create new project in %s" % (CACHE_HOME))
+        pid = self.pick_free_id()
+        self.logger.warning("New project ID: %s" % (pid))
+        project_path = os.path.join(CACHE_HOME, pid)
+        self.logger.warning("Create project path: %s" % (project_path))
+        os.mkdir(project_path)
+        self.create_project_conf(project_path)
+        self.create_project_dir_structure(project_path)
+
+
+
+    def run(self):
+        if self.args.list:
+            self.list_projects()
+            return
+        if self.args.create:
+            self.create_project()
+            return
+
+        self.logger.error("create/list/set missing to project, see --help")
+
 
 
 class CreateConfigCmd(Command):
@@ -126,21 +209,17 @@ class CreateConfigCmd(Command):
         self.write_config()
 
 
-class CreateProjectCmd(Command):
-    pass
-
-
 
 class PerfStudioControl:
 
     modes = {
             "create-config":   [ "CreateConfigCmd",  "Create use globale configure file" ],
-            "create-project":  [ "CreateProjectCmd", "Create a new perf-studio project" ]
+            "project":         [ "ProjectCmd", "Create a new perf-studio project" ]
             }
 
     def __init__(self):
         ch = logging.StreamHandler()
-        formatter = logging.Formatter("# %(message)s")
+        formatter = logging.Formatter("%(message)s")
         ch.setFormatter(formatter)
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.WARNING)
