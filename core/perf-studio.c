@@ -14,6 +14,7 @@
 #include "conf-file.h"
 #include "project.h"
 #include "version.h"
+#include "random.h"
 
 
 int parse_cli_options(struct ps *ps, int ac, char **av)
@@ -102,6 +103,9 @@ int main (int ac, char **av)
 	pr_info(ps, "Version: %s", VERSION_STRING);
 
 	rand_init(ps);
+	gchar *s = rand_hex_string(ps, 23);
+	pr_info(ps, "foo: %s", s);
+	g_free(s);
 
 	ret = parse_cli_options(ps, ac, av);
 	if (ret != 0) {

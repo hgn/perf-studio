@@ -6,5 +6,6 @@
 
 void rand_init(struct ps *ps);
 void rand_free(struct ps *ps);
+gchar *rand_hex_string(struct ps *ps, gsize length);
 
 #endif
