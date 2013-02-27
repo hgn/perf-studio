@@ -1,4 +1,40 @@
+Configuration
+=============
 
+XDG_CONFIG_HOME
+
+$HOME/.config/perf-studio/perf-studio.conf
+
+
+$HOME/.cache/perf-studio/projects/
+$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/
+$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/config
+$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/data/
+$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/data/refs/2012-02-11-20:20.2949   ->  ee6a975d30943d63dc6f1685248ecbc3
+$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/data/db/ee6a975d30943d63dc6f1685248ecbc3
+
+$HOME/.cache/perf-studio/projects/1aad11546e420be1da58080
+
+
+
+
+Projects
+========
+
+There are two kinds of projects:
+
+- Bare Projects
+- Projects
+
+Both kinds of projects are not really visible to the user. But there are some
+special abouts. So here we go:
+
+Bare Projects
+-------------
+
+$XDG_DATA_HOME (usually $HOME/.local/share/perf-studio)
+
+Perf-Studio related data is stored in ~/.cache/perf-studio/UNIQUE-ID.
 
 
 /*  foo/bar/project-foo/.perf-studio/config  */
