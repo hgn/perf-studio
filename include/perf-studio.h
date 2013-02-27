@@ -77,6 +77,8 @@ struct ps {
 
 	/* list of struct modules found in PATH, ... */
 	GSList *module_list;
+
+	GRand *rand;
 };
 
 #define MSG_LEVEL(ps) ((ps->args.msg_level))

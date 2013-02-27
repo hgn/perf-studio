@@ -70,6 +70,18 @@ static struct ps *ps_new(void)
 	return ps;
 }
 
+static void rand_init(struct ps *ps)
+{
+	pr_info(ps, "initialize PRNG");
+
+	ps->rand = g_rand_new();
+}
+
+static void rand_free(struct ps *ps)
+{
+	g_rand_free(ps->rand);
+}
+
 
 static void ps_conf_free(struct conf *conf)
 {
@@ -99,7 +111,9 @@ int main (int ac, char **av)
 	ps = ps_new();
 
 	pr_info(ps, "Perf-Studio (C)");
-	pr_info(ps, "Versio: %s", VERSION_STRING);
+	pr_info(ps, "Version: %s", VERSION_STRING);
+
+	rand_init(ps);
 
 	ret = parse_cli_options(ps, ac, av);
 	if (ret != 0) {
@@ -146,7 +160,8 @@ int main (int ac, char **av)
 out:
 	unregister_all_modules(ps);
 	project_purge_all(ps);
+	rand_free(ps);
 	ps_free(ps);
-	pr_info(ps, "bye");
+	pr_info(ps, "exiting");
 	return ret;
 }
