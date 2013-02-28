@@ -76,22 +76,32 @@ class Command:
 class ProjectCmd(Command):
 
     def initialize(self):
-        parser = argparse.ArgumentParser(description='Process some integers.')
-        parser.add_argument('-v', '--verbose', help='Verbose output', action="store_true")
-        parser.add_argument('-c', '--create', help='Create project', action="store_true")
-        parser.add_argument('-l', '--list', help='List all available projects', action="store_true")
-        parser.add_argument('args', nargs=argparse.REMAINDER)
-        self.args = parser.parse_args(sys.argv[2:])
+        self.parser = argparse.ArgumentParser(description='Create/modify/show perf-studio projects')
+        self.parser.add_argument('-v', '--verbose', help='Verbose output', action="store_true")
+        self.parser.add_argument('-c', '--create', help='Create project', action="store_true")
+        self.parser.add_argument('-l', '--list', help='List all available projects', action="store_true")
+        self.parser.add_argument('-s', '--set', help='Set projects options', action="store_true")
+        self.parser.add_argument('args', nargs=argparse.REMAINDER)
+        self.args = self.parser.parse_args(sys.argv[2:])
         self.logger.setLevel(logging.DEBUG) if self.args.verbose else None
+
+        if not self.args.list and not self.args.create:
+            self.parser.print_help()
+            self.logger.error("")
+            self.logger.error("create/list/set option missing")
+            sys.exit(1)
 
 
     def list_projects(self):
         self.logger.info("Project path: {0}".format(CACHE_HOME))
-        self.logger.warning("Registered projects")
-        for fn in os.listdir(CACHE_HOME):
-            if not os.path.isdir(fn):
-                next
-            self.logger.warning("Project ID {0}".format(fn))
+        self.logger.warning("Registered projects:")
+        try:
+            for fn in os.listdir(CACHE_HOME):
+                if not os.path.isdir(fn):
+                    next
+                self.logger.warning("Project ID {0}".format(fn))
+        except OSError:
+            self.logger.warning("No project available!")
 
 
     def create_project_conf(self, project_path):
@@ -158,21 +168,27 @@ class ProjectCmd(Command):
             self.create_project()
             return
 
-        self.logger.error("create/list/set missing to project, see --help")
-
+        self.parser.print_help()
+        self.logger.error("")
+        self.logger.error("create/list/set option missing to project")
 
 
 class ConfigCmd(Command):
 
     def initialize(self):
-        parser = argparse.ArgumentParser(description='Process some integers.')
-        parser.add_argument('-c', '--create', help='Create configuration', action="store_true")
-        parser.add_argument('-l', '--list', help='List current configuration', action="store_true")
-        parser.add_argument('-a', '--add', help='Add configuration value (common.username=fooo)', action="store_true")
-        parser.add_argument('-v', '--verbose', help='verbose output', action="store_true")
-        parser.add_argument('args', nargs=argparse.REMAINDER)
-        self.args = parser.parse_args(sys.argv[2:])
+        self.parser = argparse.ArgumentParser(description='Process some integers.')
+        self.parser.add_argument('-c', '--create', help='Create configuration', action="store_true")
+        self.parser.add_argument('-l', '--list', help='List current configuration', action="store_true")
+        self.parser.add_argument('-a', '--add', help='Add configuration value (common.username=fooo)', action="store_true")
+        self.parser.add_argument('-v', '--verbose', help='verbose output', action="store_true")
+        self.parser.add_argument('args', nargs=argparse.REMAINDER)
+        self.args = self.parser.parse_args(sys.argv[2:])
         self.logger.setLevel(logging.DEBUG) if self.args.verbose else None
+        if not self.args.list and not self.args.create and not self.args.add:
+            self.parser.print_help()
+            self.logger.error("")
+            self.logger.error("create/list/set option missing")
+            sys.exit(1)
 
     def get_username(self):
         return pwd.getpwuid(os.getuid())[4]
@@ -202,9 +218,6 @@ class ConfigCmd(Command):
 
     def diff_config(self, new_conf):
         """ return false if no difference, true if not identical"""
-        if not os.path.exists(CONFIG_CONF):
-            return False
-
         self.logger.debug("Configuration file already exists ({})".format(CONFIG_CONF))
 
         foo = tempfile.TemporaryFile()
@@ -294,6 +307,12 @@ class ConfigCmd(Command):
         data = self.merge_conf_dicts(template, argsdata)
 
         new_config = self.create_config_parser(data)
+
+        if not os.path.exists(CONFIG_CONF):
+            self.logger.warning("Write configuration file: {0}".format(CONFIG_CONF))
+            self.write_config(new_config)
+            return
+
         configuration_difference = self.diff_config(new_config)
         if configuration_difference:
             answer = StdinReader.yes_no(self.logger.warning, "Overwrite file?", default='no')
@@ -311,9 +330,6 @@ class ConfigCmd(Command):
             self.create_configuration()
             return
 
-        self.logger.error("create/list/set missing to project, see --help")
-
-
 
 
 class PerfStudioControl:
@@ -330,7 +346,6 @@ class PerfStudioControl:
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.WARNING)
         self.logger.addHandler(ch)
-        self.logger.warning("{0} (C) - {1} <{2}>".format(__programm__, __author__, __email__))
 
     def print_version(self):
         sys.stdout.write("%s\n" % (__version__))
@@ -381,6 +396,7 @@ class PerfStudioControl:
         classinstance = globals()[classtring]()
         classinstance._register_logger(self.logger)
         classinstance.initialize()
+        self.logger.warning("{0} (C)".format(__programm__))
         classinstance.run()
         return 0
 
