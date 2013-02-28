@@ -13,6 +13,8 @@ import configparser
 import xdg.BaseDirectory
 import tempfile
 import difflib
+import pwd
+import collections
 
 
 # Required packages:
@@ -39,6 +41,22 @@ CONFIG_CONF = os.path.join(CONFIG_HOME, "config")
 CACHE_HOME   = os.path.join(xdg.BaseDirectory.xdg_cache_home, "perf-studio")
 
 
+class StdinReader:
+
+    @staticmethod
+    def yes_no(outf, prompt, default='no'):
+        v = ('[y/N]', False) if default == 'no' else ('[Y/n]', True)
+        outf('{} {}'.format(prompt, v[0]))
+        for line in sys.stdin:
+            try:
+                line = line.rstrip()
+                if 'y' == line: return True
+                elif 'n' == line: return False
+                outf('{} {}'.format(prompt, v[0]))
+            except:
+                pass
+
+
 class Command:
 
     def __init__(self):
@@ -58,21 +76,26 @@ class ProjectCmd(Command):
 
     def initialize(self):
         parser = argparse.ArgumentParser(description='Process some integers.')
+        parser.add_argument('-v', '--verbose', help='Verbose output', action="store_true")
         parser.add_argument('-c', '--create', help='Create project', action="store_true")
-        parser.add_argument('-l', '--list', help='list all available projects', action="store_true")
+        parser.add_argument('-l', '--list', help='List all available projects', action="store_true")
         parser.add_argument('args', nargs=argparse.REMAINDER)
         self.args = parser.parse_args(sys.argv[2:])
+        self.logger.setLevel(logging.DEBUG) if self.args.verbose else None
 
 
     def list_projects(self):
-        self.logger.warning("list all projects in %s" % (CACHE_HOME))
-        for root, dirs, files in os.walk(CACHE_HOME):
-            self.logger.warning("%s %s %s" % (root, dirs, files))
+        self.logger.info("Project path: {0}".format(CACHE_HOME))
+        self.logger.warning("Registered projects")
+        for fn in os.listdir(CACHE_HOME):
+            if not os.path.isdir(fn):
+                next
+            self.logger.warning("Project ID {0}".format(fn))
 
 
     def create_project_conf(self, project_path):
         conf_path = os.path.join(project_path, "conf")
-        self.logger.warning("Write config file to: %s" % (conf_path))
+        self.logger.warning("Write config file to: {}".format(conf_path))
 
         config = configparser.ConfigParser()
         for argument in self.args.args:
@@ -80,18 +103,18 @@ class ProjectCmd(Command):
             (group, val) = key.split('.')
             if not group in config:
                 config[group] = {}
-            config[group]["\t%s" % (val)] = valval
+            config[group]["  {}".format(val)] = valval
 
         with open(conf_path, 'w') as configfile:
             config.write(configfile)
 
     def create_project_dir_structure(self, project_path):
         dir_path = os.path.join(project_path, "refs")
-        self.logger.warning("Create REFS directory: %s" % (dir_path))
+        self.logger.warning("Create REFS directory: {}".format(dir_path))
         os.mkdir(dir_path)
 
         dir_path = os.path.join(project_path, "db")
-        self.logger.warning("Create DB   directory: %s" % (dir_path))
+        self.logger.warning("Create DB   directory: {}".format(dir_path))
         os.mkdir(dir_path)
 
 
@@ -109,16 +132,16 @@ class ProjectCmd(Command):
             if not pid in project_dirs:
                 break
             i += 1
-        self.logger.debug("project_dirs %s, new pid %s" % (project_dirs, pid))
+        self.logger.debug("project_dirs {}, new pid {}".format(project_dirs, pid))
         return pid
 
 
     def create_project(self):
-        self.logger.warning("Create new project in %s" % (CACHE_HOME))
+        self.logger.warning("Create new project in {}".format(CACHE_HOME))
         pid = self.pick_free_id()
-        self.logger.warning("New project ID: %s" % (pid))
+        self.logger.warning("New project ID: {}".format(pid))
         project_path = os.path.join(CACHE_HOME, pid)
-        self.logger.warning("Create project path: %s" % (project_path))
+        self.logger.warning("Create project path: {}".format(project_path))
         os.mkdir(project_path)
         self.create_project_conf(project_path)
         self.create_project_dir_structure(project_path)
@@ -141,34 +164,51 @@ class ConfigCmd(Command):
 
     def initialize(self):
         parser = argparse.ArgumentParser(description='Process some integers.')
-        parser.add_argument('-n', '--name', help='username', type=str, dest='username')
+        parser.add_argument('-c', '--create', help='Create configuration', action="store_true")
+        parser.add_argument('-l', '--list', help='List current configuration', action="store_true")
+        parser.add_argument('-a', '--add', help='Add configuration value (common.username=fooo)', action="store_true")
         parser.add_argument('-v', '--verbose', help='verbose output', action="store_true")
+        parser.add_argument('args', nargs=argparse.REMAINDER)
         self.args = parser.parse_args(sys.argv[2:])
+        self.logger.setLevel(logging.DEBUG) if self.args.verbose else None
+
+    def get_username(self):
+        return pwd.getpwuid(os.getuid())[4]
 
 
-    def create_config(self):
-        self.config = configparser.ConfigParser()
-
-        common = dict()
-        common['username']       = self.args.username
-        common['perf-exec-path'] = '/usr/src/linux/tools/perf/perf' 
-        self.config['common'] = common
-
-        projects = dict()
-        projects['max-perf-data-per_project'] = '1GiB'
-        self.config['projects'] = projects
+    def conf_template(self):
+        root = collections.OrderedDict()
+        root['common'] = collections.OrderedDict()
+        root['common']['perf-exec-path'] = 'perf'
+        root['common']['username'] = self.get_username()
+        root['projects'] = collections.OrderedDict()
+        root['projects']['max-perf-data-per_project'] = '1GiB'
+        return root
 
 
-    def diff(self):
+    def args_config(self):
+        conf = collections.OrderedDict()
+        for argument in self.args.args:
+            (key, valval) = argument.split('=')
+            (group, val) = key.split('.')
+            if not group in conf:
+                conf[group] = collections.OrderedDict()
+            conf[group]["\t%s" % (val)] = valval
+        return conf
+
+
+
+    def diff_config(self, new_conf):
+        """ return false if no difference, true if not identical"""
         if not os.path.exists(CONFIG_CONF):
-            return
+            return False
 
-        self.logger.warning("configuration file already exists, will analyse difference")
+        self.logger.debug("Configuration file already exists ({})".format(CONFIG_CONF))
 
         foo = tempfile.TemporaryFile()
         foo_path = tempfile.mktemp()
         with open(foo_path, 'w') as foo:
-            self.config.write(foo)
+            new_conf.write(foo)
 
         foo = open(foo_path, 'r')
         foolines = foo.readlines()
@@ -178,9 +218,11 @@ class ConfigCmd(Command):
 
         m = difflib.SequenceMatcher(None, barlines, foolines)
         difference = 100.0 - (m.ratio() * 100.0)
-        self.logger.warning("change ratio: %.2f%%" % (difference))
         if difference == 0.0:
-            self.logger.warning("files identical")
+            self.logger.debug("files identical")
+            return False
+
+        self.logger.warning("Configuration differs! (ratio {}%)".format(difference))
 
         d = difflib.Differ()
         diff = difflib.unified_diff(barlines, foolines)
@@ -189,30 +231,51 @@ class ConfigCmd(Command):
 
         foo.close()
         os.remove(foo_path)
-
         bar.close()
 
+        return True
 
-    def write_config(self):
+
+    def write_config(self, config):
         if not os.path.isdir(CONFIG_HOME):
             self.logger.warning("create perf-studio configuration directory %s" % (CONFIG_HOME))
             os.mkdir(CONFIG_HOME)
 
-        self.diff()
-
-        self.logger.warning("write configuration file \"%s\"" % (CONFIG_CONF))
-        for section in self.config.sections():
+        self.logger.warning("Write configuration file \"%s\"" % (CONFIG_CONF))
+        for section in config.sections():
             self.logger.warning(" [%s]" % (section))
-            for option in self.config.options(section):
-                self.logger.warning("\t%s = %s" % (option, self.config.get(section, option)))
+            for option in config.options(section):
+                self.logger.warning("\t%s = %s" % (option, config.get(section, option)))
 
         with open(CONFIG_CONF, 'w') as configfile:
-            self.config.write(configfile)
+            config.write(configfile)
+
+    def create_config_parser(self, data):
+        new_config = configparser.ConfigParser()
+        for group in data.keys():
+            for key in data[group].keys():
+                if not group in new_config:
+                    new_config[group] = {}
+                new_config[group]["  {}".format(key)] = data[group][key]
+        return new_config
 
 
     def run(self):
-        self.create_config()
-        self.write_config()
+        template = self.conf_template()
+        argsdata = self.args_config()
+
+        # merge dictionaries, argsdata dict will overwrite template dict
+        data = dict(list(template.items()) + list(argsdata.items()))
+
+        new_config = self.create_config_parser(data)
+        configuration_difference = self.diff_config(new_config)
+        if configuration_difference:
+            self.logger.warning("Overwrite [y/N]?")
+            answer = StdinReader.yes_no(self.logger.warning, "Overwrite file?", default='no')
+            if answer == False:
+                self.logger.warning("aborted - configuration file untouched")
+                return
+        self.write_config(new_config)
 
 
 
