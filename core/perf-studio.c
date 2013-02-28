@@ -103,6 +103,12 @@ static void ps_free(struct ps *ps)
 }
 
 
+static int register_artwork(struct ps *ps)
+{
+	return 0;
+}
+
+
 int main (int ac, char **av)
 {
 	int ret;
@@ -143,7 +149,14 @@ int main (int ac, char **av)
 	if (ret != 0) {
 		err_msg(ps, "failed to register perf-studio modules");
 		ret = EXIT_FAILURE;
-		goto out;
+		goto out2;
+	}
+
+	ret = register_artwork(ps);
+	if (ret != 0) {
+		err_msg(ps, "failed to load artwork");
+		ret = EXIT_FAILURE;
+		goto out3;
 	}
 
 	gtk_init(&ac, &av);
@@ -159,9 +172,11 @@ int main (int ac, char **av)
 
 
 	ret = EXIT_SUCCESS;
-out:
+out3:
 	unregister_all_modules(ps);
+out2:
 	project_purge_all(ps);
+out:
 	rand_free(ps);
 	ps_free(ps);
 	pr_info(ps, "exiting");
