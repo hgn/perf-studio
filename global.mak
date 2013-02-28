@@ -34,7 +34,9 @@ man_dir = $(prefix)/share/man
 man_dir_SQ = '$(subst ','\'',$(man_dir))'
 img_install = $(prefix)/share/kernelshark/html/images
 img_install_SQ = '$(subst ','\'',$(img_install))'
+data_dir = $(prefix)/share/perf-studio/
 
+export data_dir
 export img_install img_install_SQ
 export DESTDIR DESTDIR_SQ
 
@@ -45,6 +47,8 @@ module_dir = $(prefix)/lib/perf-studio/modules
 MODULE_DIR = -DMODULE_DIR="\"$(module_dir)\""
 MODULE_DIR_SQ = '$(subst ','\'',$(MODULE_DIR))'
 endif
+
+DATA_DIR = -DDATA_DIR="\"$(data_dir)\""
 
 ifeq ("$(origin V)", "command line")
   VERBOSE = $(V)

@@ -58,6 +58,7 @@ override CFLAGS += $(WARNINGS)
 override CFLAGS += -I../include
 override CFLAGS += $(BASIC_CFLAGS)
 override CFLAGS += $(MODULE_DIR)
+override CFLAGS += $(DATA_DIR)
 override CFLAGS += -std=gnu99
 
 COBJECTS=$(subst .c,.o,$(FILES))
