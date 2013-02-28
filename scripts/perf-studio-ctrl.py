@@ -33,6 +33,7 @@ __programm__ = "perf-studio-control"
 __author__   = "Hagen Paul Pfeifer"
 __version__  = "0.1"
 __license__  = "GPLv3"
+__email__    = "hagen@jauu.net"
 
 
 CONFIG_HOME = os.path.join(xdg.BaseDirectory.xdg_config_home, "perf-studio")
@@ -194,7 +195,7 @@ class ConfigCmd(Command):
             (group, val) = key.split('.')
             if not group in conf:
                 conf[group] = collections.OrderedDict()
-            conf[group]["  %s" % (val)] = valval
+            conf[group]["%s" % (val)] = valval
         return conf
 
 
@@ -220,10 +221,9 @@ class ConfigCmd(Command):
         m = difflib.SequenceMatcher(None, barlines, foolines)
         difference = 100.0 - (m.ratio() * 100.0)
         if difference == 0.0:
-            self.logger.debug("files identical")
             return False
 
-        self.logger.warning("Configuration differs! (ratio {}%)".format(difference))
+        self.logger.warning("Configuration differs! (ratio {0:.1f} %)".format(difference))
 
         d = difflib.Differ()
         diff = difflib.unified_diff(barlines, foolines)
@@ -239,14 +239,15 @@ class ConfigCmd(Command):
 
     def write_config(self, config):
         if not os.path.isdir(CONFIG_HOME):
-            self.logger.warning("create perf-studio configuration directory %s" % (CONFIG_HOME))
+            self.logger.warning("Create perf-studio configuration directory %s" % (CONFIG_HOME))
             os.mkdir(CONFIG_HOME)
 
-        self.logger.warning("Write configuration file \"%s\"" % (CONFIG_CONF))
+        self.logger.warning("Write new configuration to \"%s\"" % (CONFIG_CONF))
+
         for section in config.sections():
-            self.logger.warning(" [%s]" % (section))
+            self.logger.info(" [%s]" % (section))
             for option in config.options(section):
-                self.logger.warning("  %s = %s" % (option, config.get(section, option)))
+                self.logger.info("  %s = %s" % (option, config.get(section, option)))
 
         with open(CONFIG_CONF, 'w') as configfile:
             config.write(configfile)
@@ -260,23 +261,58 @@ class ConfigCmd(Command):
                 new_config[group]["  {}".format(key)] = data[group][key]
         return new_config
 
+    def merge_conf_dicts(self, dicta, dictb):
+        data = collections.OrderedDict()
 
-    def run(self):
+        # merge keys from dicta and dictb into new dict
+        for key in dicta:
+            if not key in data:
+                data[key] = collections.OrderedDict()
+            if key in dictb:
+                # merge dictionaries
+                data[key] = dict(list(dicta[key].items()) + list(dictb[key].items()))
+            else:
+                # merge not required because dictb has no identical key
+                # simple copy the data into new dict
+                data[key] = dicta[key]
+
+        # add remaining keys from dictb into new dict
+        for key in dictb:
+            if not key in data:
+                data[key] = collections.OrderedDict()
+            if not key in dictb:
+                data[key] = dictb[key]
+
+        return data
+
+
+    def create_configuration(self):
         template = self.conf_template()
         argsdata = self.args_config()
 
         # merge dictionaries, argsdata dict will overwrite template dict
-        data = dict(list(template.items()) + list(argsdata.items()))
+        data = self.merge_conf_dicts(template, argsdata)
 
         new_config = self.create_config_parser(data)
         configuration_difference = self.diff_config(new_config)
         if configuration_difference:
-            self.logger.warning("Overwrite [y/N]?")
             answer = StdinReader.yes_no(self.logger.warning, "Overwrite file?", default='no')
             if answer == False:
-                self.logger.warning("aborted - configuration file untouched")
+                self.logger.warning("Aborted - configuration file untouched")
                 return
-        self.write_config(new_config)
+            self.write_config(new_config)
+        else:
+            self.logger.warning("Configuration identical, no change, no write")
+            self.logger.warning("Configuration file: {0}".format(CONFIG_CONF))
+
+
+    def run(self):
+        if self.args.create:
+            self.create_configuration()
+            return
+
+        self.logger.error("create/list/set missing to project, see --help")
+
 
 
 
@@ -294,6 +330,7 @@ class PerfStudioControl:
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.WARNING)
         self.logger.addHandler(ch)
+        self.logger.warning("{0} (C) - {1} <{2}>".format(__programm__, __author__, __email__))
 
     def print_version(self):
         sys.stdout.write("%s\n" % (__version__))
