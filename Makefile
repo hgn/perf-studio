@@ -1,10 +1,7 @@
-MAKEFLAGS += --no-print-directory
-PREFIX?=/usr
+include global.mak
 
 SUBDIRS = modules core
 
-INSTALL = /usr/bin/install -c -m 0755
-INSTALLDATA = /usr/bin/install -c -m 0644
 
 .PHONY: $(SUBDIRS)
 .PHONY: subdirs
