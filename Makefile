@@ -1,6 +1,6 @@
 include global.mak
 
-SUBDIRS = modules core
+SUBDIRS = modules/bar core
 
 
 .PHONY: $(SUBDIRS)
