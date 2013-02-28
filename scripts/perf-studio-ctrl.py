@@ -132,6 +132,7 @@ class ProjectCmd(Command):
             if not pid in project_dirs:
                 break
             i += 1
+            assert(i < 9999)
         self.logger.debug("project_dirs {}, new pid {}".format(project_dirs, pid))
         return pid
 
@@ -193,7 +194,7 @@ class ConfigCmd(Command):
             (group, val) = key.split('.')
             if not group in conf:
                 conf[group] = collections.OrderedDict()
-            conf[group]["\t%s" % (val)] = valval
+            conf[group]["  %s" % (val)] = valval
         return conf
 
 
@@ -245,7 +246,7 @@ class ConfigCmd(Command):
         for section in config.sections():
             self.logger.warning(" [%s]" % (section))
             for option in config.options(section):
-                self.logger.warning("\t%s = %s" % (option, config.get(section, option)))
+                self.logger.warning("  %s = %s" % (option, config.get(section, option)))
 
         with open(CONFIG_CONF, 'w') as configfile:
             config.write(configfile)
