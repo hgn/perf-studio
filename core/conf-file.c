@@ -152,7 +152,7 @@ out:
 }
 
 
-int load_project_conf_file(struct ps *ps)
+int load_projects_from_cache(struct ps *ps)
 {
 	GFile *file;
 	gchar *file_path, *n_path;

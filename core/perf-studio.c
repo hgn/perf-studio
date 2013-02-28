@@ -131,7 +131,7 @@ int main (int ac, char **av)
 		goto out;
 	}
 
-	ret = load_project_conf_file(ps);
+	ret = load_projects_from_cache(ps);
 	if (ret != 0) {
 		err_msg(ps, "failed to load project configuration file");
 		ret = EXIT_FAILURE;

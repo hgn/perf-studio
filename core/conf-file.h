@@ -4,6 +4,6 @@
 #include "perf-studio.h"
 
 int load_user_conf_file(struct ps *);
-int load_project_conf_file(struct ps *);
+int load_projects_from_cache(struct ps *);
 
 #endif
