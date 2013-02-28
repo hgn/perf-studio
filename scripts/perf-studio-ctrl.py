@@ -108,7 +108,7 @@ class ProjectCmd(Command):
 
 
     def create_project_conf(self, project_path):
-        conf_path = os.path.join(project_path, "conf")
+        conf_path = os.path.join(project_path, "config")
         self.logger.warning("Write config file to: {}".format(conf_path))
 
         config = configparser.ConfigParser()
@@ -173,12 +173,12 @@ class ProjectCmd(Command):
             sys.exit(1)
         for argument in self.args.args:
             project_path      = os.path.join(PROJECTS_DIR, argument)
-            project_conf_path = os.path.join(project_path, "conf")
+            project_conf_path = os.path.join(project_path, "config")
             if not os.path.exists(project_path):
                 self.logger.error("Project {0} do not exist ({1})!".format(argument, project_path))
                 sys.exit(1)
             if not os.path.exists(project_conf_path):
-                self.logger.error("Project {0} conf do not exist - strange!".format(project_conf_path))
+                self.logger.error("Project {0} do not exist - strange!".format(project_conf_path))
                 sys.exit(1)
             editor = os.environ.get('EDITOR','vi')
             self.logger.warning("spawn editor to edit project configuration")

@@ -7,6 +7,7 @@ struct project *project_new(void);
 void project_free(struct project *e);
 void project_purge_all(struct ps *ps);
 void project_deactivate(struct ps *ps);
+void project_show(struct ps *ps, struct project *p);
 
 
 static inline void project_activate(struct ps *ps, struct project *project)

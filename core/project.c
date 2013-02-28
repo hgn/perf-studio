@@ -13,7 +13,8 @@ struct project *project_new(void)
 void project_free(struct project *e)
 {
 	if (e->exec_path) g_free(e->exec_path);
-	if (e->project_conf_path) g_free(e->project_conf_path);
+	if (e->project_path) g_free(e->project_path);
+	if (e->exec_args) g_strfreev(e->exec_args);
 	g_free(e);
 }
 
@@ -42,4 +43,25 @@ void project_purge_all(struct ps *ps)
 void project_deactivate(struct ps *ps)
 {
 	pr_info(ps, "deactiveate project");
+}
+
+
+void project_show(struct ps *ps, struct project *p)
+{
+	gchar **tmp;
+	int i = 1;
+
+	pr_info(ps, " project path:      %s", p->project_path);
+	pr_info(ps, " exec-path:         %s", p->exec_path);
+	tmp = p->exec_args;
+	while (tmp && *tmp) {
+		pr_info(ps, " exec-arg %d:        %s", i, *tmp);
+		tmp++; i++;
+	}
+	pr_info(ps, " working directory:   ");
+	pr_info(ps, " environment:         ");
+	pr_info(ps, " nice level:          ");
+	pr_info(ps, " scheduler policy:    ");
+	pr_info(ps, " IO scheduler:        ");
+
 }
