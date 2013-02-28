@@ -109,6 +109,7 @@ int main (int ac, char **av)
 	struct ps *ps;
 
 	ps = ps_new();
+	g_type_init();
 
 	pr_info(ps, "Perf-Studio (C)");
 	pr_info(ps, "Version: %s", VERSION_STRING);

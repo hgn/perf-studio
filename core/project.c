@@ -12,8 +12,8 @@ struct project *project_new(void)
 
 void project_free(struct project *e)
 {
-	if (e->exec_path)
-		g_free(e->exec_path);
+	if (e->exec_path) g_free(e->exec_path);
+	if (e->project_conf_path) g_free(e->project_conf_path);
 	g_free(e);
 }
 

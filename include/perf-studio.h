@@ -58,8 +58,11 @@ struct screen {
 
 struct project {
 	/* values from .perf-studio/config */
-	char *exec_path;
+	gchar *exec_path;
 	GSList *exec_args;
+
+	/* $HOME/.cache/perf-studio/projects/0001/config */
+	gchar *project_conf_path;
 
 	/* current sha1 of executable */
 	unsigned long sha1;
