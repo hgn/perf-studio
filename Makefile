@@ -1,6 +1,8 @@
 include global.mak
 
-SUBDIRS = modules/bar core
+SUBDIRS  = gui-toolkit
+SUBDIRS += modules/hello-world
+SUBDIRS += core
 
 
 .PHONY: $(SUBDIRS)
