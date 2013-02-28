@@ -119,6 +119,7 @@ class ProjectCmd(Command):
         with open(conf_path, 'w') as configfile:
             config.write(configfile)
 
+
     def create_project_dir_structure(self, project_path):
         dir_path = os.path.join(project_path, "refs")
         self.logger.warning("Create REFS directory: {}".format(dir_path))
@@ -150,6 +151,8 @@ class ProjectCmd(Command):
 
     def create_project(self):
         self.logger.warning("Create new project in {}".format(CACHE_HOME))
+        if not os.path.exists(CACHE_HOME):
+            os.mkdir(CACHE_HOME)
         pid = self.pick_free_id()
         self.logger.warning("New project ID: {}".format(pid))
         project_path = os.path.join(CACHE_HOME, pid)
