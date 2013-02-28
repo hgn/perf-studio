@@ -3,6 +3,7 @@ include global.mak
 SUBDIRS  = gui-toolkit
 SUBDIRS += modules/hello-world
 SUBDIRS += core
+SUBDIRS += data
 
 
 .PHONY: $(SUBDIRS)
@@ -36,6 +37,10 @@ install:
 	$(INSTALL) -m 0755 scripts/perf-studio-ctrl.py $(prefix)/share/perf-studio
 	$(RM) $(prefix)/bin/perf-studio-ctrl
 	ln -s $(prefix)/share/perf-studio/perf-studio-ctrl.py $(prefix)/bin/perf-studio-ctrl
+
+	@for dir in data; do \
+					(cd $$dir && $(MAKE) install) \
+	done
 
 cscope:
 	$(Q)$(do_local_clean)

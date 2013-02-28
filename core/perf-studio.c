@@ -107,18 +107,38 @@ static void ps_free(struct ps *ps)
 
 static int register_artwork(struct ps *ps)
 {
+	int ret;
+	char image_path[PATH_MAX];
+
 	switch (ps->args.theme) {
 	case THEME_DARK:
-		ps->si.pixmapdir = g_strdup_printf("%s/%s", DATA_DIR, "pixmaps/dark/");
-		ps->si.buttondir = g_strdup_printf("%s/%s", DATA_DIR, "pixmaps/darkbuttons/16x16/");
+		ps->si.pixmapdir = g_strdup_printf("%s/%s", DATA_DIR, "artwork/pixmaps/dark/");
+		ps->si.buttondir = g_strdup_printf("%s/%s", DATA_DIR, "artwork/pixmaps/buttons/16x16/");
 		break;
 	case THEME_LIGHT:
-		ps->si.pixmapdir = g_strdup_printf("%s/%s", DATA_DIR, "pixmaps/dark/");
-		ps->si.buttondir = g_strdup_printf("%s/%s", DATA_DIR, "pixmaps/darkbuttons/16x16/");
+		ps->si.pixmapdir = g_strdup_printf("%s/%s", DATA_DIR, "artwork/pixmaps/dark/");
+		ps->si.buttondir = g_strdup_printf("%s/%s", DATA_DIR, "artwork/pixmaps/buttons/16x16/");
 		break;
 	default:
 		assert(0);
 	}
+
+	/* make a accesstest */
+	ret = snprintf(image_path, sizeof(image_path), "%s%s",  ps->si.pixmapdir, "header.png");
+	if (ret < (int)strlen("back.png")) {
+		pr_error(ps, "Cannot construct path to pixmap images");
+		return -EINVAL;
+	}
+
+	if (access(image_path, F_OK)) {
+		pr_error(ps, "Image directory seems empty: %s", ps->si.pixmapdir);
+		pr_error(ps, "Did do call \"make install\"?");
+		return -EINVAL;
+	}
+
+	pr_info(ps, "Pixmaps path: %s", ps->si.pixmapdir);
+	pr_info(ps, "Button path:  %s", ps->si.buttondir);
+
 
 	return 0;
 }

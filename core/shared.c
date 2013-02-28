@@ -48,7 +48,7 @@ static void err_doit(struct ps *ps, int sys_error, const char *file, const int l
 		snprintf(buf + len,  sizeof buf - len, " (%s)", strerror(errno_save));
 	}
 
-	fprintf(stderr, "ERROR [%9s:%3d]: %s\n", file, line_no, buf);
+	fprintf(stderr, "! ERROR [%9s:%3d]: %s\n", file, line_no, buf);
 	fflush(NULL);
 }
 
