@@ -28,13 +28,18 @@ enum {
 	MSG_LEVEL_WARNING,
 	MSG_LEVEL_ERROR
 };
-
 #define DEFAULT_MSG_LEVEL MSG_LEVEL_INFO
+
+enum {
+	THEME_DARK,
+	THEME_LIGHT
+};
 
 
 struct args {
 	gchar *me;
 	gchar msg_level;
+	guint theme;
 	gboolean list_available_modules;
 };
 

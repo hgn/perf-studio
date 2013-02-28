@@ -5,6 +5,7 @@
 #include <getopt.h>
 #include <errno.h>
 #include <assert.h>
+#include <string.h>
 #include <gtk/gtk.h>
 
 #include "perf-studio.h"
@@ -22,10 +23,12 @@ int parse_cli_options(struct ps *ps, int ac, char **av)
 	int c;
 
 	ps->args.me = g_strdup(av[0]);
+	ps->args.theme = THEME_DARK;
 
 	while (1) {
 		int option_index = 0;
 		static struct option long_options[] = {
+			{"theme",            1, 0, 't'},
 			{"verbose",          1, 0, 'v'},
 			{"modules",          0, 0, 'm'},
 			{0, 0, 0, 0}
@@ -36,6 +39,13 @@ int parse_cli_options(struct ps *ps, int ac, char **av)
 			break;
 
 		switch (c) {
+		case 't':
+			if (streq("dark", optarg)) {
+				ps->args.theme = THEME_DARK;
+			} else if (streq("light", optarg)) {
+				ps->args.theme = THEME_LIGHT;
+			}
+			break;
 		case 'v':
 			ps->args.msg_level--;
 			break;
