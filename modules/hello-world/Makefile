@@ -1,6 +1,6 @@
 include ../../global.mak
 
-MODULE_OBJS = module-foo.o
+MODULE_OBJS = hello-world.o
 MODULES := $(MODULE_OBJS:.o=.so)
 
 BASIC_CFLAGS  = $(shell pkg-config --cflags gtk+-3.0)
