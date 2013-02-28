@@ -180,8 +180,8 @@ int register_available_modules(struct ps *ps)
 		}
 	}
 
-	/* ~/.config/perf-studio/perf-studio.conf */
-	conf_tmp = ps->conf.module_paths;
+	/* ~/.config/perf-studio/conf */
+	conf_tmp = ps->conf.common.module_paths;
 	while (conf_tmp && *conf_tmp) {
 		pr_info(ps, "search modules in: %s", *conf_tmp);
 		ret = register_modules_dir(ps, *conf_tmp);

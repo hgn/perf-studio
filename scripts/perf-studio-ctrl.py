@@ -229,7 +229,7 @@ class ConfigCmd(Command):
     def conf_template(self):
         root = collections.OrderedDict()
         root['common'] = collections.OrderedDict()
-        root['common']['perf-exec-path'] = 'perf'
+        root['common']['perf-path'] = 'perf'
         root['common']['username'] = self.get_username()
         root['projects'] = collections.OrderedDict()
         root['projects']['max-perf-data-per_project'] = '1GiB'

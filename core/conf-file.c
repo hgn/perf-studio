@@ -7,7 +7,7 @@
 #include "project.h"
 
 #define PERF_STUDIO_USER_CONF_DIR "perf-studio"
-#define PERF_STUDIO_USER_GLOBAL_CONF_NAME "perf-studio.conf"
+#define PERF_STUDIO_USER_GLOBAL_CONF_NAME "config"
 #define PERF_STUDIO_USER_PROJECT_CONF_NAME "projects.conf"
 
 
@@ -43,12 +43,14 @@ int load_user_conf_file(struct ps *ps)
 	}
 
 
-	/* Read in data from the key file from the group "username". */
-	ps->conf.perf_exec_path = g_key_file_get_string(keyfile, "common", "perf-path", NULL);
-	pr_info(ps, "perf-path: %s", ps->conf.perf_exec_path);
+	ps->conf.common.perf_path = g_key_file_get_string(keyfile, "common", "perf-path", NULL);
+	pr_info(ps, "perf-path: %s", ps->conf.common.perf_path);
 
-	ps->conf.module_paths = g_key_file_get_string_list(keyfile, "common", "module-paths", &length, NULL);
-	iter = ps->conf.module_paths;
+	ps->conf.common.username = g_key_file_get_string(keyfile, "common", "username", NULL);
+	pr_info(ps, "username: %s", ps->conf.common.username);
+
+	ps->conf.common.module_paths = g_key_file_get_string_list(keyfile, "common", "module-paths", &length, NULL);
+	iter = ps->conf.common.module_paths;
 	while (iter && *iter) {
 		pr_info(ps, "module-paths: %s", *iter);
 		iter++;

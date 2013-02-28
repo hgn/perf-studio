@@ -84,8 +84,9 @@ static struct ps *ps_new(void)
 
 static void ps_conf_free(struct conf *conf)
 {
-	if (conf->perf_exec_path) g_free(conf->perf_exec_path);
-	if (conf->module_paths) g_strfreev(conf->module_paths);
+	if (conf->common.perf_path) g_free(conf->common.perf_path);
+	if (conf->common.username) g_free(conf->common.username);
+	if (conf->common.module_paths) g_strfreev(conf->common.module_paths);
 }
 
 

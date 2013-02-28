@@ -43,9 +43,13 @@ struct args {
 	gboolean list_available_modules;
 };
 
+/* nested structure reflect ini file style structure */
 struct conf {
-	gchar *perf_exec_path;
-	gchar **module_paths;
+	struct {
+		gchar *perf_path;
+		gchar *username;
+		gchar **module_paths;
+	} common;
 };
 
 struct screen {
