@@ -71,9 +71,15 @@ struct project {
 /* forward declaration, see cpu-fueatures.{c,h) */
 struct cpu_features;
 
+struct screen_info {
+	gchar *pixmapdir;
+	gchar *buttondir;
+};
+
 struct ps {
 	gboolean screen_usable;
 	struct screen s;
+	struct screen_info si;
 	/* CLI args */
 	struct args args;
 	struct conf conf;
