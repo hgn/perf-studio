@@ -40,5 +40,7 @@ install:
 cscope:
 	$(Q)$(do_local_clean)
 	find . -name '*.[ch]' > cscope.files
-	cscope -b -q -k
+	cscope -b -q
 
+memcheck: all
+	G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=full --leak-resolution=high core/perf-studio

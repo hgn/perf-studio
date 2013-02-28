@@ -112,14 +112,6 @@ do_clean =						\
 clean:
 	$(Q)$(do_clean)
 
-memcheck: $(TARGET)
-	G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=full --leak-resolution=high ./$(TARGET)
-
-cscope:
-	$(RM) cscope*
-	find .. -name '*.[ch]' | cscope -b -q
-
-
 PHONY += force
 force:
 
