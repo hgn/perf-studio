@@ -37,7 +37,7 @@ Example project configuration:
 
   [common]
     exec-path = /bin/ls
-		exec-args = -al;/proc
+    exec-args = -al;/proc
 
   [times]
     create-time = 12230.101
