@@ -15,6 +15,8 @@ import tempfile
 import difflib
 import pwd
 import collections
+import re
+
 
 
 # Required packages:
@@ -39,7 +41,7 @@ __email__    = "hagen@jauu.net"
 CONFIG_HOME = os.path.join(xdg.BaseDirectory.xdg_config_home, "perf-studio")
 CONFIG_CONF = os.path.join(CONFIG_HOME, "config")
 
-CACHE_HOME   = os.path.join(xdg.BaseDirectory.xdg_cache_home, "perf-studio")
+PROJECTS_DIR   = os.path.join(xdg.BaseDirectory.xdg_cache_home, "perf-studio/projects")
 
 
 class StdinReader:
@@ -77,15 +79,15 @@ class ProjectCmd(Command):
 
     def initialize(self):
         self.parser = argparse.ArgumentParser(description='Create/modify/show perf-studio projects')
-        self.parser.add_argument('-v', '--verbose', help='Verbose output', action="store_true")
         self.parser.add_argument('-c', '--create', help='Create project', action="store_true")
         self.parser.add_argument('-l', '--list', help='List all available projects', action="store_true")
-        self.parser.add_argument('-s', '--set', help='Set projects options', action="store_true")
+        self.parser.add_argument('-e', '--edit', help='Spawn editor to edit project configuration', action="store_true")
+        self.parser.add_argument('-v', '--verbose', help='Verbose output', action="store_true")
         self.parser.add_argument('args', nargs=argparse.REMAINDER)
         self.args = self.parser.parse_args(sys.argv[2:])
         self.logger.setLevel(logging.DEBUG) if self.args.verbose else None
 
-        if not self.args.list and not self.args.create:
+        if not self.args.list and not self.args.create and not self.args.edit:
             self.parser.print_help()
             self.logger.error("")
             self.logger.error("create/list/set option missing")
@@ -93,12 +95,13 @@ class ProjectCmd(Command):
 
 
     def list_projects(self):
-        self.logger.info("Project path: {0}".format(CACHE_HOME))
+        self.logger.info("Project path: {0}".format(PROJECTS_DIR))
         self.logger.warning("Registered projects:")
+        self.logger.warning("")
         try:
-            for fn in os.listdir(CACHE_HOME):
-                if not os.path.isdir(fn):
-                    next
+            for fn in os.listdir(PROJECTS_DIR):
+                if not os.path.isdir(os.path.join(PROJECTS_DIR, fn)):
+                    continue
                 self.logger.warning("Project ID {0}".format(fn))
         except OSError:
             self.logger.warning("No project available!")
@@ -132,7 +135,7 @@ class ProjectCmd(Command):
 
     def pick_free_id(self):
         project_dirs = list()
-        for fn in os.listdir(CACHE_HOME):
+        for fn in os.listdir(PROJECTS_DIR):
             if not os.path.isdir(fn):
                 next
             project_dirs.append(fn)
@@ -150,16 +153,37 @@ class ProjectCmd(Command):
 
 
     def create_project(self):
-        self.logger.warning("Create new project in {}".format(CACHE_HOME))
-        if not os.path.exists(CACHE_HOME):
-            os.mkdir(CACHE_HOME)
+        self.logger.warning("Create new project in {}".format(PROJECTS_DIR))
+        if not os.path.exists(PROJECTS_DIR):
+            os.makedirs(PROJECTS_DIR)
+            with open(os.path.join(PROJECTS_DIR, "README"), 'w') as readme:
+                    readme.write("Here are dragons - edit with care!\n")
         pid = self.pick_free_id()
         self.logger.warning("New project ID: {}".format(pid))
-        project_path = os.path.join(CACHE_HOME, pid)
+        project_path = os.path.join(PROJECTS_DIR, pid)
         self.logger.warning("Create project path: {}".format(project_path))
         os.mkdir(project_path)
         self.create_project_conf(project_path)
         self.create_project_dir_structure(project_path)
+
+
+    def edit_project_conf(self):
+        if not self.args.args:
+            self.logger.error("--edit requires a project-id (e.g. 0001), see --list")
+            sys.exit(1)
+        for argument in self.args.args:
+            project_path      = os.path.join(PROJECTS_DIR, argument)
+            project_conf_path = os.path.join(project_path, "conf")
+            if not os.path.exists(project_path):
+                self.logger.error("Project {0} do not exist ({1})!".format(argument, project_path))
+                sys.exit(1)
+            if not os.path.exists(project_conf_path):
+                self.logger.error("Project {0} conf do not exist - strange!".format(project_conf_path))
+                sys.exit(1)
+            editor = os.environ.get('EDITOR','vi')
+            self.logger.warning("spawn editor to edit project configuration")
+            self.logger.info("{} {}".format(editor, project_conf_path))
+            subprocess.call([editor, project_conf_path])
 
 
 
@@ -169,6 +193,9 @@ class ProjectCmd(Command):
             return
         if self.args.create:
             self.create_project()
+            return
+        if self.args.edit:
+            self.edit_project_conf()
             return
 
         self.parser.print_help()
@@ -183,18 +210,20 @@ class ConfigCmd(Command):
         self.parser.add_argument('-c', '--create', help='Create configuration', action="store_true")
         self.parser.add_argument('-l', '--list', help='List current configuration', action="store_true")
         self.parser.add_argument('-a', '--add', help='Add configuration value (common.username=fooo)', action="store_true")
+        self.parser.add_argument('-e', '--edit', help='Edit user configuration', action="store_true")
         self.parser.add_argument('-v', '--verbose', help='verbose output', action="store_true")
         self.parser.add_argument('args', nargs=argparse.REMAINDER)
         self.args = self.parser.parse_args(sys.argv[2:])
         self.logger.setLevel(logging.DEBUG) if self.args.verbose else None
-        if not self.args.list and not self.args.create and not self.args.add:
+        if not self.args.list and not self.args.create and not self.args.add and not self.args.edit:
             self.parser.print_help()
             self.logger.error("")
-            self.logger.error("create/list/set option missing")
+            self.logger.error("create/list/set/edit option missing")
             sys.exit(1)
 
     def get_username(self):
-        return pwd.getpwuid(os.getuid())[4]
+        s = pwd.getpwuid(os.getuid())[4]
+        return re.sub(r'[,.:;]', '', s)
 
 
     def conf_template(self):
@@ -327,10 +356,22 @@ class ConfigCmd(Command):
             self.logger.warning("Configuration identical, no change, no write")
             self.logger.warning("Configuration file: {0}".format(CONFIG_CONF))
 
+    def edit_user_conf(self):
+        if not os.path.exists(CONFIG_CONF):
+            self.logger.error("Configuration file {0} do not exist ({1})!".format(CONFIG_CONF))
+            sys.exit(1)
+        editor = os.environ.get('EDITOR','vi')
+        self.logger.warning("Open editor to edit configuration ({})".format(CONFIG_CONF))
+        self.logger.info("{} {}".format(editor, CONFIG_CONF))
+        subprocess.call([editor, CONFIG_CONF])
+
 
     def run(self):
         if self.args.create:
             self.create_configuration()
+            return
+        if self.args.edit:
+            self.edit_user_conf()
             return
 
 
