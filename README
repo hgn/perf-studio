@@ -1,83 +1,88 @@
 Configuration
 =============
 
+Perf-studio Configuration
+-------------------------
+
+The user specific configuration is located under
+
+$HOME/.config/perf-studio/config
+
+Via "perf-studio-ctrtl config" the configuration can be created/modified/edited.
+"perf-studio-ctrtl config --edit" to pop up a editor with the file loaded.
+
+You can edit configuration values via the --add argument:
+
+perf-studio-ctrtl config --add common.username="John Doe" common.perf-path=/usr/src/linux/tools/perf
+
+
+Project Configuration
+---------------------
+
+Each perf-project is saved in $HOME/.cache/perf-studio/projects/. The unique ID
+of the project is a increasing number. Removed project directories are recycled
+if a new project is created, thus you cannot draw conclusions when a project
+was created by looking at the ID.
+
+All project related data is stored in ../ID/config - a INI style formated
+configuration file. You can edit (but SHOULD not) by hand by calling:
+
+perf-studio-ctrtl project --edit <ID>
+
+E.g: perf-studio-ctrtl project --edit 0001
+
+
+Example project configuration:
+
+
+  [common]
+    exec-path = /bin/ls
+		exec-args = -al;/proc
+
+  [times]
+    create-time = 12230.101
+    last-accessed = 12233.010
+
+
+
+
+Project Structure
+=================
+
 
 $HOME/.cache/perf-studio/projects/
-$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/
-$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/config
-$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/data/
-$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/data/refs/2012-02-11-20:20.2949   ->  ee6a975d30943d63dc6f1685248ecbc3
-$HOME/.cache/perf-studio/projects/e14a3f1f943076668b43f92/data/db/ee6a975d30943d63dc6f1685248ecbc3
+$HOME/.cache/perf-studio/projects/0001/
+$HOME/.cache/perf-studio/projects/0001/config
+$HOME/.cache/perf-studio/projects/0001/refs/2012-02-11-20:20.2949  ->  ../db/ee6a975d30943d63dc6f1685248ecbc3-000
+$HOME/.cache/perf-studio/projects/0001/db/ee6a975d30943d63dc6f1685248ecbc3-000/
+$HOME/.cache/perf-studio/projects/0001/db/ee6a975d30943d63dc6f1685248ecbc3-000/info
+$HOME/.cache/perf-studio/projects/0001/db/ee6a975d30943d63dc6f1685248ecbc3-000/perf-00001.data
+$HOME/.cache/perf-studio/projects/0001/db/ee6a975d30943d63dc6f1685248ecbc3-000/perf-00002.data
+$HOME/.cache/perf-studio/projects/0001/db/ee6a975d30943d63dc6f1685248ecbc3-000/time-00001.data
 
-$HOME/.cache/perf-studio/projects/1aad11546e420be1da58080
-
-
-
-
-Projects
-========
-
-There are two kinds of projects:
-
-- Bare Projects
-- Projects
-
-Both kinds of projects are not really visible to the user. But there are some
-special abouts. So here we go:
-
-perf-studio-ctrl project --create common.exec-path=/usr/bin/ls common.name="ff fo" common.args="ffo;dood"
-
-Bare Projects
--------------
-
-$XDG_DATA_HOME (usually $HOME/.local/share/perf-studio)
-
-Perf-Studio related data is stored in ~/.cache/perf-studio/UNIQUE-ID.
+The longer unique id the MD5 sum of the executable. This provides a clean
+way to identify if a executable was modified (re-compiled) and measurements are
+outdated. The last three digits are normally not used, but provide a way to
+re-start measurement although the file is not modified. This can be useful if
+new command-line arguments are given or the system was modified/optimized (like
+changed sysctl)
 
 
-/*  foo/bar/project-foo/.perf-studio/config  */
+The "info" file contains information about each data file. The most important:
+what data is traced in the file, the format, etc, pp. The type key is required
+and is a human readable form of the EVENT_TYPE_*, see include/perf-studio.h for
+a list of supported events.
 
-[common]
-	name=a project new
-	description = a optional description
+info:
 
-[times]
-	create-time = 12230.101
-	last-accessed = 12233.010
+  [perf-00001.data]
+    type = PERF_SAMPLING
+		events = cycles,10000,us;instructions,10000,us
 
+  [perf-00002.data]
+    type = PERF_SAMPLING
+		events = cycles,10000,us;instructions,10000,us
 
+  [time-00001.data]
+    type = TIME
 
-
-
-/*  foo/bar/project-foo/.perf-studio/refs/2012-02-11-20:20.2949  # -> 32892250358 */
-
-/*  foo/bar/project-foo/.perf-studio/db/32892250358/db */
-/*  foo/bar/project-foo/.perf-studio/db/32892250358/db/links */
-
-[cycles-10000sampling-us]
-        path = "/home/pfeifer/programm/.perf-studio/db/32892250358/perf-00001.data"
-
-[instructions-10000sampling-us]
-        path = "/home/pfeifer/programm/.perf-studio/db/32892250358/perf-00001.data"
-
-[instructions-10000sampling-us]
-        path = "/home/pfeifer/programm/.perf-studio/db/32892250358/perf-00002.data"
-
-[time]
-        path = "/home/pfeifer/programm/.perf-studio/db/32892250358/time-00001.data"
-
-
-.../.perf-studio/db/32892250358/perf-00001.data
-.../.perf-studio/db/32892250358/perf-00002.data
-
-
-// Readme
-
-pr_error() if something goes really wrong but the application
-must not be terminated. All components (core, modules) are aware
-of this kind of errors and handle the condition. But: some compnents
-may operate in a fallback mode or modules may dont start. etc. pp
-
-pr_criticial() ciritical error and the programm must abort. The
-programm may save some temporary files etc. pp. depending on the
-error path.
