@@ -96,6 +96,8 @@ static void ps_free(struct ps *ps)
 
 	if (ps->args.me)
 		g_free(ps->args.me);
+	if (ps->si.pixmapdir) g_free(ps->si.pixmapdir);
+	if (ps->si.buttondir) g_free(ps->si.buttondir);
 
 	ps_conf_free(&ps->conf);
 
@@ -105,6 +107,19 @@ static void ps_free(struct ps *ps)
 
 static int register_artwork(struct ps *ps)
 {
+	switch (ps->args.theme) {
+	case THEME_DARK:
+		ps->si.pixmapdir = g_strdup_printf("%s/%s", DATA_DIR, "pixmaps/dark/");
+		ps->si.buttondir = g_strdup_printf("%s/%s", DATA_DIR, "pixmaps/darkbuttons/16x16/");
+		break;
+	case THEME_LIGHT:
+		ps->si.pixmapdir = g_strdup_printf("%s/%s", DATA_DIR, "pixmaps/dark/");
+		ps->si.buttondir = g_strdup_printf("%s/%s", DATA_DIR, "pixmaps/darkbuttons/16x16/");
+		break;
+	default:
+		assert(0);
+	}
+
 	return 0;
 }
 
