@@ -1,0 +1,12 @@
+
+Dependencies
+============
+
+
+
+
+Installation
+============
+
+make
+su -c "make install"
