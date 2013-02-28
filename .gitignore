@@ -8,6 +8,7 @@ modules/*.so
 *.o
 *.o.*
 *.a
+*.so
 !.gitignore
 
 cscope.*
