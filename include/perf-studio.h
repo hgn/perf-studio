@@ -188,6 +188,8 @@ enum {
 	EVENT_TYPE_COUNTER = 0,
 	EVENT_TYPE_SAMPLING,
 
+	EVENT_TYPE_PERF_RECORD,
+
 	EVENT_TYPE_MAX
 };
 
@@ -209,12 +211,43 @@ struct event_sampling {
 };
 
 struct event {
-	int type;
+	guint type;
 	union {
 		struct event_sampling sampling;
 		struct event_counting counting;
 	};
 };
+
+
+/* Disector Section */
+enum disect_error {
+	DISECT_ERROR_NO_ERROR
+};
+
+
+struct disect {
+
+	/* former section of disect is filled
+	 * by caller, it provides the disector all
+	 * required information to just do the parsing
+	 */
+	guint type;
+	gchar *db_path;
+
+	/* If data parsing is done the data is stored here.
+	 * Note that data returned from specific disector */
+	enum disect_error disect_error;
+	union {
+		void *data;
+	};
+};
+
+typedef int (*disect_async_cb)(struct ps *, struct disect *disct);
+
+/* disect-core.c */
+struct disect *disect_new(void);
+void disect_free(struct ps *, struct disect *disect);
+int disect_async(struct ps *, struct disect *, disect_async_cb);
 
 #define streq(a, b) (!strcmp((a),(b)))
 # if !defined likely && !defined unlikely

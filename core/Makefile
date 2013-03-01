@@ -13,6 +13,8 @@ FILES += gui-main.c
 FILES += gui-amc.c
 FILES += gui-amn.c
 FILES += gui-apo.c
+FILES += disect-core.c
+FILES += disect-perf.c
 
 
 BASIC_CFLAGS  = $(shell pkg-config --cflags gtk+-3.0)
