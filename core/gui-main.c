@@ -32,6 +32,45 @@ out:
 	g_object_unref(provider);
 }
 
+static void setup_main_row_layout(struct ps *ps)
+{
+	ps->s.vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	gtk_container_add(GTK_CONTAINER(ps->s.main_window), ps->s.vbox);
+}
+
+
+static void setup_main_row_artwork_image(struct ps *ps)
+{
+        GtkWidget *event_box;
+
+        event_box = gtk_event_box_new();
+	gtk_widget_set_name(event_box, "header");
+	gtk_widget_set_size_request(event_box, 800, 50);
+
+        gtk_box_pack_start(GTK_BOX(ps->s.vbox), event_box, FALSE, TRUE, 0);
+        gtk_widget_show_all(event_box);
+
+}
+
+static GdkScreen* get_default_screen(void)
+{
+	return gdk_display_get_default_screen(gdk_display_get_default());
+}
+
+
+static void resize_main_window(GtkWidget *window)
+{
+	gint width, height;
+	GdkScreen*screen;
+
+	screen = get_default_screen();
+	width = gdk_screen_get_width(screen);
+	height = gdk_screen_get_height(screen);
+
+	gtk_window_resize(GTK_WINDOW(window), width * 3 / 4, height  * 3 / 4);
+}
+
+
 
 int gui_init(struct ps *ps, int ac, char **av)
 {
@@ -49,8 +88,13 @@ int gui_init(struct ps *ps, int ac, char **av)
 
 	gtk_container_set_border_width(GTK_CONTAINER(ps->s.main_window), 0);
 
+	setup_main_row_layout(ps);
+	setup_main_row_artwork_image(ps);
 
-	gtk_widget_show(ps->s.main_window);
+	resize_main_window(ps->s.main_window);
+	gtk_window_set_position(GTK_WINDOW(ps->s.main_window), GTK_WIN_POS_CENTER);
+
+	gtk_widget_show_all(ps->s.main_window);
 
 	return 0;
 }

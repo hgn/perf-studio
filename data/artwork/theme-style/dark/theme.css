@@ -1,4 +1,5 @@
 * {
+	engine: none;
   padding: 1px;
   -GtkButton-child-displacement-x: 1;
   -GtkButton-child-displacement-y: 1;
@@ -7,8 +8,6 @@
   background-color: #111111;
   color: #ffffff;
 
-  -Clearlooks-colorize-scrollbar: true;
-  -Clearlooks-style: classic;
 }
 
 *:hover {
@@ -37,7 +36,7 @@
 
 .button {
   padding: 3px;
-  background-color: shade (@bg_color, 1.04);
+  background-color: #444444;
 }
 
 .button:hover {
@@ -65,4 +64,17 @@
 #window-name .button,
 GtkWindow#window-name GtkButton.button {
   background-color: #ff0000;
+}
+
+/* 
+ * Enabled via gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(list), TRUE);
+ * see http://stackoverflow.com/questions/8946016/gtktreeview-with-css-in-gtk3
+ */
+GtkTreeView {
+	-GtkWidget-even-row-color: green;
+	color: white;
+}
+
+GtkEventBox#header {
+	background-image: url("../../pixmaps/dark/header.png");
 }
