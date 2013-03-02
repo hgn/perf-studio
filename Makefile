@@ -28,7 +28,7 @@ clean:
 	done
 	$(Q)$(do_local_clean)
 
-install:
+install: all
 	test -d $(prefix) || mkdir --parents $(prefix)
 	test -d $(prefix)/bin || mkdir --parents $(prefix)/bin
 	test -d $(prefix)/share || mkdir --parents $(prefix)/share
