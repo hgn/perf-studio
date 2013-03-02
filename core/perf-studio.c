@@ -9,13 +9,13 @@
 #include <gtk/gtk.h>
 
 #include "perf-studio.h"
-
 #include "shared.h"
 #include "modules.h"
 #include "conf-file.h"
 #include "project.h"
 #include "version.h"
 #include "random.h"
+#include "gui-main.h"
 
 
 int parse_cli_options(struct ps *ps, int ac, char **av)
@@ -105,42 +105,22 @@ static void ps_free(struct ps *ps)
 }
 
 
-static int register_artwork(struct ps *ps)
+
+static void quit_perf_studio_sig(int sig)
 {
-	int ret;
-	char image_path[PATH_MAX];
-
-	switch (ps->args.theme) {
-	case THEME_DARK:
-		ps->si.pixmapdir = g_strdup_printf("%s/%s", DATA_DIR, "artwork/pixmaps/dark/");
-		ps->si.buttondir = g_strdup_printf("%s/%s", DATA_DIR, "artwork/pixmaps/buttons/16x16/");
-		break;
-	case THEME_LIGHT:
-		ps->si.pixmapdir = g_strdup_printf("%s/%s", DATA_DIR, "artwork/pixmaps/dark/");
-		ps->si.buttondir = g_strdup_printf("%s/%s", DATA_DIR, "artwork/pixmaps/buttons/16x16/");
-		break;
-	default:
-		assert(0);
-	}
-
-	/* make a accesstest */
-	ret = snprintf(image_path, sizeof(image_path), "%s%s",  ps->si.pixmapdir, "header.png");
-	if (ret < (int)strlen("back.png")) {
-		pr_error(ps, "Cannot construct path to pixmap images");
-		return -EINVAL;
-	}
-
-	if (access(image_path, F_OK)) {
-		pr_error(ps, "Image directory seems empty: %s", ps->si.pixmapdir);
-		pr_error(ps, "Did do call \"make install\"?");
-		return -EINVAL;
-	}
-
-	pr_info(ps, "Pixmaps path: %s", ps->si.pixmapdir);
-	pr_info(ps, "Button path:  %s", ps->si.buttondir);
+	psignal(sig, "perf-studio");
+	fprintf(stderr, "signaled enforced exit received\n");
+	gtk_main_quit();
+}
 
 
-	return 0;
+static void register_signal_handler(struct ps *ps)
+{
+	signal(SIGSEGV, quit_perf_studio_sig);
+	signal(SIGFPE,  quit_perf_studio_sig);
+	signal(SIGINT,  quit_perf_studio_sig);
+	signal(SIGQUIT, quit_perf_studio_sig);
+	signal(SIGTERM, quit_perf_studio_sig);
 }
 
 
@@ -187,21 +167,16 @@ int main (int ac, char **av)
 		goto out2;
 	}
 
-	ret = register_artwork(ps);
+	ret = gui_register_artwork(ps);
 	if (ret != 0) {
 		err_msg(ps, "failed to load artwork");
 		ret = EXIT_FAILURE;
 		goto out3;
 	}
 
-	gtk_init(&ac, &av);
+	register_signal_handler(ps);
 
-	ps->s.main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-
-	/* gtk_main_quit() simple leave the main loop */
-	g_signal_connect(ps->s.main_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-
-	gtk_widget_show(ps->s.main_window);
+	gui_init(ps, ac, av);
 
 	gtk_main();
 

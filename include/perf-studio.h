@@ -74,6 +74,7 @@ struct cpu_features;
 struct screen_info {
 	gchar *pixmapdir;
 	gchar *buttondir;
+	gchar *theme_style_path;
 };
 
 struct ps {
