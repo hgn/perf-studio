@@ -34,6 +34,10 @@ pr_error_sys_die()
 
 #include "perf-studio.h"
 
+#define EXIT_INTERNAL 2
+#define EXIT_SYS_FAIL 3
+#define EXIT_COMMANDLINE 4
+
 /* error handling */
 #define err_msg(ps, format, args...) \
         do { \

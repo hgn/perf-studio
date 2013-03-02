@@ -105,22 +105,71 @@ static void ps_free(struct ps *ps)
 }
 
 
-
-static void quit_perf_studio_sig(int sig)
+static void sigterm_handler(int signal)
 {
-	psignal(sig, "perf-studio");
-	fprintf(stderr, "signaled enforced exit received\n");
+	assert(signal == SIGTERM);
+
+	fprintf(stderr, " signal (SIGTERM) enforced exit\n");
+	gtk_main_quit();
+}
+
+
+static void sigint_handler(int signal)
+{
+	assert(signal == SIGINT);
+
+	fprintf(stderr, " signal (SIGINT) enforced exit\n");
+	gtk_main_quit();
+}
+
+
+static void sigquit_handler(int signal)
+{
+	assert(signal == SIGQUIT);
+
+	fprintf(stderr, "signal (SIGQUIT) enforced exit\n");
+	gtk_main_quit();
+}
+
+
+static void sighup_handler(int signal)
+{
+	assert(signal == SIGHUP);
+
+	fprintf(stderr, "signal (SIGHUP) enforced exit\n");
 	gtk_main_quit();
 }
 
 
 static void register_signal_handler(struct ps *ps)
 {
-	signal(SIGSEGV, quit_perf_studio_sig);
-	signal(SIGFPE,  quit_perf_studio_sig);
-	signal(SIGINT,  quit_perf_studio_sig);
-	signal(SIGQUIT, quit_perf_studio_sig);
-	signal(SIGTERM, quit_perf_studio_sig);
+	int ret;
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = sigterm_handler;
+	ret = sigaction(SIGTERM, &sa, NULL);
+	if (ret)
+		err_msg_die(ps, EXIT_SYS_FAIL, "Cannot register sigterm handler");
+
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = sigquit_handler;
+	ret = sigaction(SIGQUIT, &sa, NULL);
+	if (ret)
+		err_msg_die(ps, EXIT_SYS_FAIL, "Cannot register sigquit handler");
+
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = sigint_handler;
+	ret = sigaction(SIGINT, &sa, NULL);
+	if (ret)
+		err_msg_die(ps, EXIT_SYS_FAIL, "Cannot register sigint handler");
+
+	/* send by init during system shutdown */
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = sighup_handler;
+	ret = sigaction(SIGHUP, &sa, NULL);
+	if (ret)
+		err_msg_die(ps, EXIT_SYS_FAIL, "Cannot register SIGHUP handler");
 }
 
 

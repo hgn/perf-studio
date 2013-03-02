@@ -45,7 +45,7 @@ static void setup_main_row_artwork_image(struct ps *ps)
 
         event_box = gtk_event_box_new();
 	gtk_widget_set_name(event_box, "header");
-	gtk_widget_set_size_request(event_box, 800, 50);
+	gtk_widget_set_size_request(event_box, 0, 30);
 
         gtk_box_pack_start(GTK_BOX(ps->s.vbox), event_box, FALSE, TRUE, 0);
         gtk_widget_show_all(event_box);
