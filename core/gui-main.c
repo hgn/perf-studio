@@ -98,7 +98,7 @@ static void setup_menu(struct ps *ps)
 	GtkWidget *help_report;
 
 	menubar     = gtk_menu_bar_new();
-	gtk_widget_set_name(menubar, "menubar");
+	gtk_widget_set_name(menubar, "mainmenu");
 
 	filemenu    = gtk_menu_new();
 	projectmenu = gtk_menu_new();
