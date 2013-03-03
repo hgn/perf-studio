@@ -1,3 +1,5 @@
+@define-color base_color #ffffff;
+
 * {
 	engine: none;
   padding: 1px;
@@ -8,7 +10,30 @@
   background-color: #111111;
   color: #ffffff;
 
+	font: Sans 10;
+
 }
+
+.menubar {
+  background-color: #040404;
+	border: 0px;
+}
+
+GtkMenu {
+  background-color: #555555;
+	border-color: #777777;
+	border-width: 2px;
+	border-style: solid;
+	border-radius: 5px;
+}
+
+GtkMenuItem {
+  background-color: #000000;
+	border: 0px;
+	border-radius: 4px;
+}
+
+/*
 
 *:hover {
   background-color: shade (@bg_color, 1.02);
@@ -59,12 +84,12 @@
   -Clearlooks-focus-color: shade (0.65, @selected_bg_color)
 }
 
-/* The latter selector is an specification of the first,
-   since any widget may use the same classes or names */
 #window-name .button,
 GtkWindow#window-name GtkButton.button {
   background-color: #ff0000;
 }
+
+*/
 
 /* 
  * Enabled via gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(list), TRUE);
