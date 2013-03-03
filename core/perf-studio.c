@@ -17,24 +17,35 @@
 #include "random.h"
 #include "gui-main.h"
 
+static void print_usage(void)
+{
+	printf("perf-studio [options]\n");
+	puts("Options:");
+	puts("  -v, --verbose                verbose output");
+	puts("  -t, --theme <light, dark>    select the used GUI theme");
+	puts("  -h, --help                   print this output");
+}
+
 
 int parse_cli_options(struct ps *ps, int ac, char **av)
 {
 	int c;
 
 	ps->args.me = g_strdup(av[0]);
+	/* FIXME: should be removed and get from config file */
 	ps->args.theme = THEME_DARK;
 
 	while (1) {
 		int option_index = 0;
 		static struct option long_options[] = {
 			{"theme",            1, 0, 't'},
-			{"verbose",          1, 0, 'v'},
-			{"modules",          0, 0, 'm'},
+			{"verbose",          0, 0, 'v'},
+			{"modules",          1, 0, 'm'},
+			{"help",             0, 0, 'h'},
 			{0, 0, 0, 0}
 		};
 
-		c = getopt_long(ac, av, "vm", long_options, &option_index);
+		c = getopt_long(ac, av, "vmht:", long_options, &option_index);
 		if (c == -1)
 			break;
 
@@ -51,6 +62,10 @@ int parse_cli_options(struct ps *ps, int ac, char **av)
 			break;
 		case 'm':
 			ps->args.list_available_modules = TRUE;
+			break;
+		case 'h':
+			print_usage();
+			exit(EXIT_SUCCESS);
 			break;
 		case '?':
 			break;
