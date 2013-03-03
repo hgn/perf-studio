@@ -9,10 +9,13 @@ FILES += conf-file.c
 FILES += cpu-features.c
 FILES += project.c
 FILES += random.c
+
 FILES += gui-main.c
 FILES += gui-amc.c
 FILES += gui-amn.c
 FILES += gui-apo.c
+FILES += gui-atitle.c
+
 FILES += disect-core.c
 FILES += disect-perf.c
 

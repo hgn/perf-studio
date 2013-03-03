@@ -55,6 +55,9 @@ struct conf {
 struct screen {
 	GtkWidget *main_window;
 	GtkWidget *vbox;
+	struct {
+		GtkWidget *label;
+	} atitle;
 };
 
 struct project {

@@ -4,6 +4,7 @@
 
 #include "perf-studio.h"
 #include "gui-main.h"
+#include "gui-atitle.h"
 #include "shared.h"
 
 static void init_styles(struct ps *ps)
@@ -158,7 +159,6 @@ static void setup_menu(struct ps *ps)
 }
 
 
-
 int gui_init(struct ps *ps, int ac, char **av)
 {
 	gtk_init(&ac, &av);
@@ -178,6 +178,7 @@ int gui_init(struct ps *ps, int ac, char **av)
 	setup_main_row_layout(ps);
 	setup_main_row_artwork_image(ps);
 	setup_menu(ps);
+	gui_atitle_init(ps);
 
 	resize_main_window(ps->s.main_window);
 	gtk_window_set_position(GTK_WINDOW(ps->s.main_window), GTK_WIN_POS_CENTER);
