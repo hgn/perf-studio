@@ -6,6 +6,7 @@
 #include "gui-main.h"
 #include "gui-atitle.h"
 #include "gui-amc.h"
+#include "gui-apo.h"
 #include "shared.h"
 #include "gui-toolkit.h"
 
@@ -163,7 +164,20 @@ static void setup_menu(struct ps *ps)
 
 static GtkWidget *control_module_project_panel_new(struct ps *ps)
 {
-	return gt_stub_widget(ps, "Control Module", 100, 100);
+	GtkWidget *module_project_panel;
+	GtkWidget *module_panel;
+	GtkWidget *project_overview_panel;
+
+	module_project_panel = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+
+	module_panel = gui_amc_new(ps);
+	gtk_widget_show_all(module_panel);
+	gtk_paned_pack1(GTK_PANED(module_project_panel), module_panel, TRUE, FALSE);
+
+	project_overview_panel = gui_apo_new(ps);
+	gtk_paned_pack2(GTK_PANED(module_project_panel), project_overview_panel, TRUE, TRUE);
+
+	return module_project_panel;
 }
 
 
