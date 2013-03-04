@@ -62,6 +62,17 @@ GtkMenuItem {
 	border-radius: 4px;
 }
 
+GtkFrame {
+	font-color: #ff0000;
+	border-width: 2px;
+	border-style: solid;
+	border-color: #333333;
+}
+
+GtkLabel {
+	color: #bbbbbb;
+}
+
 
 /*
 
