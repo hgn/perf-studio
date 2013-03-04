@@ -1,3 +1,7 @@
+* {
+	font: Sans 8;
+}
+
 GtkFrame > GtkLabel {
 	font: Sans 8;
 }

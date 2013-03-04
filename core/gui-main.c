@@ -209,9 +209,9 @@ int gui_init(struct ps *ps, int ac, char **av)
 {
 	gtk_init(&ac, &av);
 
+	ps->s.main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	init_styles(ps);
 
-	ps->s.main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(ps->s.main_window), "perf-studio");
 
 

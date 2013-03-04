@@ -15,8 +15,14 @@ struct system_cpu *system_cpu_new(struct ps *ps)
 {
 	(void) ps;
 
-	return g_slice_alloc0(sizeof(struct system_cpu));
+	struct system_cpu *system_cpu;
+
+	system_cpu = g_slice_alloc0(sizeof(*system_cpu));
+	system_cpu->cpu_array = g_array_new(FALSE, FALSE, sizeof(struct system_cpu_info));
+
+	return system_cpu;
 }
+
 
 void system_cpu_start(struct ps *ps, struct system_cpu *system_cpu)
 {
@@ -31,6 +37,7 @@ void system_cpu_start(struct ps *ps, struct system_cpu *system_cpu)
 		err_msg_die(ps, EXIT_FAILURE, "Cannot get SC_CLK_TCK - needs fix!");
 
 }
+
 
 void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
 		           struct system_cpu_info *system_cpu_info)
@@ -62,6 +69,9 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
 			continue;
 
 		if (sscanf (line, "cpu%d %lu %*d %lu %ld", &cpu, &user, &system, &idle) == 4) {
+
+			g_array_insert_val(system_cpu->cpu_array, cpu, cpu);
+
 			it = (idle * 1000 / system_cpu->clock_tick * 1000);	/* Idle Time in microseconds */
 			kt = (system * 1000 / system_cpu->clock_tick * 1000);	/* Kernel Time in microseconds */
 			ut = (user * 1000 / system_cpu->clock_tick * 1000);	/* User Time in microseconds */
@@ -77,5 +87,6 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
 
 void system_cpu_free(struct system_cpu *system_cpu)
 {
+	g_array_free(system_cpu->cpu_array, TRUE);
 	g_slice_free1(sizeof(struct system_cpu), system_cpu);
 }

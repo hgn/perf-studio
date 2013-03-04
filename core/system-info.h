@@ -7,6 +7,7 @@
 
 struct system_cpu {
 	struct timespec last_checkpointed;
+	GArray *cpu_array;
 	long clock_tick;
 };
 
