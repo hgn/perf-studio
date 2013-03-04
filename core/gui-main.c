@@ -35,6 +35,7 @@ out:
 	g_object_unref(provider);
 }
 
+
 static void setup_main_row_layout(struct ps *ps)
 {
 	ps->s.vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);

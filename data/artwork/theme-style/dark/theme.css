@@ -1,4 +1,4 @@
-/* @import url("gtk-widgets.css"); */
+@import url("../shared.css");
 
 @define-color base_color #ffffff;
 
@@ -63,11 +63,15 @@ GtkMenuItem {
 }
 
 GtkFrame {
-	font-color: #ff0000;
 	border-width: 2px;
 	border-style: solid;
 	border-color: #333333;
 }
+
+GtkFrame > GtkLabel {
+	color: #ff0000;
+}
+
 
 GtkLabel {
 	color: #bbbbbb;
