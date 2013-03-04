@@ -20,6 +20,8 @@ FILES += gui-statusbar.c
 FILES += disect-core.c
 FILES += disect-perf.c
 
+FILES += system-info.c
+
 
 BASIC_CFLAGS  = $(shell pkg-config --cflags gtk+-3.0)
 BASIC_CFLAGS += $(shell pkg-config --cflags libxml-2.0)
