@@ -1,4 +1,4 @@
-include ../global.mak
+include ../project.mk
 
 FILES  = canvas.c
 

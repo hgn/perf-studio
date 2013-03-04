@@ -1,4 +1,4 @@
-include ../../global.mak
+include ../../project.mk
 
 MODULE_OBJS = hello-world.o
 MODULES := $(MODULE_OBJS:.o=.so)

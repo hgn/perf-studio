@@ -1,4 +1,4 @@
-include global.mak
+include project.mk
 
 SUBDIRS  = gui-toolkit
 SUBDIRS += modules/hello-world
