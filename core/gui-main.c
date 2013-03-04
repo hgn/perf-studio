@@ -173,7 +173,7 @@ static GtkWidget *control_module_project_panel_new(struct ps *ps)
 
 	module_project_panel = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 
-	module_panel = gui_amc_new(ps);
+	module_panel = gui_amn_new(ps);
 	gtk_widget_show_all(module_panel);
 	gtk_paned_pack1(GTK_PANED(module_project_panel), module_panel, TRUE, FALSE);
 
