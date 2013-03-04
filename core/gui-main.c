@@ -5,7 +5,9 @@
 #include "perf-studio.h"
 #include "gui-main.h"
 #include "gui-atitle.h"
+#include "gui-amc.h"
 #include "shared.h"
+#include "gui-toolkit.h"
 
 static void init_styles(struct ps *ps)
 {
@@ -158,6 +160,32 @@ static void setup_menu(struct ps *ps)
 	return;
 }
 
+static GtkWidget *control_module_project_panel_new(struct ps *ps)
+{
+	return gt_stub_widget(ps, "Control Module", 100, 100);
+}
+
+
+static void gui_main_content_pane_init(struct ps *ps)
+{
+	GtkWidget *main_panel;
+	GtkWidget *upper_control_module_project_panel;
+	GtkWidget *lower_module_panel;
+
+	main_panel = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+
+	upper_control_module_project_panel = control_module_project_panel_new(ps);
+	gtk_widget_show_all(upper_control_module_project_panel);
+	gtk_paned_pack1(GTK_PANED(main_panel), upper_control_module_project_panel, TRUE, FALSE);
+
+	lower_module_panel = gui_amc_new(ps);
+	gtk_paned_pack2(GTK_PANED(main_panel), lower_module_panel, TRUE, TRUE);
+
+
+	gtk_box_pack_start(GTK_BOX(ps->s.vbox), main_panel, TRUE, TRUE, 0);
+	gtk_widget_show_all(main_panel);
+}
+
 
 int gui_init(struct ps *ps, int ac, char **av)
 {
@@ -175,10 +203,21 @@ int gui_init(struct ps *ps, int ac, char **av)
 
 	gtk_container_set_border_width(GTK_CONTAINER(ps->s.main_window), 0);
 
+	/* main layout */
 	setup_main_row_layout(ps);
+
+	/* first row: upper image */
 	setup_main_row_artwork_image(ps);
+
+	/* next row: main menubar */
 	setup_menu(ps);
+
+	/* next row: project title on the right */
 	gui_atitle_init(ps);
+
+	/* next row main widget where all content widgets are stored */
+	gui_main_content_pane_init(ps);
+
 
 	resize_main_window(ps->s.main_window);
 	gtk_window_set_position(GTK_WINDOW(ps->s.main_window), GTK_WIN_POS_CENTER);

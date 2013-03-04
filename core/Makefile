@@ -30,6 +30,7 @@ EXTLIBS += $(shell pkg-config --libs dbus-1)
 EXTLIBS += -lpthread
 EXTLIBS += -lm
 EXTLIBS += -ldl
+EXTLIBS += ../gui-toolkit/gui-toolkit.a
 
 WARNINGS = -Wall \
 					 -Wextra \
@@ -61,6 +62,7 @@ override CFLAGS += -D_FILE_OFFSET_BITS=64
 override CFLAGS += -D_GNU_SOURCE
 override CFLAGS += $(WARNINGS)
 override CFLAGS += -I../include
+override CFLAGS += -I../gui-toolkit
 override CFLAGS += $(BASIC_CFLAGS)
 override CFLAGS += $(MODULE_DIR)
 override CFLAGS += $(DATA_DIR)
