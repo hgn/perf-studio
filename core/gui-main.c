@@ -3,12 +3,15 @@
 #include <string.h>
 
 #include "perf-studio.h"
+#include "shared.h"
+
 #include "gui-main.h"
 #include "gui-atitle.h"
 #include "gui-amc.h"
 #include "gui-apo.h"
-#include "shared.h"
+#include "gui-statusbar.h"
 #include "gui-toolkit.h"
+
 
 static void init_styles(struct ps *ps)
 {
@@ -232,6 +235,9 @@ int gui_init(struct ps *ps, int ac, char **av)
 
 	/* next row main widget where all content widgets are stored */
 	gui_main_content_pane_init(ps);
+
+	/* finally at a statusbar at the bottom of the window */
+	gui_statusbar_init(ps);
 
 
 	resize_main_window(ps->s.main_window);

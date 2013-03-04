@@ -15,6 +15,7 @@ FILES += gui-amc.c
 FILES += gui-amn.c
 FILES += gui-apo.c
 FILES += gui-atitle.c
+FILES += gui-statusbar.c
 
 FILES += disect-core.c
 FILES += disect-perf.c

@@ -58,6 +58,7 @@ struct screen {
 	struct {
 		GtkWidget *label;
 	} atitle;
+	GtkWidget *statusbar;
 };
 
 struct project {

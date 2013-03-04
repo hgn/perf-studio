@@ -1,4 +1,8 @@
 GtkFrame > GtkLabel {
-	font: Sans 6;
+	font: Sans 8;
+}
+
+GtkStatusbar > GtkLabel {
+	font: Sans 3;
 }
 
