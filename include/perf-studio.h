@@ -82,6 +82,7 @@ struct cpu_features;
 enum {
 	FG_COLOR = 0,
 	BG_COLOR,
+	BG_COLOR_DARKER,
 
 	COLOR_MAX
 };

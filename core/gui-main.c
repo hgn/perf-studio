@@ -259,11 +259,13 @@ static void colors_init(struct ps *ps)
 	switch (ps->args.theme) {
 	case THEME_DARK:
 		gdk_rgba_parse(&ps->si.color[FG_COLOR], "#eeeeee");
-		gdk_rgba_parse(&ps->si.color[BG_COLOR], "#111111");
+		gdk_rgba_parse(&ps->si.color[BG_COLOR], "#262626");
+		gdk_rgba_parse(&ps->si.color[BG_COLOR_DARKER], "#161616");
 		break;
 	case THEME_LIGHT:
 		gdk_rgba_parse(&ps->si.color[FG_COLOR], "#111111");
 		gdk_rgba_parse(&ps->si.color[BG_COLOR], "#eeeeee");
+		gdk_rgba_parse(&ps->si.color[BG_COLOR_DARKER], "#bbbbbb");
 		break;
 	}
 }

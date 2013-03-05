@@ -17,24 +17,71 @@
 
 
 #define TOP_SPACE 20
+#define MARGIN_LEFT 40
 
 
-static void draw_towers(struct ps *ps, cairo_t *cr, struct system_cpu *system_cpu)
+static void draw_towers(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct system_cpu *system_cpu)
 {
 	GSList *tmp;
-	int pos_x;
+	int pos_x, y_offset;
 
 	(void)ps;
 
-	pos_x = 20;
+	pos_x = MARGIN_LEFT;
 
 	cairo_set_line_width(cr, 0);
+
+	int max_width = SYSTEM_CPU_NO_CPUS(system_cpu);
+	max_width *= (CPU_USAGE_TOWER_WIDTH + CPU_USAGE_TOWER_MARGIN);
+	max_width += CPU_USAGE_TOWER_WIDTH + 7 + MARGIN_LEFT;
+
+	gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR_DARKER]);
+	cairo_rectangle(cr, 0, 0, max_width, 135);
+	cairo_fill(cr);
+
+	cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
+	cairo_set_line_width(cr, 1);
+
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
+	cairo_move_to(cr, MARGIN_LEFT - 10, TOP_SPACE);
+	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + CPU_USAGE_TOWER_HEIGHT);
+	cairo_stroke(cr);
+
+	/* 100 % */
+	cairo_set_source_rgb(cr, 0.2, 0.2, 0.2);
+	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE);
+	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE);
+	cairo_stroke(cr);
+
+	/* 75 % */
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
+	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.25));
+	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.25));
+	cairo_stroke(cr);
+
+	/* 50 % */
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
+	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.50));
+	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.50));
+	cairo_stroke(cr);
+
+	/* 25 % */
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
+	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.75));
+	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.75));
+	cairo_stroke(cr);
+
+	/* 0 % */
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
+	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE + CPU_USAGE_TOWER_HEIGHT);
+	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + CPU_USAGE_TOWER_HEIGHT);
+	cairo_stroke(cr);
 
 
 	tmp = system_cpu->cpu_data_list;
 	while (tmp) {
 		PangoLayout *layout;
-		float system_user_time, y_offset, height;
+		float system_user_time, height;
 		struct cpu_data *cpu_data;
 		char buf[8];
 
@@ -75,6 +122,8 @@ static void draw_towers(struct ps *ps, cairo_t *cr, struct system_cpu *system_cp
 		pos_x += CPU_USAGE_TOWER_WIDTH + CPU_USAGE_TOWER_MARGIN;
 		tmp = g_slist_next(tmp);
 	}
+
+	gtk_widget_set_size_request(widget, pos_x + CPU_USAGE_TOWER_WIDTH + 7, 135);
 }
 
 
@@ -98,7 +147,7 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 
 	cr = gdk_cairo_create(gtk_widget_get_window(widget));
 
-	draw_towers(ps, cr, system_cpu);
+	draw_towers(ps, widget, cr, system_cpu);
 
 	cairo_destroy(cr);
 

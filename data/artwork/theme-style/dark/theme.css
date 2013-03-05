@@ -6,6 +6,7 @@
 
 /* default color scheme */
 @define-color bg_color #262626;
+@define-color bg_color_darker #161616;
 @define-color bg_header_color #343131;
 @define-color fg_color #222222;
 @define-color base_color #ffffff;
@@ -82,7 +83,7 @@ GtkLabel {
 }
 
 GtkNotebook {
-	background-color: darker(@bg_color);
+	background-color: @bg_color_darker;
 	-GtkWidget-focus-line-width: 0;
   color: @standard_font_color;
 	border-width: 2px;
