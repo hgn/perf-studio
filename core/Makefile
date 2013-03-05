@@ -51,7 +51,6 @@ WARNINGS = -Wall \
 					 -Winit-self \
 					 -Wredundant-decls \
 					 -Wstrict-aliasing=3 \
-					 -Wswitch-default \
 					 -Wswitch-enum \
 					 -Wno-system-headers \
 					 -Wundef \
