@@ -56,6 +56,9 @@ int load_user_conf_file(struct ps *ps)
 		iter++;
 	}
 
+	/* FIXME: needs parsing */
+	ps->conf.ui.statusbar_enabled = FALSE;
+
 out:
 	g_free(full_path);
 	g_key_file_free(keyfile);

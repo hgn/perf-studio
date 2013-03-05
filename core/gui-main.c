@@ -237,7 +237,9 @@ int gui_init(struct ps *ps, int ac, char **av)
 	gui_main_content_pane_init(ps);
 
 	/* finally at a statusbar at the bottom of the window */
-	gui_statusbar_init(ps);
+	if (ps->conf.ui.statusbar_enabled) {
+		gui_statusbar_init(ps);
+	}
 
 
 	resize_main_window(ps->s.main_window);

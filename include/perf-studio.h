@@ -50,6 +50,9 @@ struct conf {
 		gchar *username;
 		gchar **module_paths;
 	} common;
+	struct {
+		gboolean statusbar_enabled;
+	} ui;
 };
 
 struct screen {

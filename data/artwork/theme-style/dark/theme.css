@@ -2,10 +2,11 @@
 
 @define-color base_color #ffffff;
 
-@define-color standard_font_color #eeeeee;
+@define-color standard_font_color #cccccc;
 
 /* default color scheme */
-@define-color bg_color #111111;
+@define-color bg_color #262626;
+@define-color bg_header_color #343131;
 @define-color fg_color #222222;
 @define-color base_color #ffffff;
 @define-color text_color #3C3C3C;
@@ -37,20 +38,21 @@
 * {
 	engine: none;
   padding: 1px;
-  background-color: #111111;
+  background-color: @bg_color;
   color: #eeeeee;
 	border-width: 2px;
 	border-color: #440000;
 }
 
 #mainmenu {
+  background-color: darker(@bg_color);
 	border: 0px;
 	color: blue;
 	font-weight:bold;
 }
 
 GtkMenu {
-  background-color: #555555;
+  background-color: @bg_header_color;
 	border-color: #777777;
 	border-width: 2px;
 	border-style: solid;
@@ -80,22 +82,25 @@ GtkLabel {
 }
 
 GtkNotebook {
-	background-color: @bg_color;
+	background-color: darker(@bg_color);
 	-GtkWidget-focus-line-width: 0;
   color: @standard_font_color;
 	border-width: 2px;
-	border-radius: 4px;
-	border-color: #222222;
+	border-radius: 8px;
+	border-color: #111111;
+	font-weight:bold;
+	font: Sans 8;
 }
 
 GtkNotebook tab GtkLabel {
+	padding: 3px 20px 3px 20px;
 	background-color: #ff0000;
+	color: @standard_font_color;
+	font-weight:bold;
+	font: Sans 10;
 }
 
-GtkNotebook tab GtkLabel {
-	color: @standard_font_color;
-	padding: 0px 20px 0px 20px;
-}
+
 
 
 

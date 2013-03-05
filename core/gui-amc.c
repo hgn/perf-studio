@@ -15,18 +15,20 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 {
 	cairo_t *cr;
 	guint width, height;
-	GdkRGBA color, color2;
+	struct ps *ps;
 
-	gdk_rgba_parse(&color, "#000000");
-	gdk_rgba_parse(&color2, "#222222");
+	ps = g_object_get_data(G_OBJECT(widget), "ps");
+	assert(ps);
 
-	width = gtk_widget_get_allocated_width (widget);
-	height = gtk_widget_get_allocated_height (widget);
+	//gtk_widget_set_size_request(widget, CPU_USAGE_WIDTH_MAX, rand() % 400);
+
+	width = gtk_widget_get_allocated_width(widget);
+	height = gtk_widget_get_allocated_height(widget);
 
 	cr = gdk_cairo_create(gtk_widget_get_window(widget));
-	gdk_cairo_set_source_rgba(cr, &color2);
+	gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR]);
 	cairo_paint(cr);
-	gdk_cairo_set_source_rgba(cr, &color);
+	gdk_cairo_set_source_rgba(cr, &ps->si.color[FG_COLOR]);
 	cairo_set_line_width(cr, 2);
 	cairo_rectangle(cr, 0, 0, width - 10, height - 10);
 	cairo_stroke(cr);
