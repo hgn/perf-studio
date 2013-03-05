@@ -55,6 +55,10 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu)
 	long unsigned int user, system, idle;
 	GSList *tmp;
 
+	/* FIXME: do not open the file every time,
+	 * just seek(0) and close at system_cpu_free()
+	 * time
+	 */
 	fp = fopen("/proc/stat", "r");
 	if (fp == NULL) {
 		err_msg_die(ps, EXIT_FAILURE, "Cannot open /proc/stat - urrghl!");
