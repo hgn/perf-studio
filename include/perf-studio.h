@@ -303,10 +303,10 @@ int disect_async(struct ps *, struct disect *, disect_async_cb);
 #endif
 
 #define min(x,y) ({             \
-        typeof(x) _x = (x);     \
-        typeof(y) _y = (y);     \
-        (void) (&_x == &_y);    \
-        _x < _y ? _x : _y; })
+        typeof(x) _i = (x);     \
+        typeof(y) _j = (y);     \
+        (void) (&_i == &_j);    \
+        _i < _j ? _i : _j; })
 
 #define max(x,y) ({             \
         typeof(x) _x = (x);     \

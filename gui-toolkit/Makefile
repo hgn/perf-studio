@@ -2,6 +2,7 @@ include ../project.mk
 
 FILES  = canvas.c
 FILES += configuration.c
+FILES += font.c
 
 BASIC_CFLAGS  = $(shell pkg-config --cflags gtk+-3.0)
 

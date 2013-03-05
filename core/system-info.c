@@ -44,8 +44,7 @@ struct system_cpu *system_cpu_new(struct ps *ps)
 }
 
 
-void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
-		           struct system_cpu_info *system_cpu_info)
+void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu)
 {
 	FILE *fp;
 	char *line = NULL;
@@ -55,8 +54,6 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
 	long int cpu;
 	long unsigned int user, system, idle;
 	GSList *tmp;
-
-	assert(system_cpu_info);
 
 	fp = fopen("/proc/stat", "r");
 	if (fp == NULL) {
@@ -86,14 +83,18 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
 			assert(cpu_data->cpu_no == cpu);
 
 			it = (idle - cpu_data->idle_time_last);
-			kt = (system - cpu_data->kernel_time_last);
+			kt = (system - cpu_data->system_time_last);
 			ut = (user - cpu_data->user_time_last);
 
-			fprintf(stderr, "CPU:%4ld %4ld %4ld %4ld (clock tick: %ld)\n",
-					cpu, it, kt, ut, system_cpu->clock_tick);
+			//fprintf(stderr, "CPU:%4ld %4ld %4ld %4ld (clock tick: %ld)\n",
+			//		cpu, it, kt, ut, system_cpu->clock_tick);
+
+			cpu_data->idle_time_percent   = min(max(0.0f, (float)it), 100.0f);
+			cpu_data->system_time_percent = min(max(0.0f, (float)kt), 100.0f);
+			cpu_data->user_time_percent   = min(max(0.0f, (float)ut), 100.0f);
 
 			cpu_data->idle_time_last   = idle;
-			cpu_data->kernel_time_last = system;
+			cpu_data->system_time_last = system;
 			cpu_data->user_time_last   = user;
 		}
 
