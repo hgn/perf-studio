@@ -249,6 +249,23 @@ int gui_init(struct ps *ps, int ac, char **av)
 }
 
 
+static int colors_init(struct ps *ps)
+{
+	pr_info(ps, "Initialize color subsystem");
+
+	switch (ps->args.theme) {
+	case THEME_DARK:
+		gdk_rgba_parse(&ps->si.color[FG_COLOR], "#eeeeee");
+		gdk_rgba_parse(&ps->si.color[BG_COLOR], "#111111");
+		break;
+	case THEME_LIGHT:
+		gdk_rgba_parse(&ps->si.color[FG_COLOR], "#111111");
+		gdk_rgba_parse(&ps->si.color[BG_COLOR], "#eeeeee");
+		break;
+	}
+}
+
+
 int gui_register_artwork(struct ps *ps)
 {
 	int ret;
@@ -292,6 +309,7 @@ int gui_register_artwork(struct ps *ps)
 	pr_info(ps, "Button path:  %s", ps->si.buttondir);
 	pr_info(ps, "Theme path:   %s", ps->si.theme_style_path);
 
+	colors_init(ps);
 
 	return 0;
 }

@@ -76,10 +76,18 @@ struct project {
 /* forward declaration, see cpu-fueatures.{c,h) */
 struct cpu_features;
 
+enum {
+	FG_COLOR = 0,
+	BG_COLOR,
+
+	COLOR_MAX
+};
+
 struct screen_info {
 	gchar *pixmapdir;
 	gchar *buttondir;
 	gchar *theme_style_path;
+	GdkRGBA color[COLOR_MAX];
 };
 
 struct ps {
