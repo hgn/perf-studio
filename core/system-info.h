@@ -6,7 +6,7 @@
 #include "perf-studio.h"
 
 struct cpu_data {
-	guint cpu;
+	guint cpu_no;
 	unsigned long idle_time_last;
 	unsigned long kernel_time_last;
 	unsigned long user_time_last;
@@ -14,6 +14,7 @@ struct cpu_data {
 
 struct system_cpu {
 	struct timespec last_checkpointed;
+	/* index in list is number of cpu */
 	GSList *cpu_data_list;
 	long clock_tick;
 };

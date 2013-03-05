@@ -13,19 +13,11 @@
 
 struct system_cpu *system_cpu_new(struct ps *ps)
 {
+	int ret;
+	long no_cpus, i;
 	struct system_cpu *system_cpu;
 
-	(void) ps;
-
 	system_cpu = g_slice_alloc0(sizeof(*system_cpu));
-
-	return system_cpu;
-}
-
-
-void system_cpu_start(struct ps *ps, struct system_cpu *system_cpu)
-{
-	int ret;
 
 	ret = clock_gettime(CLOCK_REALTIME, &system_cpu->last_checkpointed);
 	if (ret != 0)
@@ -35,6 +27,20 @@ void system_cpu_start(struct ps *ps, struct system_cpu *system_cpu)
 	if (system_cpu->clock_tick < 0)
 		err_msg_die(ps, EXIT_FAILURE, "Cannot get SC_CLK_TCK - needs fix!");
 
+	no_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+	if (no_cpus < 1) {
+		err_msg_die(ps, EXIT_FAILURE, "Cannot determine number of CPUs");
+	}
+
+	for (i = 0; i < no_cpus; i++) {
+		struct cpu_data *cpu_data;
+
+		cpu_data = g_malloc0(sizeof(*cpu_data));
+		cpu_data->cpu_no = i;
+		system_cpu->cpu_data_list = g_slist_append(system_cpu->cpu_data_list, cpu_data);
+	}
+
+	return system_cpu;
 }
 
 
@@ -45,8 +51,10 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
-	int it, kt, ut, cpu;
+	long unsigned it, kt, ut;
+	long int cpu;
 	long unsigned int user, system, idle;
+	GSList *tmp;
 
 	assert(system_cpu_info);
 
@@ -55,6 +63,9 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
 		err_msg_die(ps, EXIT_FAILURE, "Cannot open /proc/stat - urrghl!");
 	}
 
+
+
+	tmp = system_cpu->cpu_data_list;
 	while ((read = getline(&line, &len, fp)) != -1) {
 		line[read - 1] = '\0';
 
@@ -67,14 +78,26 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu,
 		if (!isdigit(line[3]))
 			continue;
 
-		if (sscanf (line, "cpu%d %lu %*d %lu %ld", &cpu, &user, &system, &idle) == 4) {
+		if (sscanf (line, "cpu%lu %lu %*d %lu %lu", &cpu, &user, &system, &idle) == 4) {
+			struct cpu_data *cpu_data;
 
-			it = (idle * 1000 / system_cpu->clock_tick * 1000);	/* Idle Time in microseconds */
-			kt = (system * 1000 / system_cpu->clock_tick * 1000);	/* Kernel Time in microseconds */
-			ut = (user * 1000 / system_cpu->clock_tick * 1000);	/* User Time in microseconds */
-			fprintf(stderr, "\"%s\"\n", line);
-			fprintf(stderr, "CPU:%d %d %d %d \n", cpu, it, kt, ut);
+			assert(tmp && tmp->data);
+			cpu_data = tmp->data;
+			assert(cpu_data->cpu_no == cpu);
+
+			it = (idle - cpu_data->idle_time_last);
+			kt = (system - cpu_data->kernel_time_last);
+			ut = (user - cpu_data->user_time_last);
+
+			fprintf(stderr, "CPU:%4ld %4ld %4ld %4ld (clock tick: %ld)\n",
+					cpu, it, kt, ut, system_cpu->clock_tick);
+
+			cpu_data->idle_time_last   = idle;
+			cpu_data->kernel_time_last = system;
+			cpu_data->user_time_last   = user;
 		}
+
+		tmp = g_slist_next(tmp);
 	}
 
 	free(line);

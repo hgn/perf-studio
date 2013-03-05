@@ -87,7 +87,6 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 	gtk_widget_set_size_request(darea, CPU_USAGE_WIDTH_MAX, CPU_USAGE_HEIGHT_MAX);
 
 	system_cpu = system_cpu_new(ps);
-	system_cpu_start(ps, system_cpu);
 
 	g_signal_connect(darea, "draw", G_CALLBACK(draw_cb), NULL);
 	g_signal_connect(darea, "configure-event", G_CALLBACK(configure_cb), NULL);
