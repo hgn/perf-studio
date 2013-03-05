@@ -318,4 +318,27 @@ int disect_async(struct ps *, struct disect *, disect_async_cb);
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 #define BITSIZEOF(x)  (CHAR_BIT * sizeof(x))
 
+#define UNUSED_PARAM __attribute__ ((__unused__))
+#define NORETURN __attribute__ ((__noreturn__))
+#define PACKED __attribute__ ((__packed__))
+#define ALIGNED(m) __attribute__ ((__aligned__(m)))
+
+#if __GNUC_PREREQ(3,0) && !defined(__NO_INLINE__)
+# define ALWAYS_INLINE __attribute__ ((always_inline)) inline
+# define NOINLINE      __attribute__((__noinline__))
+# if !ENABLE_WERROR
+#  define DEPRECATED __attribute__ ((__deprecated__))
+#  define UNUSED_PARAM_RESULT __attribute__ ((warn_unused_result))
+# else
+#  define DEPRECATED /* n/a */
+#  define UNUSED_PARAM_RESULT /* n/a */
+# endif
+#else
+# define ALWAYS_INLINE inline /* n/a */
+# define NOINLINE /* n/a */
+# define DEPRECATED /* n/a */
+# define UNUSED_PARAM_RESULT /* n/a */
+#endif
+
+
 #endif

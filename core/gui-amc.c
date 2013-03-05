@@ -24,6 +24,8 @@ static void draw_towers(struct ps *ps, cairo_t *cr, struct system_cpu *system_cp
 	GSList *tmp;
 	int pos_x;
 
+	(void)ps;
+
 	pos_x = 20;
 
 	cairo_set_line_width(cr, 0);
@@ -31,6 +33,8 @@ static void draw_towers(struct ps *ps, cairo_t *cr, struct system_cpu *system_cp
 
 	tmp = system_cpu->cpu_data_list;
 	while (tmp) {
+		PangoLayout *layout;
+		float system_user_time, y_offset, height;
 		struct cpu_data *cpu_data;
 		char buf[8];
 
@@ -42,27 +46,27 @@ static void draw_towers(struct ps *ps, cairo_t *cr, struct system_cpu *system_cp
 
 		/* draw data charts */
 		//gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR]);
-		float system_user_time = min(100.0f, cpu_data->system_time_percent +
+		system_user_time = min(100.0f, cpu_data->system_time_percent +
 				             cpu_data->user_time_percent);
-		int y_offset = TOP_SPACE + (100);
-		int height   = -system_user_time;
+		y_offset = TOP_SPACE + (100);
+		height   = -system_user_time;
 		cairo_set_source_rgb(cr, 0.122, 0.584, 0.714);
 		cairo_rectangle(cr, pos_x, y_offset, CPU_USAGE_TOWER_WIDTH, height);
 		cairo_fill(cr);
 
-		cairo_save (cr);
+		cairo_save(cr);
 		cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
-		PangoLayout *layout = create_pango_layout(cr);
+		layout = create_pango_layout(cr);
 		cairo_set_line_width(cr, 0);
 		sprintf(buf, "CPU%d", cpu_data->cpu_no);
 
 		pango_layout_set_text(layout, buf, -1);
 		pango_cairo_update_layout(cr, layout);
 
-		cairo_move_to (cr, pos_x - 5, 125);
-		pango_cairo_show_layout (cr, layout);
+		cairo_move_to(cr, pos_x - 5, 125);
+		pango_cairo_show_layout(cr, layout);
 
-		g_object_unref (layout);
+		g_object_unref(layout);
 
 		cairo_stroke_preserve(cr);
 		cairo_restore(cr);
@@ -77,10 +81,10 @@ static void draw_towers(struct ps *ps, cairo_t *cr, struct system_cpu *system_cp
 static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 {
 	cairo_t *cr;
-	guint width, height;
 	struct ps *ps;
 	struct system_cpu *system_cpu;
-	int i;
+
+	(void) event;
 
 	ps = g_object_get_data(G_OBJECT(widget), "ps");
 	assert(ps);
@@ -89,9 +93,8 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 
 
 	//gtk_widget_set_size_request(widget, CPU_USAGE_WIDTH_MAX, rand() % 400);
-
-	width = gtk_widget_get_allocated_width(widget);
-	height = gtk_widget_get_allocated_height(widget);
+	//width = gtk_widget_get_allocated_width(widget);
+	//height = gtk_widget_get_allocated_height(widget);
 
 	cr = gdk_cairo_create(gtk_widget_get_window(widget));
 
@@ -106,6 +109,10 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 static gboolean configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
 	fprintf(stderr, "configure called\n");
+
+	(void)widget;
+	(void)event;
+	(void)data;
 
 	return FALSE;
 }

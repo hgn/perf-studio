@@ -8,6 +8,7 @@
 #include "gui-main.h"
 #include "gui-atitle.h"
 #include "gui-amc.h"
+#include "gui-amn.h"
 #include "gui-apo.h"
 #include "gui-statusbar.h"
 #include "gui-toolkit.h"
@@ -251,7 +252,7 @@ int gui_init(struct ps *ps, int ac, char **av)
 }
 
 
-static int colors_init(struct ps *ps)
+static void colors_init(struct ps *ps)
 {
 	pr_info(ps, "Initialize color subsystem");
 
