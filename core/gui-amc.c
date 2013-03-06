@@ -7,103 +7,141 @@
 #include "system-info.h"
 
 #define CPU_USAGE_REFRESH 1000
-#define CPU_USAGE_WIDTH_MAX 600
-#define CPU_USAGE_HEIGHT_MAX 250
+
+#define CPU_USAGE_CHART_WIDTH 30
+#define CPU_USAGE_CHART_HEIGHT 250
+#define CPU_USAGE_CHART_INNER_GAP 4
+#define CPU_USAGE_CHART_GAP 10
+#define CPU_USAGE_MARGIN_TOP 20
+#define CPU_USAGE_MARING_LEFT 30
+#define CPU_USAGE_CPU_LABEL_HEIGHT 40
+#define CPU_USAGE_AXIS_MARGIN 5
+#define CPU_USAGE_AXIS_LINE_LENGTH 4
+#define CPU_USAGE_AXIS_DESC_WIDTH 50
+
+#define CPU_USAGE_CHART_AXIS_HEIGHT(x) (CPU_USAGE_MARGIN_TOP + (CPU_USAGE_CHART_HEIGHT * x))
+#define CPU_USAGE_CHART_AXIS_HEIGHT_100 CPU_USAGE_MARGIN_TOP
+#define CPU_USAGE_CHART_AXIS_HEIGHT_75  CPU_USAGE_CHART_AXIS_HEIGHT(0.25f)
+#define CPU_USAGE_CHART_AXIS_HEIGHT_50  CPU_USAGE_CHART_AXIS_HEIGHT(0.50f)
+#define CPU_USAGE_CHART_AXIS_HEIGHT_25  CPU_USAGE_CHART_AXIS_HEIGHT(0.75f)
+#define CPU_USAGE_CHART_AXIS_HEIGHT_0   (CPU_USAGE_MARGIN_TOP + CPU_USAGE_CHART_HEIGHT)
 
 
-#define CPU_USAGE_TOWER_HEIGHT 100
-#define CPU_USAGE_TOWER_WIDTH 30
-#define CPU_USAGE_TOWER_MARGIN 10
+#define CPU_USAGE_SYS_USER_USAGE_GAP 40
+
+#define SYS_USER_USAGE_CHART_WIDTH 30
+#define SYS_USER_USAGE_CHART_HEIGHT 200
+#define SYS_USER_USAGE_CHART_INNER_GAG 2
+#define SYS_USER_USAGE_MARGIN_TOP 20
 
 
-#define TOP_SPACE 20
-#define MARGIN_LEFT 40
-
-
-static void draw_towers(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct system_cpu *system_cpu)
+static void draw_cpu_usage_background(struct ps *ps, GtkWidget *widget, cairo_t *cr)
 {
-	GSList *tmp;
-	int pos_x, y_offset;
+	int width, height;
 
-	(void)ps;
-
-	pos_x = MARGIN_LEFT;
-
-	cairo_set_line_width(cr, 0);
-
-	int max_width = SYSTEM_CPU_NO_CPUS(system_cpu);
-	max_width *= (CPU_USAGE_TOWER_WIDTH + CPU_USAGE_TOWER_MARGIN);
-	max_width += CPU_USAGE_TOWER_WIDTH + 7 + MARGIN_LEFT;
-
-	int width = gtk_widget_get_allocated_width(widget);
-	int height = gtk_widget_get_allocated_height(widget);
+	width = gtk_widget_get_allocated_width(widget);
+	height = gtk_widget_get_allocated_height(widget);
 
 	gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR_DARKER]);
 	cairo_rectangle(cr, 0, 0, width, height);
 	cairo_fill(cr);
+}
 
+
+static void draw_cpu_usage_axis(cairo_t *cr, int x_position)
+{
+	int axis_x_start;
+	int axis_x_end;
+
+	axis_x_start = x_position + CPU_USAGE_AXIS_MARGIN;
+	axis_x_end = axis_x_start + CPU_USAGE_AXIS_LINE_LENGTH;
+
+	/* draw axis */
 	cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
 	cairo_set_line_width(cr, 1);
-
-	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
-	cairo_move_to(cr, MARGIN_LEFT - 10, TOP_SPACE);
-	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + CPU_USAGE_TOWER_HEIGHT);
+	cairo_set_source_rgb(cr, 0.25, 0.25, 0.25);
+	cairo_move_to(cr, axis_x_start, CPU_USAGE_MARGIN_TOP);
+	cairo_line_to(cr, axis_x_start, CPU_USAGE_MARGIN_TOP + CPU_USAGE_CHART_HEIGHT);
 	cairo_stroke(cr);
 
 	/* 100 % */
-	cairo_set_source_rgb(cr, 0.2, 0.2, 0.2);
-	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE);
-	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE);
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
+	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_100 + 1);
+	cairo_line_to(cr, axis_x_end, CPU_USAGE_CHART_AXIS_HEIGHT_100 + 1);
 	cairo_stroke(cr);
 
 	/* 75 % */
 	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
-	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.25));
-	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.25));
+	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_75);
+	cairo_line_to(cr, axis_x_end,   CPU_USAGE_CHART_AXIS_HEIGHT_75);
 	cairo_stroke(cr);
 
 	/* 50 % */
 	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
-	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.50));
-	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.50));
+	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_50);
+	cairo_line_to(cr, axis_x_end,   CPU_USAGE_CHART_AXIS_HEIGHT_50);
 	cairo_stroke(cr);
 
 	/* 25 % */
 	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
-	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.75));
-	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + (CPU_USAGE_TOWER_HEIGHT * 0.75));
+	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_25);
+	cairo_line_to(cr, axis_x_end,   CPU_USAGE_CHART_AXIS_HEIGHT_25);
 	cairo_stroke(cr);
 
 	/* 0 % */
 	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
-	cairo_move_to(cr, MARGIN_LEFT - 10 - 4, TOP_SPACE + CPU_USAGE_TOWER_HEIGHT);
-	cairo_line_to(cr, MARGIN_LEFT - 10, TOP_SPACE + CPU_USAGE_TOWER_HEIGHT);
+	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_0);
+	cairo_line_to(cr, axis_x_end,   CPU_USAGE_CHART_AXIS_HEIGHT_0);
 	cairo_stroke(cr);
+}
 
+
+static void draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
+				  cairo_t *cr, struct system_cpu *system_cpu)
+{
+	int x_position;
+	GSList *tmp;
+
+	cairo_set_line_width(cr, 0);
+
+	draw_cpu_usage_background(ps, widget, cr);
+
+	cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
+
+	unsigned long no_cpu = SYSTEM_CPU_NO_CPUS(system_cpu);
+
+	x_position = CPU_USAGE_MARING_LEFT;
 
 	tmp = system_cpu->cpu_data_list;
 	while (tmp) {
 		PangoLayout *layout;
-		float system_user_time, height;
 		struct cpu_data *cpu_data;
+		int system_user_time, height;
 		char buf[8];
 
 		cpu_data = tmp->data;
 
+		/* draw background rectangle */
 		cairo_set_source_rgb(cr, 0.2, 0.2, 0.2);
-		cairo_rectangle(cr, pos_x - 5, TOP_SPACE, CPU_USAGE_TOWER_WIDTH + 7, CPU_USAGE_TOWER_HEIGHT);
+		cairo_rectangle(cr, x_position, CPU_USAGE_MARGIN_TOP,
+				CPU_USAGE_CHART_WIDTH, CPU_USAGE_CHART_HEIGHT);
 		cairo_fill(cr);
 
-		/* draw data charts */
-		//gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR]);
+		/* draw chart */
 		system_user_time = min(100.0f, cpu_data->system_time_percent +
-				             cpu_data->user_time_percent);
-		y_offset = TOP_SPACE + (100);
-		height   = -system_user_time;
+				               cpu_data->user_time_percent);
+
+		/* no need to draw if CPU is down */
+		height = -((float)CPU_USAGE_CHART_HEIGHT * (system_user_time / 100.0f));
 		cairo_set_source_rgb(cr, 0.122, 0.584, 0.714);
-		cairo_rectangle(cr, pos_x, y_offset, CPU_USAGE_TOWER_WIDTH, height);
+		cairo_rectangle(cr,
+				x_position + CPU_USAGE_CHART_INNER_GAP,
+				CPU_USAGE_MARGIN_TOP + CPU_USAGE_CHART_HEIGHT,
+				CPU_USAGE_CHART_WIDTH - (CPU_USAGE_CHART_INNER_GAP * 2),
+				height);
 		cairo_fill(cr);
 
+		/* CPUn */
 		cairo_save(cr);
 		cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
 		layout = create_pango_layout(cr);
@@ -113,7 +151,7 @@ static void draw_towers(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct sy
 		pango_layout_set_text(layout, buf, -1);
 		pango_cairo_update_layout(cr, layout);
 
-		cairo_move_to(cr, pos_x - 5, 125);
+		cairo_move_to(cr, x_position, CPU_USAGE_MARGIN_TOP + CPU_USAGE_CHART_HEIGHT + 5);
 		pango_cairo_show_layout(cr, layout);
 
 		g_object_unref(layout);
@@ -121,12 +159,19 @@ static void draw_towers(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct sy
 		cairo_stroke_preserve(cr);
 		cairo_restore(cr);
 
-
-		pos_x += CPU_USAGE_TOWER_WIDTH + CPU_USAGE_TOWER_MARGIN;
+		x_position += CPU_USAGE_CHART_WIDTH + CPU_USAGE_CHART_GAP;
 		tmp = g_slist_next(tmp);
 	}
 
-	gtk_widget_set_size_request(widget, pos_x + CPU_USAGE_TOWER_WIDTH + 7, 150);
+	/* correct x possition by wrong gap */
+	x_position -= CPU_USAGE_CHART_GAP;
+
+	draw_cpu_usage_axis(cr, x_position);
+
+
+	gtk_widget_set_size_request(widget,
+			x_position + CPU_USAGE_CHART_WIDTH,
+			CPU_USAGE_MARGIN_TOP + CPU_USAGE_CHART_HEIGHT + CPU_USAGE_CPU_LABEL_HEIGHT);
 }
 
 
@@ -150,7 +195,7 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 
 	cr = gdk_cairo_create(gtk_widget_get_window(widget));
 
-	draw_towers(ps, widget, cr, system_cpu);
+	draw_cpu_usage_charts(ps, widget, cr, system_cpu);
 
 	cairo_destroy(cr);
 
@@ -255,15 +300,19 @@ static GtkWidget *system_tab_new(struct ps *ps)
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
 	header = header_status_widget(ps, " CPU and Interrupt Info");
-        gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
 	gtk_widget_show_all(header);
 
 	darea = cpu_usage_new(ps);
-        gtk_box_pack_start(GTK_BOX(vbox), darea, FALSE, TRUE, 0);
-        gtk_widget_show_all(darea);
+	gtk_box_pack_start(GTK_BOX(vbox), darea, FALSE, TRUE, 0);
+	gtk_widget_show_all(darea);
 
-	header = header_status_widget(ps, " Disk and Slab Info");
-        gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
+	header = header_status_widget(ps, " Memory and Slab Info");
+	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
+	gtk_widget_show_all(header);
+
+	header = header_status_widget(ps, " SoftIRQ");
+	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
 	gtk_widget_show_all(header);
 
 	return vbox;
