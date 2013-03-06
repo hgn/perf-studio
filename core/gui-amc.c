@@ -35,8 +35,11 @@ static void draw_towers(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct sy
 	max_width *= (CPU_USAGE_TOWER_WIDTH + CPU_USAGE_TOWER_MARGIN);
 	max_width += CPU_USAGE_TOWER_WIDTH + 7 + MARGIN_LEFT;
 
+	int width = gtk_widget_get_allocated_width(widget);
+	int height = gtk_widget_get_allocated_height(widget);
+
 	gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR_DARKER]);
-	cairo_rectangle(cr, 0, 0, max_width, 135);
+	cairo_rectangle(cr, 0, 0, width, height);
 	cairo_fill(cr);
 
 	cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
@@ -123,7 +126,7 @@ static void draw_towers(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct sy
 		tmp = g_slist_next(tmp);
 	}
 
-	gtk_widget_set_size_request(widget, pos_x + CPU_USAGE_TOWER_WIDTH + 7, 135);
+	gtk_widget_set_size_request(widget, pos_x + CPU_USAGE_TOWER_WIDTH + 7, 150);
 }
 
 
@@ -201,7 +204,7 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 	struct system_cpu *system_cpu;
 
 	darea = gtk_drawing_area_new();
-	gtk_widget_set_size_request(darea, CPU_USAGE_WIDTH_MAX, CPU_USAGE_HEIGHT_MAX);
+	//gtk_widget_set_size_request(darea, CPU_USAGE_WIDTH_MAX, CPU_USAGE_HEIGHT_MAX);
 
 	system_cpu = system_cpu_new(ps);
 
@@ -215,18 +218,55 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 	return darea;
 }
 
+void header_status_widget_set_title(GtkWidget *widget, const char *title)
+{
+	char buf[128];
+
+	snprintf(buf, sizeof(buf) - 1,
+			"<span size=\"large\" font_weight=\"thin\" "
+			"foreground=\"#777\">%s</span>", title);
+
+	gtk_label_set_markup(GTK_LABEL(widget), buf);
+}
+
+static GtkWidget *header_status_widget(struct ps *ps, const char *text)
+{
+	GtkWidget *hbox;
+	GtkWidget *label;
+
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	label = gtk_label_new(NULL);
+	header_status_widget_set_title(label, text);
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+
+	label = gtk_label_new(NULL);
+	header_status_widget_set_title(label, "Disable");
+	gtk_box_pack_end(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+
+	return hbox;
+}
 
 static GtkWidget *system_tab_new(struct ps *ps)
 {
-	GtkWidget *grid;
+	GtkWidget *vbox;
 	GtkWidget *darea;
+	GtkWidget *header;
 
-	grid = gtk_grid_new();
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+	header = header_status_widget(ps, " CPU and Interrupt Info");
+        gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
+	gtk_widget_show_all(header);
+
 	darea = cpu_usage_new(ps);
+        gtk_box_pack_start(GTK_BOX(vbox), darea, FALSE, TRUE, 0);
+        gtk_widget_show_all(darea);
 
-	gtk_grid_attach(GTK_GRID(grid), darea, 0, 1, 1, 2);
+	header = header_status_widget(ps, " Disk and Slab Info");
+        gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
+	gtk_widget_show_all(header);
 
-	return grid;
+	return vbox;
 }
 
 

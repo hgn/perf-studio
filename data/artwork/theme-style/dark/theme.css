@@ -52,6 +52,12 @@
 	font-weight:bold;
 }
 
+#systembox {
+  background-color: #ff0000;
+  color: #ff0000;
+	border: 20px;
+}
+
 GtkMenu {
   background-color: @bg_header_color;
 	border-color: #777777;
