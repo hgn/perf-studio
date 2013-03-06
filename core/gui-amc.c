@@ -50,49 +50,79 @@ static void draw_cpu_usage_background(struct ps *ps, GtkWidget *widget, cairo_t 
 
 static void draw_cpu_usage_axis(cairo_t *cr, int x_position)
 {
+	PangoLayout *layout;
 	int axis_x_start;
 	int axis_x_end;
+
+	cairo_save(cr);
+	layout = create_pango_layout(cr, "Sans 5");
 
 	axis_x_start = x_position + CPU_USAGE_AXIS_MARGIN;
 	axis_x_end = axis_x_start + CPU_USAGE_AXIS_LINE_LENGTH;
 
+	cairo_set_source_rgb(cr, 0.25, 0.25, 0.25);
+
 	/* draw axis */
 	cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
 	cairo_set_line_width(cr, 1);
-	cairo_set_source_rgb(cr, 0.25, 0.25, 0.25);
 	cairo_move_to(cr, axis_x_start, CPU_USAGE_MARGIN_TOP);
 	cairo_line_to(cr, axis_x_start, CPU_USAGE_MARGIN_TOP + CPU_USAGE_CHART_HEIGHT);
 	cairo_stroke(cr);
 
 	/* 100 % */
-	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
 	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_100 + 1);
 	cairo_line_to(cr, axis_x_end, CPU_USAGE_CHART_AXIS_HEIGHT_100 + 1);
 	cairo_stroke(cr);
 
+	pango_layout_set_text(layout, "100%", -1);
+	cairo_move_to(cr, axis_x_start + 8, CPU_USAGE_CHART_AXIS_HEIGHT_100 - 4);
+	pango_cairo_show_layout(cr, layout);
+	cairo_stroke(cr);
+
 	/* 75 % */
-	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
 	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_75);
 	cairo_line_to(cr, axis_x_end,   CPU_USAGE_CHART_AXIS_HEIGHT_75);
 	cairo_stroke(cr);
 
+	pango_layout_set_text(layout, " 75%", -1);
+	cairo_move_to(cr, axis_x_start + 8, CPU_USAGE_CHART_AXIS_HEIGHT_75 - 4);
+	pango_cairo_show_layout(cr, layout);
+	cairo_stroke(cr);
+
+
 	/* 50 % */
-	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
 	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_50);
 	cairo_line_to(cr, axis_x_end,   CPU_USAGE_CHART_AXIS_HEIGHT_50);
 	cairo_stroke(cr);
 
+	pango_layout_set_text(layout, " 50%", -1);
+	cairo_move_to(cr, axis_x_start + 8, CPU_USAGE_CHART_AXIS_HEIGHT_50 - 4);
+	pango_cairo_show_layout(cr, layout);
+	cairo_stroke(cr);
+
 	/* 25 % */
-	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
 	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_25);
 	cairo_line_to(cr, axis_x_end,   CPU_USAGE_CHART_AXIS_HEIGHT_25);
 	cairo_stroke(cr);
 
+	pango_layout_set_text(layout, " 25%", -1);
+	cairo_move_to(cr, axis_x_start + 8, CPU_USAGE_CHART_AXIS_HEIGHT_25 - 4);
+	pango_cairo_show_layout(cr, layout);
+	cairo_stroke(cr);
+
 	/* 0 % */
-	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
 	cairo_move_to(cr, axis_x_start, CPU_USAGE_CHART_AXIS_HEIGHT_0);
 	cairo_line_to(cr, axis_x_end,   CPU_USAGE_CHART_AXIS_HEIGHT_0);
 	cairo_stroke(cr);
+
+	pango_layout_set_text(layout, "  0%", -1);
+	cairo_move_to(cr, axis_x_start + 8, CPU_USAGE_CHART_AXIS_HEIGHT_0 - 4);
+	pango_cairo_show_layout(cr, layout);
+	cairo_stroke(cr);
+
+
+	g_object_unref(layout);
+	cairo_restore(cr);
 }
 
 
@@ -144,7 +174,7 @@ static void draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
 		/* CPUn */
 		cairo_save(cr);
 		cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
-		layout = create_pango_layout(cr);
+		layout = create_pango_layout(cr, "Sans 7");
 		cairo_set_line_width(cr, 0);
 		sprintf(buf, "CPU%d", cpu_data->cpu_no);
 
