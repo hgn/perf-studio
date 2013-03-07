@@ -65,7 +65,6 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu)
 	}
 
 
-
 	tmp = system_cpu->cpu_data_list;
 	while ((read = getline(&line, &len, fp)) != -1) {
 		line[read - 1] = '\0';
@@ -81,17 +80,34 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu)
 
 		if (sscanf (line, "cpu%lu %lu %*d %lu %lu", &cpu, &user, &system, &idle) == 4) {
 			struct cpu_data *cpu_data;
-
 			assert(tmp && tmp->data);
 			cpu_data = tmp->data;
-			assert(cpu_data->cpu_no == cpu);
+			//assert(cpu_data->cpu_no == cpu);
+			if (cpu != cpu_data->cpu_no) {
+				/*
+				 * ok, one or more CPU seems offline!
+				 * There is gap between the previous cpu and
+				 * the currently parsed number here in
+				 * /proc/stat. We mark this CPU as offline.
+				 */
+				do {
+					pr_info(ps, "CPU core %d disabled by system\n",
+						cpu_data->cpu_no);
+					/* fast forward to the current CPU and mark
+					   all offline CPUs as offline */
+					tmp = g_slist_next(tmp);
+					if (!tmp)
+						break;
+					cpu_data = tmp->data;
+				} while (cpu != cpu_data->cpu_no);
+
+			}
+
+			cpu_data->cpu_no = cpu;
 
 			it = (idle - cpu_data->idle_time_last);
 			kt = (system - cpu_data->system_time_last);
 			ut = (user - cpu_data->user_time_last);
-
-			//fprintf(stderr, "CPU:%4ld %4ld %4ld %4ld (clock tick: %ld)\n",
-			//		cpu, it, kt, ut, system_cpu->clock_tick);
 
 			cpu_data->idle_time_percent   = min(max(0.0f, (float)it), 100.0f);
 			cpu_data->system_time_percent = min(max(0.0f, (float)kt), 100.0f);
@@ -104,7 +120,6 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu)
 
 		tmp = g_slist_next(tmp);
 	}
-
 	free(line);
 	fclose(fp);
 }
