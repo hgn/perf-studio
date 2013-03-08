@@ -11,6 +11,7 @@ FILES += project.c
 FILES += shared.c
 FILES += random.c
 FILES += ringbuffer.c
+FILES += str-parser.c
 
 FILES += gui-main.c
 FILES += gui-amc.c
