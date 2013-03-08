@@ -22,6 +22,82 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#define streq(a, b) (!strcmp((a),(b)))
+# if !defined likely && !defined unlikely
+#  define likely(x)   __builtin_expect(!!(x), 1)
+#  define unlikely(x) __builtin_expect(!!(x), 0)
+# endif
+
+/* for CHAR_BITS */
+#include <limits.h>
+
+#undef __always_inline
+#if __GNUC_PREREQ (3,2)
+# define __always_inline __inline __attribute__ ((__always_inline__))
+#else
+# define __always_inline __inline
+#endif
+
+/*
+ * See if our compiler is known to support flexible array members.
+ */
+#ifndef FLEX_ARRAY
+#if defined(__STDC_VERSION__) && \
+	(__STDC_VERSION__ >= 199901L) && \
+	(!defined(__SUNPRO_C) || (__SUNPRO_C > 0x580))
+# define FLEX_ARRAY /* empty */
+#elif defined(__GNUC__)
+# if (__GNUC__ >= 3)
+#  define FLEX_ARRAY /* empty */
+# else
+#  define FLEX_ARRAY 0 /* older GNU extension */
+# endif
+#endif
+#ifndef FLEX_ARRAY
+# define FLEX_ARRAY 1
+#endif
+#endif
+
+#define min(x,y) ({             \
+        typeof(x) _i = (x);     \
+        typeof(y) _j = (y);     \
+        (void) (&_i == &_j);    \
+        _i < _j ? _i : _j; })
+
+#define max(x,y) ({             \
+        typeof(x) _x = (x);     \
+        typeof(y) _y = (y);     \
+        (void) (&_x == &_y);    \
+        _x > _y ? _x : _y; })
+
+/* determine the size of an array */
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+#define BITSIZEOF(x)  (CHAR_BIT * sizeof(x))
+
+#define UNUSED_PARAM __attribute__ ((__unused__))
+#define NORETURN __attribute__ ((__noreturn__))
+#define PACKED __attribute__ ((__packed__))
+#define ALIGNED(m) __attribute__ ((__aligned__(m)))
+
+#if __GNUC_PREREQ(3,0) && !defined(__NO_INLINE__)
+# define ALWAYS_INLINE __attribute__ ((always_inline)) inline
+# define NOINLINE      __attribute__((__noinline__))
+# if !ENABLE_WERROR
+#  define DEPRECATED __attribute__ ((__deprecated__))
+#  define UNUSED_PARAM_RESULT __attribute__ ((warn_unused_result))
+# else
+#  define DEPRECATED /* n/a */
+#  define UNUSED_PARAM_RESULT /* n/a */
+# endif
+#else
+# define ALWAYS_INLINE inline /* n/a */
+# define NOINLINE /* n/a */
+# define DEPRECATED /* n/a */
+# define UNUSED_PARAM_RESULT /* n/a */
+#endif
+
+
+
 enum {
 	MSG_LEVEL_DEBUG,
 	MSG_LEVEL_INFO,
@@ -266,80 +342,5 @@ typedef int (*disect_async_cb)(struct ps *, struct disect *disct);
 struct disect *disect_new(void);
 void disect_free(struct ps *, struct disect *disect);
 int disect_async(struct ps *, struct disect *, disect_async_cb);
-
-#define streq(a, b) (!strcmp((a),(b)))
-# if !defined likely && !defined unlikely
-#  define likely(x)   __builtin_expect(!!(x), 1)
-#  define unlikely(x) __builtin_expect(!!(x), 0)
-# endif
-
-/* for CHAR_BITS */
-#include <limits.h>
-
-#undef __always_inline
-#if __GNUC_PREREQ (3,2)
-# define __always_inline __inline __attribute__ ((__always_inline__))
-#else
-# define __always_inline __inline
-#endif
-
-/*
- * See if our compiler is known to support flexible array members.
- */
-#ifndef FLEX_ARRAY
-#if defined(__STDC_VERSION__) && \
-	(__STDC_VERSION__ >= 199901L) && \
-	(!defined(__SUNPRO_C) || (__SUNPRO_C > 0x580))
-# define FLEX_ARRAY /* empty */
-#elif defined(__GNUC__)
-# if (__GNUC__ >= 3)
-#  define FLEX_ARRAY /* empty */
-# else
-#  define FLEX_ARRAY 0 /* older GNU extension */
-# endif
-#endif
-#ifndef FLEX_ARRAY
-# define FLEX_ARRAY 1
-#endif
-#endif
-
-#define min(x,y) ({             \
-        typeof(x) _i = (x);     \
-        typeof(y) _j = (y);     \
-        (void) (&_i == &_j);    \
-        _i < _j ? _i : _j; })
-
-#define max(x,y) ({             \
-        typeof(x) _x = (x);     \
-        typeof(y) _y = (y);     \
-        (void) (&_x == &_y);    \
-        _x > _y ? _x : _y; })
-
-/* determine the size of an array */
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-#define BITSIZEOF(x)  (CHAR_BIT * sizeof(x))
-
-#define UNUSED_PARAM __attribute__ ((__unused__))
-#define NORETURN __attribute__ ((__noreturn__))
-#define PACKED __attribute__ ((__packed__))
-#define ALIGNED(m) __attribute__ ((__aligned__(m)))
-
-#if __GNUC_PREREQ(3,0) && !defined(__NO_INLINE__)
-# define ALWAYS_INLINE __attribute__ ((always_inline)) inline
-# define NOINLINE      __attribute__((__noinline__))
-# if !ENABLE_WERROR
-#  define DEPRECATED __attribute__ ((__deprecated__))
-#  define UNUSED_PARAM_RESULT __attribute__ ((warn_unused_result))
-# else
-#  define DEPRECATED /* n/a */
-#  define UNUSED_PARAM_RESULT /* n/a */
-# endif
-#else
-# define ALWAYS_INLINE inline /* n/a */
-# define NOINLINE /* n/a */
-# define DEPRECATED /* n/a */
-# define UNUSED_PARAM_RESULT /* n/a */
-#endif
-
 
 #endif
