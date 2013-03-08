@@ -78,7 +78,7 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu)
 		if (!isdigit(line[3]))
 			continue;
 
-		if (sscanf (line, "cpu%lu %lu %*d %lu %lu", &cpu, &user, &system, &idle) == 4) {
+		if (sscanf(line, "cpu%lu %lu %*d %lu %lu", &cpu, &user, &system, &idle) == 4) {
 			struct cpu_data *cpu_data;
 			assert(tmp && tmp->data);
 			cpu_data = tmp->data;
@@ -128,4 +128,64 @@ void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu)
 void system_cpu_free(struct system_cpu *system_cpu)
 {
 	g_slice_free1(sizeof(struct system_cpu), system_cpu);
+}
+
+
+struct interrupt_monitor_data *interrupt_monitor_data_new(struct ps *ps)
+{
+	struct interrupt_monitor_data *imd;
+
+	imd = g_slice_alloc0(sizeof(*imd));
+	imd->proc_interrupts_fh = fopen("/proc/interrupts", "r");
+	if (!imd->proc_interrupts_fh) {
+		pr_warn(ps, "Cannot open /proc/interrupts");
+		goto err;
+	}
+
+
+	return imd;
+err:
+	g_slice_free1(sizeof(struct interrupt_monitor_data), imd);
+	return NULL;
+}
+
+
+void interrupt_monitor_ctrl_free(struct interrupt_monitor_data *imd)
+{
+	if (imd->proc_interrupts_fh)
+		fclose(imd->proc_interrupts_fh);
+	g_slice_free1(sizeof(struct interrupt_monitor_data), imd);
+}
+
+void interrupt_monitor_ctrl_checkpoint(struct ps *ps, struct interrupt_monitor_data *imd)
+{
+	int ret;
+	char *line = NULL;
+	size_t size = 0;
+	ssize_t read;
+
+	assert(imd);
+	assert(imd->proc_interrupts_fh);
+
+	ret = fseek(imd->proc_interrupts_fh, SEEK_SET, 0);
+	if (ret != 0) {
+		pr_warn(ps, "Could net fseek to 0 for /proc/interrupts");
+		return;
+	}
+
+	/* skip cpu line */
+	read = getline(&line, &size, imd->proc_interrupts_fh);
+	if (read == -1)
+		return;
+
+	while (!feof(imd->proc_interrupts_fh)) {
+
+		read = getline(&line, &size, imd->proc_interrupts_fh);
+		if (read == -1)
+			return;
+
+		line[read - 1] = '\0';
+	}
+
+	free(line);
 }

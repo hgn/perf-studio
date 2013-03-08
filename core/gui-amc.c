@@ -7,6 +7,13 @@
 #include "gui-amc.h"
 #include "gui-toolkit.h"
 #include "system-info.h"
+#include "shared.h"
+
+#if 0
+
+inner: padding
+outer: margin
+#endif
 
 #define CPU_USAGE_REFRESH 1000
 
@@ -36,8 +43,10 @@
 #define SYS_USER_USAGE_CHART_INNER_GAG 5
 #define SYS_USER_USAGE_MARGIN_TOP CPU_USAGE_MARGIN_TOP
 
+#define PADDING_LEFT 20
 
-static void draw_user_vs_system_axis(cairo_t *cr, int x_position)
+
+static int draw_user_vs_system_axis(cairo_t *cr, int x_position)
 {
 	PangoLayout *layout;
 	int axis_x_start;
@@ -53,7 +62,7 @@ static void draw_user_vs_system_axis(cairo_t *cr, int x_position)
 	cairo_stroke(cr);
 
 	axis_x_start = x_position + CPU_USAGE_AXIS_MARGIN;
-	axis_x_end = axis_x_start + CPU_USAGE_AXIS_LINE_LENGTH;
+	axis_x_end   = axis_x_start + CPU_USAGE_AXIS_LINE_LENGTH;
 
 
 	/* draw axis */
@@ -119,7 +128,7 @@ static void draw_user_vs_system_axis(cairo_t *cr, int x_position)
 }
 
 
-static void draw_user_vs_system_char(cairo_t *cr, int x_position, float acc_system, float acc_user)
+static int draw_user_vs_system_char(cairo_t *cr, int x_position, float acc_system, float acc_user)
 {
 	int height;
 	float ratio;
@@ -134,12 +143,15 @@ static void draw_user_vs_system_char(cairo_t *cr, int x_position, float acc_syst
 
 	x_position += CPU_USAGE_SYS_USER_USAGE_GAP;
 
+	/* background rectangle */
 	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
-	cairo_rectangle(cr, x_position - 30,
+	cairo_rectangle(cr, x_position,
 			SYS_USER_USAGE_MARGIN_TOP - 30,
 			SYS_USER_USAGE_CHART_WIDTH + 100,
 			SYS_USER_USAGE_MARGIN_TOP + SYS_USER_USAGE_CHART_HEIGHT + 10);
 	cairo_fill(cr);
+
+	x_position += PADDING_LEFT;
 
 	cairo_set_source_rgb(cr, 0.2, 0.2, 0.2);
 	cairo_rectangle(cr, x_position, SYS_USER_USAGE_MARGIN_TOP,
@@ -157,6 +169,8 @@ static void draw_user_vs_system_char(cairo_t *cr, int x_position, float acc_syst
 	cairo_fill(cr);
 
 	draw_user_vs_system_axis(cr, x_position + SYS_USER_USAGE_CHART_WIDTH);
+
+	return x_position - 30 + SYS_USER_USAGE_CHART_WIDTH + 100;
 }
 
 
@@ -251,7 +265,7 @@ static void draw_cpu_usage_axis(cairo_t *cr, int x_position)
 }
 
 
-static void draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
+static int draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
 				  cairo_t *cr, struct system_cpu *system_cpu)
 {
 	float acc_system, acc_user;
@@ -329,20 +343,45 @@ static void draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
 	draw_cpu_usage_axis(cr, x_position);
 
 
-	draw_user_vs_system_char(cr, x_position, acc_system, acc_user);
+	x_position = draw_user_vs_system_char(cr, x_position, acc_system, acc_user);
 
 
 	gtk_widget_set_size_request(widget,
-			x_position + CPU_USAGE_CHART_WIDTH,
+			x_position,
 			CPU_USAGE_MARGIN_TOP + CPU_USAGE_CHART_HEIGHT + CPU_USAGE_CPU_LABEL_HEIGHT);
+
+	return x_position;
+}
+
+
+static void draw_interrupt_monitor_charts(struct ps *ps, GtkWidget *widget,
+				  cairo_t *cr,
+				  struct interrupt_monitor_data *interrupt_monitor_data,
+				  int x_position)
+{
+	x_position += CPU_USAGE_SYS_USER_USAGE_GAP;
+
+	/* background rectangle */
+	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
+	cairo_rectangle(cr, x_position,
+			SYS_USER_USAGE_MARGIN_TOP - 30,
+			SYS_USER_USAGE_CHART_WIDTH + 100,
+			SYS_USER_USAGE_MARGIN_TOP + SYS_USER_USAGE_CHART_HEIGHT + 10);
+	cairo_fill(cr);
+
+	/* ok, we draw the background - not we can move forward */
+	x_position += PADDING_LEFT;
 }
 
 
 static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 {
 	cairo_t *cr;
+	int x_position;
 	struct ps *ps;
 	struct system_cpu *system_cpu;
+	struct interrupt_monitor_data *interrupt_monitor_data;
+
 
 	(void) event;
 
@@ -350,15 +389,12 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 	assert(ps);
 	system_cpu = g_object_get_data(G_OBJECT(widget), "system-cpu");
 	assert(system_cpu);
-
-
-	//gtk_widget_set_size_request(widget, CPU_USAGE_WIDTH_MAX, rand() % 400);
-	//width = gtk_widget_get_allocated_width(widget);
-	//height = gtk_widget_get_allocated_height(widget);
+	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
+	assert(interrupt_monitor_data);
 
 	cr = gdk_cairo_create(gtk_widget_get_window(widget));
-
-	draw_cpu_usage_charts(ps, widget, cr, system_cpu);
+	x_position = draw_cpu_usage_charts(ps, widget, cr, system_cpu);
+	draw_interrupt_monitor_charts(ps, widget, cr, interrupt_monitor_data, x_position);
 
 	cairo_destroy(cr);
 
@@ -381,8 +417,9 @@ static gboolean configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpoint
 static gboolean timer_cb(GtkWidget *widget)
 {
 	int width, height;
-	struct system_cpu *sc;
 	struct ps *ps;
+	struct system_cpu *sc;
+	struct interrupt_monitor_data *interrupt_monitor_data;
 
 	if (!gtk_widget_get_visible(widget)) {
 		fprintf(stderr, "not visible\n");
@@ -390,12 +427,15 @@ static gboolean timer_cb(GtkWidget *widget)
 	}
 
 	/* get data first */
-	sc = g_object_get_data(G_OBJECT(widget), "system-cpu");
-	assert(sc);
 	ps = g_object_get_data(G_OBJECT(widget), "ps");
 	assert(ps);
+	sc = g_object_get_data(G_OBJECT(widget), "system-cpu");
+	assert(sc);
+	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
+	assert(interrupt_monitor_data);
 
 	system_cpu_checkpoint(ps, sc);
+	interrupt_monitor_ctrl_checkpoint(ps, interrupt_monitor_data);
 
 	width = gtk_widget_get_allocated_width(widget);
 	height = gtk_widget_get_allocated_height(widget);
@@ -410,17 +450,23 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 {
 	GtkWidget *darea;
 	struct system_cpu *system_cpu;
+	struct interrupt_monitor_data *interrupt_monitor_data;
 
 	darea = gtk_drawing_area_new();
-	//gtk_widget_set_size_request(darea, CPU_USAGE_WIDTH_MAX, CPU_USAGE_HEIGHT_MAX);
 
 	system_cpu = system_cpu_new(ps);
+	interrupt_monitor_data = interrupt_monitor_data_new(ps);
+	if (!interrupt_monitor_data) {
+		pr_warn(ps, "Could not initilize interrupt monitor");
+		// FIXME complete error path, also for system_cpu
+	}
 
 	g_signal_connect(darea, "draw", G_CALLBACK(draw_cb), NULL);
 	g_signal_connect(darea, "configure-event", G_CALLBACK(configure_cb), NULL);
 
 	g_object_set_data(G_OBJECT(darea), "ps", ps);
 	g_object_set_data(G_OBJECT(darea), "system-cpu", system_cpu);
+	g_object_set_data(G_OBJECT(darea), "interrupt-monitor-data", interrupt_monitor_data);
 	g_timeout_add(CPU_USAGE_REFRESH, (GSourceFunc)timer_cb, darea);
 
 	return darea;
