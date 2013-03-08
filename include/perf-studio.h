@@ -70,6 +70,51 @@
         (void) (&_x == &_y);    \
         _x > _y ? _x : _y; })
 
+#define min_t(type, x, y) ({                    \
+	type __min1 = (x);                      \
+	type __min2 = (y);                      \
+	__min1 < __min2 ? __min1: __min2; })
+
+#define max_t(type, x, y) ({                    \
+	type __max1 = (x);                      \
+	type __max2 = (y);                      \
+	__max1 > __max2 ? __max1: __max2; })
+
+#define clamp(val, min, max) ({                 \
+	typeof(val) __val = (val);              \
+	typeof(min) __min = (min);              \
+	typeof(max) __max = (max);              \
+	(void) (&__val == &__min);              \
+	(void) (&__val == &__max);              \
+	__val = __val < __min ? __min: __val;   \
+	__val > __max ? __max: __val; })
+
+#define clamp_t(type, val, min, max) ({         \
+	type __val = (val);                     \
+	type __min = (min);                     \
+	type __max = (max);                     \
+	__val = __val < __min ? __min: __val;   \
+	__val > __max ? __max: __val; })
+
+#define min3(x, y, z) ({                        \
+	typeof(x) _min1 = (x);                  \
+	typeof(y) _min2 = (y);                  \
+	typeof(z) _min3 = (z);                  \
+	(void) (&_min1 == &_min2);              \
+	(void) (&_min1 == &_min3);              \
+	_min1 < _min2 ? (_min1 < _min3 ? _min1 : _min3) : \
+	(_min2 < _min3 ? _min2 : _min3); })
+
+#define max3(x, y, z) ({                        \
+	typeof(x) _max1 = (x);                  \
+	typeof(y) _max2 = (y);                  \
+	typeof(z) _max3 = (z);                  \
+	(void) (&_max1 == &_max2);              \
+	(void) (&_max1 == &_max3);              \
+	_max1 > _max2 ? (_max1 > _max3 ? _max1 : _max3) : \
+	(_max2 > _max3 ? _max2 : _max3); })
+
+
 /* determine the size of an array */
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 #define BITSIZEOF(x)  (CHAR_BIT * sizeof(x))
