@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <assert.h>
 
+#include "perf-studio.h"
 #include "str-parser.h"
 
 
@@ -64,10 +65,8 @@ int str_parser_long(struct str_parser *str_parser, long *retval)
 		return STR_PARSER_RET_EXCEPTION;
 	}
 
-	if (endptr == str_parser->curr_ptr) {
-		fprintf(stderr, "No digits were found\n");
+	if (endptr == str_parser->curr_ptr)
 		return STR_PARSER_RET_INVALID;
-	}
 
 	*retval = val;
 	str_parser->curr_ptr = endptr;
@@ -116,11 +115,7 @@ int str_parser_next_alphanum(struct str_parser *str_parser, char *dest, size_t m
 		return STR_PARSER_RET_INVALID;
 
 	delta = newptr - str_parser->curr_ptr;
-
-	if (delta > (ptrdiff_t)max_len - 1) {
-		return STR_PARSER_RET_NOBUFS;
-	}
-
+	delta = min(delta, (ptrdiff_t)max_len - 1);
 	memcpy(dest, str_parser->curr_ptr, delta);
 	dest[delta] = '\0';
 
@@ -134,9 +129,7 @@ int str_parser_remain(struct str_parser *str_parser, char *dest, size_t max_len)
 {
 	size_t delta;
 
-	delta = strlen(str_parser->curr_ptr);
-	if (delta > max_len -1)
-		return STR_PARSER_RET_NOBUFS;
+	delta = min(strlen(str_parser->curr_ptr), max_len - 1);
 
 	memcpy(dest, str_parser->curr_ptr, delta);
 	dest[delta] = '\0';

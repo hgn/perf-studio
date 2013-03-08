@@ -9,6 +9,7 @@
 #include <ctype.h>
 
 #include "system-info.h"
+#include "str-parser.h"
 #include "shared.h"
 
 struct system_cpu *system_cpu_new(struct ps *ps)
@@ -141,7 +142,9 @@ struct interrupt_monitor_data *interrupt_monitor_data_new(struct ps *ps)
 		pr_warn(ps, "Cannot open /proc/interrupts");
 		goto err;
 	}
-
+	imd->interrupt_data_array = g_array_new(FALSE, FALSE, sizeof(struct interrupt_data));
+	/* al cheapo flog to signal un/initialized state[TM] */
+	imd->start_time.tv_sec = 0;
 
 	return imd;
 err:
@@ -152,6 +155,7 @@ err:
 
 void interrupt_monitor_ctrl_free(struct interrupt_monitor_data *imd)
 {
+	g_array_free(imd->interrupt_data_array, TRUE);
 	if (imd->proc_interrupts_fh)
 		fclose(imd->proc_interrupts_fh);
 	g_slice_free1(sizeof(struct interrupt_monitor_data), imd);
@@ -160,9 +164,11 @@ void interrupt_monitor_ctrl_free(struct interrupt_monitor_data *imd)
 void interrupt_monitor_ctrl_checkpoint(struct ps *ps, struct interrupt_monitor_data *imd)
 {
 	int ret;
+	unsigned i, j;
 	char *line = NULL;
 	size_t size = 0;
 	ssize_t read;
+	gboolean initial_phase = FALSE;
 
 	assert(imd);
 	assert(imd->proc_interrupts_fh);
@@ -178,14 +184,69 @@ void interrupt_monitor_ctrl_checkpoint(struct ps *ps, struct interrupt_monitor_d
 	if (read == -1)
 		return;
 
+	i = 0;
 	while (!feof(imd->proc_interrupts_fh)) {
+		struct str_parser str_parser;
+		struct interrupt_data *interrupt_data;
+		char buffer[8];
+		long retval;
 
 		read = getline(&line, &size, imd->proc_interrupts_fh);
 		if (read == -1)
 			return;
 
 		line[read - 1] = '\0';
+		str_parser_init(&str_parser, line);
+
+		str_parser_next_alphanum(&str_parser, buffer, 8);
+		if (streq(buffer, "ERR") || streq(buffer, "MIS"))
+			continue;
+
+		if (unlikely(imd->interrupt_data_array->len <= i)) {
+			/* array to small, just increase array by one element */
+			imd->interrupt_data_array = g_array_set_size(imd->interrupt_data_array, i + 1);
+			interrupt_data = &g_array_index(imd->interrupt_data_array, struct interrupt_data, i);
+			interrupt_data->irq_array = g_array_new(FALSE, FALSE, sizeof(struct irq_start_current));
+			memcpy(interrupt_data->name, buffer, 8);
+			initial_phase = TRUE;
+		}  else {
+			/* get the existing struct */
+			interrupt_data = &g_array_index(imd->interrupt_data_array, struct interrupt_data, i);
+		}
+
+		str_parser_skip_char(&str_parser, ':');
+		j = 0;
+		do {
+			struct irq_start_current *irq_start_current;
+
+			ret = str_parser_next_long(&str_parser, &retval);
+			if (ret == STR_PARSER_RET_INVALID)
+				break;
+
+			if (unlikely(interrupt_data->irq_array->len <= j)) {
+				interrupt_data->irq_array = g_array_set_size(interrupt_data->irq_array, j + 1);
+				irq_start_current = &g_array_index(interrupt_data->irq_array,  struct irq_start_current, j);
+				irq_start_current->start = irq_start_current->current = retval;
+			} else {
+				irq_start_current = &g_array_index(interrupt_data->irq_array,  struct irq_start_current, j);
+				irq_start_current->current = retval;
+			}
+
+			j++;
+		} while (1);
+
+		/*
+		 * now we store the remaining interrupt description
+		 * if we parse the line the first time
+		 */
+		if (initial_phase)
+			str_parser_remain(&str_parser, interrupt_data->description, sizeof(interrupt_data->description));
+
+		i++;
 	}
+
+	if (!imd->start_time.tv_sec)
+		clock_gettime(CLOCK_REALTIME, &imd->start_time);
 
 	free(line);
 }

@@ -43,10 +43,14 @@ outer: margin
 #define SYS_USER_USAGE_CHART_INNER_GAG 5
 #define SYS_USER_USAGE_MARGIN_TOP CPU_USAGE_MARGIN_TOP
 
+
+#define MARGIN_TOP 20
+#define PADDING_TOP 10
+
 #define PADDING_LEFT 20
 
 
-static int draw_user_vs_system_axis(cairo_t *cr, int x_position)
+static void draw_user_vs_system_axis(cairo_t *cr, int x_position)
 {
 	PangoLayout *layout;
 	int axis_x_start;
@@ -270,7 +274,6 @@ static int draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
 {
 	float acc_system, acc_user;
 	int x_position;
-	long no_cpu;
 	GSList *tmp;
 
 	acc_system = acc_user = 0.0f;
@@ -280,7 +283,7 @@ static int draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
 
 	draw_cpu_usage_background(ps, widget, cr);
 
-	no_cpu = SYSTEM_CPU_NO_CPUS(system_cpu);
+	//no_cpu = SYSTEM_CPU_NO_CPUS(system_cpu);
 	x_position = CPU_USAGE_MARING_LEFT;
 
 	tmp = system_cpu->cpu_data_list;
@@ -356,21 +359,62 @@ static int draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
 
 static void draw_interrupt_monitor_charts(struct ps *ps, GtkWidget *widget,
 				  cairo_t *cr,
-				  struct interrupt_monitor_data *interrupt_monitor_data,
+				  struct interrupt_monitor_data *imd,
 				  int x_position)
 {
+	unsigned int i, j;
+	int y_position;
+	PangoLayout *layout;
+
+	(void) ps;
+	(void) widget;
+
 	x_position += CPU_USAGE_SYS_USER_USAGE_GAP;
 
 	/* background rectangle */
 	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
 	cairo_rectangle(cr, x_position,
-			SYS_USER_USAGE_MARGIN_TOP - 30,
+			MARGIN_TOP,
 			SYS_USER_USAGE_CHART_WIDTH + 100,
 			SYS_USER_USAGE_MARGIN_TOP + SYS_USER_USAGE_CHART_HEIGHT + 10);
 	cairo_fill(cr);
 
+	layout = create_pango_layout(cr, "Sans 8");
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
+
 	/* ok, we draw the background - not we can move forward */
 	x_position += PADDING_LEFT;
+	y_position = MARGIN_TOP + PADDING_TOP;
+
+	//y_position = PA
+
+	for (i = 0; i < imd->interrupt_data_array->len; i++) {
+		struct interrupt_data *interrupt_data;
+
+		interrupt_data = &g_array_index(imd->interrupt_data_array, struct interrupt_data, i);
+		pango_layout_set_text(layout, interrupt_data->name, -1);
+		cairo_move_to(cr, x_position, y_position);
+		pango_cairo_show_layout(cr, layout);
+		cairo_stroke(cr);
+
+		for (j = 0; j < interrupt_data->irq_array->len; j++) {
+			char buf[16];
+			struct irq_start_current *irq_start_current;
+
+			irq_start_current = &g_array_index(interrupt_data->irq_array,  struct irq_start_current, j);
+			snprintf(buf, 16, "%ld", irq_start_current->current);
+			buf[15] = '\0';
+			pango_layout_set_text(layout, buf, -1);
+			cairo_move_to(cr, x_position + ((j + 1) * 70), y_position);
+			pango_cairo_show_layout(cr, layout);
+			cairo_stroke(cr);
+
+		}
+
+		y_position += 10;
+	}
+
+	g_object_unref(layout);
 }
 
 
@@ -382,8 +426,9 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 	struct system_cpu *system_cpu;
 	struct interrupt_monitor_data *interrupt_monitor_data;
 
-
 	(void) event;
+
+	fprintf(stderr, "redraw\n");
 
 	ps = g_object_get_data(G_OBJECT(widget), "ps");
 	assert(ps);
@@ -487,6 +532,8 @@ static GtkWidget *header_status_widget(struct ps *ps, const char *text)
 {
 	GtkWidget *hbox;
 	GtkWidget *label;
+
+	(void) ps;
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	label = gtk_label_new(NULL);
