@@ -73,50 +73,29 @@ static GtkTreeModel *create_and_fill_model(struct ps *ps)
 
 	gtk_tree_store_append(treestore, &toplevel, NULL);
 
-	gtk_tree_store_set(treestore, &toplevel, NAME, "Trace Based Analysis", -1);
+	gtk_tree_store_set(treestore, &toplevel, NAME, "Core Analysis", -1);
 
 	gtk_tree_store_append(treestore, &child, &toplevel);
 	gtk_tree_store_set(treestore, &child,
-			NAME, "Lock Contention",
+			NAME, "Time",
 			-1);
 
 	gtk_tree_store_append(treestore, &toplevel, NULL);
-	gtk_tree_store_set(treestore, &toplevel, NAME, "EBS Analysis", UPTODATE, "yes", -1);
+	gtk_tree_store_set(treestore, &toplevel, NAME, "Application Level Analysis", UPTODATE, "yes", -1);
 
 	gtk_tree_store_append(treestore, &child, &toplevel);
 	gtk_tree_store_set(treestore, &child,
-			NAME, "Pipeline Stalls",
+			NAME, "Lock Contention Analysis",
 			-1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Frontent Stalls",
-			-1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Backend Stalls",
-			-1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "CPU Time",
-			-1);
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "CPI/IPC",
-			-1);
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Cache Behavior",
-			-1);
-
-	gtk_tree_store_append(treestore, &toplevel, NULL);
-	gtk_tree_store_set(treestore, &toplevel, NAME, "Event Analysis", -1);
 
 	gtk_tree_store_append(treestore, &child, &toplevel);
 	gtk_tree_store_set(treestore, &child,
 			NAME, "Scheduling Analysis",
+			-1);
+
+	gtk_tree_store_append(treestore, &child, &toplevel);
+	gtk_tree_store_set(treestore, &child,
+			NAME, "CPU Bouncing",
 			-1);
 
 	gtk_tree_store_append(treestore, &child, &toplevel);
@@ -128,6 +107,27 @@ static GtkTreeModel *create_and_fill_model(struct ps *ps)
 	gtk_tree_store_set(treestore, &child,
 			NAME, "Wakeup Analysis",
 			-1);
+
+
+
+	gtk_tree_store_append(treestore, &toplevel, NULL);
+	gtk_tree_store_set(treestore, &toplevel, NAME, "Architecture Level Analysis", -1);
+
+
+	gtk_tree_store_append(treestore, &child, &toplevel);
+	gtk_tree_store_set(treestore, &child,
+			NAME, "Backend and Pipelining Stalls",
+			-1);
+
+	gtk_tree_store_append(treestore, &child, &toplevel);
+	gtk_tree_store_set(treestore, &child,
+			NAME, "CPI/IPC",
+			-1);
+	gtk_tree_store_append(treestore, &child, &toplevel);
+	gtk_tree_store_set(treestore, &child,
+			NAME, "Cache Behavior",
+			-1);
+
 
 #if 0
 	tmp = sc->control_pane_data_list;

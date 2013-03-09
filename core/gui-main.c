@@ -12,6 +12,7 @@
 #include "gui-apo.h"
 #include "gui-statusbar.h"
 #include "gui-toolkit.h"
+#include "gui-about.h"
 
 
 static void init_styles(struct ps *ps)
@@ -104,6 +105,7 @@ static void setup_menu(struct ps *ps)
 
 	GtkWidget *help;
 	GtkWidget *help_report;
+	GtkWidget *help_about;
 
 	menubar     = gtk_menu_bar_new();
 	gtk_widget_set_name(menubar, "mainmenu");
@@ -117,6 +119,8 @@ static void setup_menu(struct ps *ps)
 	/* File submenues */
 	file      = gtk_menu_item_new_with_mnemonic("_File");
 	file_quit = gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, NULL);
+	g_signal_connect(G_OBJECT(file_quit), "activate", G_CALLBACK(gtk_main_quit), NULL);
+
 
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), filemenu);
 	gtk_menu_shell_append(GTK_MENU_SHELL(filemenu), file_quit);
@@ -153,15 +157,16 @@ static void setup_menu(struct ps *ps)
 	/* Help submenues */
 	help        = gtk_menu_item_new_with_mnemonic("_Help");
 	help_report  = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
+	help_about   = gtk_menu_item_new_with_mnemonic("_About");
+	g_signal_connect(G_OBJECT(help_about), "activate", G_CALLBACK(gui_show_about), ps);
 
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), helpmenu);
 	gtk_menu_shell_append(GTK_MENU_SHELL(helpmenu), help_report);
+	gtk_menu_shell_append(GTK_MENU_SHELL(helpmenu), help_about);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), help);
 
 	gtk_box_pack_start(GTK_BOX(ps->s.vbox), menubar, FALSE, FALSE, 0);
 	gtk_widget_show_all(menubar);
-
-	g_signal_connect(G_OBJECT(file_quit), "activate", G_CALLBACK(gtk_main_quit), NULL);
 
 	return;
 }
@@ -198,7 +203,7 @@ static void gui_main_content_pane_init(struct ps *ps)
 	gtk_paned_pack1(GTK_PANED(main_panel), upper_control_module_project_panel, TRUE, TRUE);
 
 	lower_module_panel = gui_amc_new(ps);
-	gtk_paned_pack2(GTK_PANED(main_panel), lower_module_panel, TRUE, TRUE);
+	gtk_paned_pack2(GTK_PANED(main_panel), lower_module_panel, FALSE, FALSE);
 
 
 	gtk_box_pack_start(GTK_BOX(ps->s.vbox), main_panel, TRUE, TRUE, 0);
