@@ -1,12 +1,13 @@
 include ../project.mk
 
 FILES  = perf-studio.c
-FILES += modules.c
-FILES += module-utils.c
 FILES += event.c
 FILES += conf-file.c
 FILES += cpu-features.c
 FILES += project.c
+
+FILES += module-loader.c
+FILES += module-utils.c
 
 FILES += shared.c
 FILES += random.c

@@ -10,7 +10,7 @@
 
 #include "perf-studio.h"
 #include "shared.h"
-#include "modules.h"
+#include "module-loader.h"
 #include "conf-file.h"
 #include "project.h"
 #include "version.h"

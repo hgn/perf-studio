@@ -15,7 +15,7 @@
 #include "perf-studio.h"
 
 #include "shared.h"
-#include "modules.h"
+#include "module-loader.h"
 #include "module-utils.h"
 
 static void clean_module_data(struct module *module)
