@@ -506,6 +506,9 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 		// FIXME complete error path, also for system_cpu
 	}
 
+	system_cpu_checkpoint(ps, system_cpu);
+	interrupt_monitor_ctrl_checkpoint(ps, interrupt_monitor_data);
+
 	g_signal_connect(darea, "draw", G_CALLBACK(draw_cb), NULL);
 	g_signal_connect(darea, "configure-event", G_CALLBACK(configure_cb), NULL);
 
