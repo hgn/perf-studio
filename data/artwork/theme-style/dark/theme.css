@@ -42,7 +42,10 @@
   background-color: @bg_color;
   color: #eeeeee;
 	border-width: 2px;
-	border-color: #440000;
+	border-color: #111111;
+
+	-GtkScrolledWindow-scrollbar-spacing: 0;
+	-GtkScrolledWindow-scrollbars-within-bevel: 1;
 }
 
 #mainmenu {
@@ -182,3 +185,6 @@ GtkTreeView {
 GtkEventBox#header {
 	background-image: url("../../pixmaps/dark/header.png");
 }
+
+@import url("scroolbar.css");
+@import url("tree.css");

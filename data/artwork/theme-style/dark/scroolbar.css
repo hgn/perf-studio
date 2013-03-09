@@ -1,0 +1,29 @@
+
+.scrollbar {
+    background-image: none;
+    border-style: solid;
+}
+
+.scrollbar.slider.horizontal {
+    border-image: none;
+    border-radius: 5px;
+    border-width: 1px;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    border-style: solid;
+		background-color: #151515;
+}   
+
+.scrollbar.slider.vertical {
+    border-image: none;
+    border-radius: 5px;
+    border-width: 1px;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    border-style: solid;
+		background-color: #151515;
+}   
+
+.scrollbar.slider:hover {
+		background-color: #111111;
+}
