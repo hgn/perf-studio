@@ -195,7 +195,7 @@ static void gui_main_content_pane_init(struct ps *ps)
 
 	upper_control_module_project_panel = control_module_project_panel_new(ps);
 	gtk_widget_show_all(upper_control_module_project_panel);
-	gtk_paned_pack1(GTK_PANED(main_panel), upper_control_module_project_panel, TRUE, FALSE);
+	gtk_paned_pack1(GTK_PANED(main_panel), upper_control_module_project_panel, TRUE, TRUE);
 
 	lower_module_panel = gui_amc_new(ps);
 	gtk_paned_pack2(GTK_PANED(main_panel), lower_module_panel, TRUE, TRUE);
