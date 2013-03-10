@@ -428,8 +428,6 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 
 	(void) event;
 
-	fprintf(stderr, "redraw\n");
-
 	ps = g_object_get_data(G_OBJECT(widget), "ps");
 	assert(ps);
 	system_cpu = g_object_get_data(G_OBJECT(widget), "system-cpu");
