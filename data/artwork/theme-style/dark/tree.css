@@ -1,8 +1,8 @@
 .view,
 GtkTreeView {
     background-color: @bg_color_darker;
-    color: @standard_font_color;
-		font: "Sans 9";
+    color: @darker_font_color;
+		font: Sans thin 9;
 }
 
 
