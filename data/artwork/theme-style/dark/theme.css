@@ -3,6 +3,7 @@
 @define-color base_color #ffffff;
 
 @define-color standard_font_color #cccccc;
+@define-color darker_font_color #aaaaaa;
 
 /* default color scheme */
 @define-color bg_color #262626;
@@ -244,7 +245,7 @@ GtkViewport {
 
 #project_info_label {
     background-color: @bg_color;
-    color: @standard_font_color;
+    color: @darker_font_color;
 		font: Sans thin 10; 
 }
 
