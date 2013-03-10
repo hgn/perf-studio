@@ -447,8 +447,6 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 
 static gboolean configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
-	fprintf(stderr, "configure called\n");
-
 	(void)widget;
 	(void)event;
 	(void)data;
