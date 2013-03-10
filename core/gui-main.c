@@ -181,7 +181,7 @@ static GtkWidget *control_module_project_panel_new(struct ps *ps)
 
 	module_panel = gui_amn_new(ps);
 	gtk_widget_show_all(module_panel);
-	gtk_paned_pack1(GTK_PANED(module_project_panel), module_panel, TRUE, FALSE);
+	gtk_paned_pack1(GTK_PANED(module_project_panel), module_panel, TRUE, TRUE);
 
 	project_overview_panel = gui_apo_new(ps);
 	gtk_paned_pack2(GTK_PANED(module_project_panel), project_overview_panel, TRUE, TRUE);
