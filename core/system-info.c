@@ -181,8 +181,10 @@ void interrupt_monitor_ctrl_checkpoint(struct ps *ps, struct interrupt_monitor_d
 
 	/* skip cpu line */
 	read = getline(&line, &size, imd->proc_interrupts_fh);
-	if (read == -1)
+	if (read == -1) {
+		free(line); line = NULL;
 		return;
+	}
 
 	i = 0;
 	while (!feof(imd->proc_interrupts_fh)) {
@@ -192,15 +194,19 @@ void interrupt_monitor_ctrl_checkpoint(struct ps *ps, struct interrupt_monitor_d
 		long retval;
 
 		read = getline(&line, &size, imd->proc_interrupts_fh);
-		if (read == -1)
+		if (read == -1) {
+			free(line); line = NULL;
 			return;
+		}
 
 		line[read - 1] = '\0';
 		str_parser_init(&str_parser, line);
 
 		str_parser_next_alphanum(&str_parser, buffer, 8);
-		if (streq(buffer, "ERR") || streq(buffer, "MIS"))
+		if (streq(buffer, "ERR") || streq(buffer, "MIS")) {
+			free(line); line = NULL;
 			continue;
+		}
 
 		if (unlikely(imd->interrupt_data_array->len <= i)) {
 			/* array to small, just increase array by one element */
@@ -242,6 +248,7 @@ void interrupt_monitor_ctrl_checkpoint(struct ps *ps, struct interrupt_monitor_d
 		if (initial_phase)
 			str_parser_remain(&str_parser, interrupt_data->description, sizeof(interrupt_data->description));
 
+		free(line); line = NULL;
 		i++;
 	}
 

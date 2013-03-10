@@ -203,10 +203,12 @@ static void gui_main_content_pane_init(struct ps *ps)
 	gtk_paned_pack1(GTK_PANED(main_panel), upper_control_module_project_panel, TRUE, TRUE);
 
 	lower_module_panel = gui_amc_new(ps);
-	gtk_paned_pack2(GTK_PANED(main_panel), lower_module_panel, FALSE, FALSE);
-
+	gtk_paned_pack2(GTK_PANED(main_panel), lower_module_panel, TRUE, TRUE);
 
 	gtk_box_pack_start(GTK_BOX(ps->s.vbox), main_panel, TRUE, TRUE, 0);
+
+	gtk_paned_set_position(GTK_PANED(main_panel), 300);
+
 	gtk_widget_show_all(main_panel);
 }
 
