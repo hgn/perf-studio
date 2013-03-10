@@ -1,23 +1,27 @@
 #include <webkit/webkit.h>
 
 #include "gui-help.h"
+#include "shared.h"
 
-static void destroyWindowCb(GtkWidget* widget, GtkWidget* window)
-{
-	    gtk_main_quit();
-}
 
-static gboolean closeWebViewCb(WebKitWebView* webView, GtkWidget* window)
+static gboolean close_webview_cb(WebKitWebView* webView, GtkWidget* window)
 {
 	gtk_widget_destroy(window);
 	return TRUE;
 }
 
+#define FILE_URI_SCHEME "file://"
 
 void gui_help_overview_window(GtkWidget *widget, struct ps *ps)
 {
+	gchar *html_help_path;
 	GtkWidget *help_window;
+	gchar *url;
 
+	html_help_path = g_build_filename(DATA_DIR, "help-pages/index.html", NULL);
+	url = g_malloc(strlen(html_help_path) + strlen(FILE_URI_SCHEME) + 2);
+	sprintf(url, "%s%s", FILE_URI_SCHEME, html_help_path);
+	pr_info(ps, "Load help page from: %s\n", url);
 
 	help_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_widget_set_size_request(help_window, 600, 400);
@@ -29,11 +33,10 @@ void gui_help_overview_window(GtkWidget *widget, struct ps *ps)
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_container_add(GTK_CONTAINER(scrolledWindow), GTK_WIDGET(webView));
 
-	//g_signal_connect(help_window, "destroy", G_CALLBACK(destroyWindowCb), NULL);
-	g_signal_connect(webView, "close-web-view", G_CALLBACK(closeWebViewCb), help_window);
+	g_signal_connect(webView, "close-web-view", G_CALLBACK(close_webview_cb), help_window);
 
 	gtk_container_add(GTK_CONTAINER(help_window), scrolledWindow);
-	webkit_web_view_load_uri(webView, "http://www.perf-studio.com/");
+	webkit_web_view_load_uri(webView, url);
 	gtk_widget_grab_focus(GTK_WIDGET(webView));
 
 	gtk_window_set_decorated(GTK_WINDOW(help_window), FALSE);
@@ -41,4 +44,7 @@ void gui_help_overview_window(GtkWidget *widget, struct ps *ps)
 	gtk_window_present((GtkWindow *)help_window);
 	gtk_widget_show_all((GtkWidget *)help_window);
 	gtk_widget_grab_focus(GTK_WIDGET(help_window));
+
+	g_free(url);
+	g_free(html_help_path);
 }
