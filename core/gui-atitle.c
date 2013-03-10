@@ -22,7 +22,6 @@ void gui_atitle_init(struct ps *ps)
 {
 	GtkWidget *hbox;
 
-
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	ps->s.atitle.label = gtk_label_new(NULL);
 	gui_atitle_set_title(ps, "Project Foo");

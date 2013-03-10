@@ -14,7 +14,7 @@ GtkWidget *gt_stub_widget(struct ps *ps, const gchar *str, guint width, guint he
 	return frame;
 }
 
-static void screen_err_msg(const gchar *format, ...)
+void gui_err_dialog(struct ps *ps, const gchar *format, ...)
 {
 	va_list  args;
 	gchar *str;
@@ -24,7 +24,7 @@ static void screen_err_msg(const gchar *format, ...)
 	str = g_strdup_vprintf (format, args);
 	va_end(args);
 
-	dialog = gtk_message_dialog_new(GTK_WINDOW(sc.screen.main_window), 0,
+	dialog = gtk_message_dialog_new(GTK_WINDOW(ps->s.main_window), 0,
 				        GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", str);
 
 	gtk_dialog_run(GTK_DIALOG(dialog));

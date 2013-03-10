@@ -2,10 +2,11 @@
 #include "version.h"
 #include "authors.h"
 
-void gui_show_about(struct ps *ps)
+void gui_show_about(GtkWidget *widget, struct ps *ps)
 {
 	GtkWidget *about_dialog;
 
+	(void) widget;
 	(void) ps;
 
 	about_dialog = gtk_about_dialog_new();

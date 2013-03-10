@@ -98,7 +98,6 @@ static void setup_menu(struct ps *ps)
 	GtkWidget *project_manage;
 
 	GtkWidget *project;
-	GtkWidget *project_report;
 
 	GtkWidget *systemm;
 	GtkWidget *system_report;
@@ -128,12 +127,11 @@ static void setup_menu(struct ps *ps)
 
 	/* Projects submenues */
 	project         = gtk_menu_item_new_with_mnemonic("_Projects");
-	project_report  = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
-	project_recent  = gtk_menu_item_new_with_mnemonic("Re_cent Projects");
+	project_recent  = gtk_menu_item_new_with_mnemonic("_Load Project");
+	g_signal_connect(G_OBJECT(project_recent), "activate", G_CALLBACK(gui_amc_load_project), ps);
 	project_manage  = gtk_menu_item_new_with_mnemonic("_Manage Projects");
 
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(project), projectmenu);
-	gtk_menu_shell_append(GTK_MENU_SHELL(projectmenu), project_report);
 	gtk_menu_shell_append(GTK_MENU_SHELL(projectmenu), project_recent);
 	gtk_menu_shell_append(GTK_MENU_SHELL(projectmenu), project_manage);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), project);

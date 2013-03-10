@@ -3,6 +3,6 @@
 
 #include "perf-studio.h"
 
-void gui_show_about(struct ps *ps);
+void gui_show_about(GtkWidget *w, struct ps *ps);
 
 #endif

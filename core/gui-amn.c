@@ -15,8 +15,132 @@ enum {
 	NUM_COLS
 };
 
+void project_load_widget_add_header(struct ps *ps, GtkWidget *container)
+{
+	GtkWidget *hbox;
+	GtkWidget *label;
 
-void row_activated(GtkTreeView *treeview, GtkTreePath *path,
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	label = gtk_label_new("Open Project");
+	gtk_widget_set_name(label, "dialog_window_header");
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+
+	gtk_box_pack_start(GTK_BOX(container), hbox, FALSE, FALSE, 0);
+	gtk_widget_show_all(hbox);
+}
+
+
+static void project_load_widget_add_artwork(struct ps *ps, GtkWidget *container)
+{
+        GtkWidget *event_box;
+
+        event_box = gtk_event_box_new();
+	gtk_widget_set_name(event_box, "header");
+	gtk_widget_set_size_request(event_box, -1, 10);
+
+        gtk_box_pack_start(GTK_BOX(container), event_box, FALSE, TRUE, 0);
+        gtk_widget_show_all(event_box);
+}
+
+
+static void screen_intro_dialog_existing_activated(GtkTreeView *view,
+		GtkTreePath *path, GtkTreeViewColumn *col, gpointer user_data)
+{
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+	struct ps *ps;
+
+	assert(user_data);
+	(void) col;
+
+	ps = user_data;
+
+	model = gtk_tree_view_get_model(view);
+
+	if (gtk_tree_model_get_iter(model, &iter, path)) {
+		gchar *name, *project_path;
+		gtk_tree_model_get(model, &iter, 0, &name, -1);
+		gtk_tree_model_get(model, &iter, 1, &project_path, -1);
+		//gtk_widget_destroy(sc.screen.dialog_window);
+		//sc.screen.dialog_window = NULL;
+		g_print("project selected: %s, path: %s\n", name, project_path);
+		//control_window_reload_new_project(xsc, project_path);
+		g_free(name);
+		g_free(project_path);
+	}
+}
+
+
+static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *container)
+{
+	GtkListStore *lista1;
+	GtkWidget *tree1;
+	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *column;
+	GtkTreeIter iter;
+	GSList *list_tmp;
+
+
+	lista1 = gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+	tree1 = gtk_tree_view_new_with_model(GTK_TREE_MODEL(lista1));
+	gtk_widget_show(tree1);
+
+	g_signal_connect(tree1, "row-activated", G_CALLBACK(screen_intro_dialog_existing_activated), ps);
+
+	renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes("  Name  ", renderer, "text", 0,NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
+	column = gtk_tree_view_column_new_with_attributes("  Path  ", renderer, "text" ,1,NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
+	column = gtk_tree_view_column_new_with_attributes("  Last Used  ", renderer, "text",2,NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
+
+	list_tmp = ps->project_list;
+	while (list_tmp) {
+		struct project *project;
+		project = list_tmp->data;
+		gtk_list_store_append(lista1, &iter);
+		gtk_list_store_set(lista1, &iter, 0, project->exec_path,
+						  1, project->exec_path,
+						  2, project->exec_path,
+						  -1);
+
+		list_tmp = g_slist_next(list_tmp);
+	}
+
+        gtk_box_pack_start(GTK_BOX(container), tree1, FALSE, TRUE, 30);
+        gtk_widget_show_all(tree1);
+}
+
+
+void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
+{
+	GtkWidget *vbox;
+	GtkWidget *dialog_window;
+
+	pr_info(ps, "Load project");
+
+	dialog_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_widget_set_size_request(dialog_window, 600, 400);
+	gtk_container_set_border_width(GTK_CONTAINER(dialog_window), 0);
+	gtk_window_set_modal((GtkWindow *)dialog_window, TRUE);
+
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+	project_load_widget_add_header(ps, vbox);
+	project_load_widget_add_artwork(ps, vbox);
+	project_load_widget_add_project_list(ps, vbox);
+	gtk_widget_show(vbox);
+
+
+	gtk_container_add(GTK_CONTAINER(dialog_window), vbox);
+	gtk_window_set_position((GtkWindow *)dialog_window, GTK_WIN_POS_CENTER);
+	gtk_window_present((GtkWindow *)dialog_window);
+	gtk_widget_show((GtkWidget *)dialog_window);
+}
+
+
+static void row_activated(GtkTreeView *treeview, GtkTreePath *path,
 		   GtkTreeViewColumn *col, gpointer priv_data)
 {
 	GtkTreeModel *model;
