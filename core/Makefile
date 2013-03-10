@@ -25,15 +25,17 @@ FILES += gui-about.c
 FILES += disect-core.c
 FILES += disect-perf.c
 
+FILES += gui-help.c
+
 FILES += system-info.c
 
 
 BASIC_CFLAGS  = $(shell pkg-config --cflags gtk+-3.0)
-BASIC_CFLAGS += $(shell pkg-config --cflags libxml-2.0)
+BASIC_CFLAGS += $(shell pkg-config --cflags webkitgtk-3.0)
 BASIC_CFLAGS += $(shell pkg-config --cflags dbus-1)
 
 EXTLIBS  = $(shell pkg-config --libs gtk+-3.0)
-EXTLIBS += $(shell pkg-config --libs libxml-2.0)
+EXTLIBS += $(shell pkg-config --libs webkitgtk-3.0)
 EXTLIBS += $(shell pkg-config --libs dbus-1)
 EXTLIBS += -lpthread
 EXTLIBS += -lm

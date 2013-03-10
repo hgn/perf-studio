@@ -13,6 +13,7 @@
 #include "gui-statusbar.h"
 #include "gui-toolkit.h"
 #include "gui-about.h"
+#include "gui-help.h"
 
 
 static void init_styles(struct ps *ps)
@@ -103,7 +104,7 @@ static void setup_menu(struct ps *ps)
 	GtkWidget *system_report;
 
 	GtkWidget *help;
-	GtkWidget *help_report;
+	GtkWidget *help_overview;
 	GtkWidget *help_about;
 
 	menubar     = gtk_menu_bar_new();
@@ -154,12 +155,13 @@ static void setup_menu(struct ps *ps)
 
 	/* Help submenues */
 	help        = gtk_menu_item_new_with_mnemonic("_Help");
-	help_report  = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
+	help_overview  = gtk_menu_item_new_with_mnemonic("_Overview");
+	g_signal_connect(G_OBJECT(help_overview), "activate", G_CALLBACK(gui_help_overview_window), ps);
 	help_about   = gtk_menu_item_new_with_mnemonic("_About");
 	g_signal_connect(G_OBJECT(help_about), "activate", G_CALLBACK(gui_show_about), ps);
 
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), helpmenu);
-	gtk_menu_shell_append(GTK_MENU_SHELL(helpmenu), help_report);
+	gtk_menu_shell_append(GTK_MENU_SHELL(helpmenu), help_overview);
 	gtk_menu_shell_append(GTK_MENU_SHELL(helpmenu), help_about);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), help);
 

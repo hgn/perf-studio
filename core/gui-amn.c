@@ -137,6 +137,7 @@ void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 	gtk_window_set_position((GtkWindow *)dialog_window, GTK_WIN_POS_CENTER);
 	gtk_window_present((GtkWindow *)dialog_window);
 	gtk_widget_show((GtkWidget *)dialog_window);
+	gtk_widget_grab_focus(GTK_WIDGET(dialog_window));
 }
 
 
