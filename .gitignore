@@ -14,8 +14,6 @@ modules/*.so
 cscope.*
 ncscope.*
 
-*.png
-
 *.orig
 *~
 \#*#
