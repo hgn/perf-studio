@@ -28,10 +28,6 @@ static GtkWidget *header_status_widget(struct ps *ps, const char *text)
 	widget_set_title(label, text);
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
 
-	label = gtk_label_new(NULL);
-	widget_set_title(label, "Disable");
-	gtk_box_pack_end(GTK_BOX(hbox), label, FALSE, FALSE, 0);
-
 	return hbox;
 }
 
@@ -47,7 +43,7 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	row = 0;
 
 	/* spacing cells */
-	label = gtk_label_new("      ");
+	label = gtk_label_new("  ");
 	gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
 
 	label = gtk_label_new("");
@@ -177,8 +173,54 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	gtk_grid_attach(GTK_GRID(grid), ps->s.project_info.working_dir, 3, row, 1, 1);
 	row++;
 
+	/* spacing cells */
+	label = gtk_label_new("");
+	gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
+
+	label = gtk_label_new("");
+	gtk_grid_attach(GTK_GRID(grid), label, 1, row, 1, 1);
+
+	label = gtk_label_new("");
+	gtk_grid_attach(GTK_GRID(grid), label, 2, row, 1, 1);
+
+	label = gtk_label_new("");
+	gtk_grid_attach(GTK_GRID(grid), label, 3, row, 1, 1);
+
+	label = gtk_label_new(" ");
+	gtk_grid_attach(GTK_GRID(grid), label, 4, row, 1, 1);
+
 
 	return grid;
+}
+
+
+static GtkWidget *object_section_size_widget_new(void)
+{
+	GtkWidget *expander;
+	GtkWidget *entry;
+
+	expander= gtk_expander_new("Object Section Size");
+
+	entry = gtk_entry_new();
+	gtk_container_add(GTK_CONTAINER(expander), entry);
+	gtk_expander_set_expanded(GTK_EXPANDER (expander), FALSE);
+
+	return expander;
+}
+
+
+static GtkWidget *function_size_widget_new(void)
+{
+	GtkWidget *expander;
+	GtkWidget *entry;
+
+	expander= gtk_expander_new("Function Size");
+
+	entry = gtk_entry_new();
+	gtk_container_add(GTK_CONTAINER(expander), entry);
+	gtk_expander_set_expanded(GTK_EXPANDER (expander), FALSE);
+
+	return expander;
 }
 
 
@@ -187,14 +229,25 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 	GtkWidget *vbox;
 	GtkWidget *header;
 	GtkWidget *project_info;
+	GtkWidget *widget;
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
 	header = header_status_widget(ps, " Project Overview");
-	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 2);
 
 	project_info = project_info_widget_new(ps);
-	gtk_box_pack_start(GTK_BOX(vbox), project_info, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), project_info, FALSE, TRUE, 2);
+
+	header = header_status_widget(ps, " Project Details");
+	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 2);
+
+	widget = object_section_size_widget_new();
+	gtk_box_pack_start(GTK_BOX(vbox), widget, FALSE, FALSE, 4);
+
+	widget = function_size_widget_new();
+	gtk_box_pack_start(GTK_BOX(vbox), widget, FALSE, FALSE, 4);
+
 
 	return vbox;
 }
