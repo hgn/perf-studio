@@ -13,7 +13,6 @@ void gui_show_about(GtkWidget *widget, struct ps *ps)
 	(void) widget;
 
 	logo_path = g_build_filename(ps->si.pixmapdir, PERF_LOGO_FILENAME, NULL);
-	fprintf(stderr, "%s\n", logo_path);
 	pixbuf = gdk_pixbuf_new_from_file(logo_path, NULL);
 
 	about_dialog = gtk_about_dialog_new();
