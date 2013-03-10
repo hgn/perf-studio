@@ -46,13 +46,55 @@
 
 	-GtkScrolledWindow-scrollbar-spacing: 0;
 	-GtkScrolledWindow-scrollbars-within-bevel: 1;
+
+    padding: 0;
+
+    background-clip: padding-box;
+
+    -GtkToolButton-icon-spacing: 4;
+
+    -GtkTextView-error-underline-color: @error_color;
+
+    -GtkPaned-handle-size: 5;
+
+    -GtkCheckButton-indicator-size: 16;
+    -GtkCheckMenuItem-indicator-size: 12;
+
+    -GtkScrolledWindow-scrollbar-spacing: 0;
+    -GtkScrolledWindow-scrollbars-within-bevel: 1;
+
+    -GtkToolItemGroup-expander-size: 11;
+    -GtkExpander-expander-size: 11;
+
+    -GtkMenu-horizontal-padding: 0;
+    -GtkMenu-vertical-padding: 0;
+
+    -GtkWidget-link-color: @link_color;
+    -GtkWidget-visited-link-color: shade(@link_color, 0.85);
+    -GtkIMHtml-hyperlink-color: @standard_font_color;
+    -GtkHTML-link-color: @standard_font_color;
+
+    -WnckTasklist-fade-overlay-rect: 0;
+
+    -GtkWidget-focus-line-width: 0;
+    -GtkWidget-focus-padding: 2;
+    
+    -GtkWindow-resize-grip-width: 0;
+    -GtkWindow-resize-grip-height: 0;  
+    
+    -GtkWidget-cursor-color: @highlight_selected_bg;
+    -GtkWidget-cursor-aspect-ratio: 0.1; 
+    -GtkWidget-secondary-cursor-color: @theme_text_color; 
+    
+    outline-color: alpha(@theme_selected_bg_color, 0.20);
+    outline-style: dashed;
 }
 
 #mainmenu {
   background-color: darker(@bg_color);
 	border: 0px;
 	color: blue;
-	font-weight:bold;
+	font-weight:thin;
 }
 
 #systembox {
@@ -91,6 +133,7 @@ GtkLabel {
 	color: #bbbbbb;
 }
 
+
 GtkNotebook {
 	background-color: @bg_color_darker;
 	-GtkWidget-focus-line-width: 0;
@@ -98,16 +141,14 @@ GtkNotebook {
 	border-width: 2px;
 	border-radius: 8px;
 	border-color: #111111;
-	font-weight:bold;
-	font: Sans 8;
+	font: Sans thin 8;
 }
 
 GtkNotebook tab GtkLabel {
 	padding: 3px 20px 3px 20px;
 	background-color: #ff0000;
 	color: @standard_font_color;
-	font-weight:bold;
-	font: Sans 10;
+	font: Sans thin 10;
 }
 
 
@@ -186,5 +227,24 @@ GtkEventBox#header {
 	background-image: url("../../pixmaps/dark/header.png");
 }
 
+
 @import url("scroolbar.css");
 @import url("tree.css");
+
+
+
+.tooltip * {
+    background-color: transparent;
+}
+
+
+GtkViewport {
+    background-color: @bg_color_darker;
+}
+
+#project_info_label {
+    background-color: @bg_color;
+    color: @standard_font_color;
+		font: Sans thin 10; 
+}
+
