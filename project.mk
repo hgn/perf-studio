@@ -1,8 +1,8 @@
 # Linux kbuild and trace-cmd parts included
 
 PS_VERSION = 0
-PS_PATCHLEVEL = 0
-PS_EXTRAVERSION = 1
+PS_PATCHLEVEL = 1
+PS_EXTRAVERSION = 0
 
 # Makefiles suck: This macro sets a default value of $(2) for the
 # variable named by $(1), unless the variable has been set by
