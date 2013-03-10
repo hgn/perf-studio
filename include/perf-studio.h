@@ -183,6 +183,13 @@ struct screen {
 		GtkWidget *label;
 	} atitle;
 	GtkWidget *statusbar;
+	struct {
+		GtkWidget *name;
+		GtkWidget *description;
+		GtkWidget *exec_path;
+		GtkWidget *exec_args;
+		GtkWidget *working_dir;
+	} project_info;
 };
 
 struct project {
