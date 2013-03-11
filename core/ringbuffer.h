@@ -81,6 +81,10 @@ int ring_buffer_avail_no_wrap(struct ring_buffer *buf);
 int ring_buffer_read(struct ring_buffer *buf, void *data,
 			unsigned int len);
 
+int ring_buffer_read_at(struct ring_buffer *buf, void *data, unsigned int len, unsigned int offset);
+
+#define ring_buffer_purge ring_buffer_drain
+
 /*!
  * Returns the read pointer with read offset specified by offset.  No bounds
  * checking is performed.  Be careful not to read past the end of the buffer.

@@ -6,6 +6,7 @@
 
 #include "gui-amc.h"
 #include "gui-toolkit.h"
+#include "gui-waterfall.h"
 #include "system-info.h"
 #include "shared.h"
 
@@ -269,7 +270,7 @@ static void draw_cpu_usage_axis(cairo_t *cr, int x_position)
 }
 
 
-static int draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
+static int draw_cpu_usage_chart(struct ps *ps, GtkWidget *widget,
 				  cairo_t *cr, struct system_cpu *system_cpu)
 {
 	float acc_system, acc_user;
@@ -356,6 +357,28 @@ static int draw_cpu_usage_charts(struct ps *ps, GtkWidget *widget,
 	return x_position;
 }
 
+static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
+				    cairo_t *cr, struct cpu_waterfall *cpu_waterfall)
+{
+	int i, j;
+	int ret, offset;
+
+	offset = 0;
+	for (i = 0; i < cpu_waterfall->ring_buffer_elements; i++) {
+		GdkColor waterfall_entry[cpu_waterfall->no_cpu];
+		//fprintf(stderr, "Time: %4d  ", i);
+		offset += ring_buffer_read_at(cpu_waterfall->ring_buffer,
+				              waterfall_entry,
+					      cpu_waterfall->no_cpu * sizeof(GdkColor), offset);
+		for (j = 0; j < cpu_waterfall->no_cpu; j++) {
+			//fprintf(stderr, " %5d", waterfall_entry[j].blue);
+		}
+		//fprintf(stderr, "\n");
+
+	}
+	//fprintf(stderr, "\n");
+}
+
 
 static void draw_interrupt_monitor_charts(struct ps *ps, GtkWidget *widget,
 				  cairo_t *cr,
@@ -425,6 +448,7 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 	struct ps *ps;
 	struct system_cpu *system_cpu;
 	struct interrupt_monitor_data *interrupt_monitor_data;
+	struct cpu_waterfall *cpu_waterfall;
 
 	(void) event;
 
@@ -434,10 +458,16 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 	assert(system_cpu);
 	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
 	assert(interrupt_monitor_data);
+	cpu_waterfall = g_object_get_data(G_OBJECT(widget), "cpu-waterfall");
+	assert(cpu_waterfall);
 
 	cr = gdk_cairo_create(gtk_widget_get_window(widget));
-	x_position = draw_cpu_usage_charts(ps, widget, cr, system_cpu);
-	draw_interrupt_monitor_charts(ps, widget, cr, interrupt_monitor_data, x_position);
+
+	/* draw CPU bar charts */
+	x_position = draw_cpu_usage_chart(ps, widget, cr, system_cpu);
+	x_position = draw_cpu_waterfall_chart(ps, widget, cr, cpu_waterfall);
+
+	//draw_interrupt_monitor_charts(ps, widget, cr, interrupt_monitor_data, x_position);
 
 	cairo_destroy(cr);
 
@@ -455,12 +485,13 @@ static gboolean configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpoint
 }
 
 
-static gboolean timer_cb(GtkWidget *widget)
+static gboolean draw_area_timer_cb(GtkWidget *widget)
 {
 	int width, height;
 	struct ps *ps;
 	struct system_cpu *sc;
 	struct interrupt_monitor_data *interrupt_monitor_data;
+	struct cpu_waterfall *cpu_waterfall;
 
 	if (!gtk_widget_get_visible(widget)) {
 		fprintf(stderr, "not visible\n");
@@ -474,8 +505,11 @@ static gboolean timer_cb(GtkWidget *widget)
 	assert(sc);
 	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
 	assert(interrupt_monitor_data);
+	cpu_waterfall = g_object_get_data(G_OBJECT(widget), "cpu-waterfall");
+	assert(cpu_waterfall);
 
 	system_cpu_checkpoint(ps, sc);
+	cpu_waterfall_checkpoint(ps, cpu_waterfall, sc);
 	interrupt_monitor_ctrl_checkpoint(ps, interrupt_monitor_data);
 
 	width = gtk_widget_get_allocated_width(widget);
@@ -492,15 +526,18 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 	GtkWidget *darea;
 	struct system_cpu *system_cpu;
 	struct interrupt_monitor_data *interrupt_monitor_data;
+	struct cpu_waterfall *cpu_waterfall;
 
 	darea = gtk_drawing_area_new();
 
 	system_cpu = system_cpu_new(ps);
 	interrupt_monitor_data = interrupt_monitor_data_new(ps);
-	if (!interrupt_monitor_data) {
-		pr_warn(ps, "Could not initilize interrupt monitor");
-		// FIXME complete error path, also for system_cpu
-	}
+	if (!interrupt_monitor_data)
+		pr_error(ps, "Could not initilize interrupt monitor");
+
+	cpu_waterfall = cpu_waterfall_new(ps);
+	if (!cpu_waterfall)
+		pr_error(ps, "Could not initilize waterfall gui");
 
 	system_cpu_checkpoint(ps, system_cpu);
 	interrupt_monitor_ctrl_checkpoint(ps, interrupt_monitor_data);
@@ -511,7 +548,8 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 	g_object_set_data(G_OBJECT(darea), "ps", ps);
 	g_object_set_data(G_OBJECT(darea), "system-cpu", system_cpu);
 	g_object_set_data(G_OBJECT(darea), "interrupt-monitor-data", interrupt_monitor_data);
-	g_timeout_add(CPU_USAGE_REFRESH, (GSourceFunc)timer_cb, darea);
+	g_object_set_data(G_OBJECT(darea), "cpu-waterfall", cpu_waterfall);
+	g_timeout_add(CPU_USAGE_REFRESH, (GSourceFunc)draw_area_timer_cb, darea);
 
 	return darea;
 }

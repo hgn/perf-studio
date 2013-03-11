@@ -199,7 +199,7 @@ static GtkWidget *object_section_size_widget_new(void)
 	GtkWidget *expander;
 	GtkWidget *entry;
 
-	expander= gtk_expander_new("Object Section Size");
+	expander= gtk_expander_new("Section Size");
 
 	entry = gtk_entry_new();
 	gtk_container_add(GTK_CONTAINER(expander), entry);
@@ -239,7 +239,7 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 	project_info = project_info_widget_new(ps);
 	gtk_box_pack_start(GTK_BOX(vbox), project_info, FALSE, TRUE, 2);
 
-	header = header_status_widget(ps, " Project Details");
+	header = header_status_widget(ps, " Object Details");
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 2);
 
 	widget = object_section_size_widget_new();

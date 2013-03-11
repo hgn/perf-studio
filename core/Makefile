@@ -21,6 +21,7 @@ FILES += gui-apo.c
 FILES += gui-atitle.c
 FILES += gui-statusbar.c
 FILES += gui-about.c
+FILES += gui-waterfall.c
 
 FILES += disect-core.c
 FILES += disect-perf.c

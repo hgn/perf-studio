@@ -116,6 +116,28 @@ int ring_buffer_read(struct ring_buffer *buf, void *data, unsigned int len)
 	return len;
 }
 
+int ring_buffer_read_at(struct ring_buffer *buf, void *data, unsigned int len, unsigned int at)
+{
+	unsigned int end;
+	unsigned int offset;
+	unsigned char *d = data;
+
+	len = MIN(len, buf->in - (buf->out + at));
+
+	/* Grab data from buffer starting at offset until the end */
+	offset = (buf->out + at) % buf->size;
+	end = MIN(len, buf->size - offset);
+	memcpy(d, buf->buffer + offset, end);
+
+	/* Now grab remainder from the beginning */
+	memcpy(d + end, buf->buffer, len - end);
+
+	if ((buf->out + len + at) == buf->in)
+		return 0;
+
+	return len;
+}
+
 
 int ring_buffer_drain(struct ring_buffer *buf, unsigned int len)
 {
