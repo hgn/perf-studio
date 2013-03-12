@@ -1,6 +1,7 @@
 #include <assert.h>
 
 #include "gui-waterfall.h"
+#include "gui-toolkit.h"
 #include "system-info.h"
 #include "shared.h"
 
@@ -28,7 +29,7 @@ struct cpu_waterfall *cpu_waterfall_new(struct ps *ps)
 
 	req_circ_buf_mem = cpu_waterfall->no_cpu *
 			   CIRC_BUFFER_MAX_STEPS *
-			   sizeof(GdkColor);
+			   sizeof(struct ps_color);
 	cpu_waterfall->ring_buffer = ring_buffer_new(req_circ_buf_mem);
 
 	return cpu_waterfall;
@@ -39,12 +40,128 @@ err:
 }
 
 
-static void cpu_waterfall_calc_color(int percent, GdkColor *color)
+static void cpu_waterfall_calc_color(int percent, struct ps_color *color)
 {
-	color->red   = 0;
-	color->green = 0;
-	color->blue  = (guint16)(65535.0 * ((float)percent / 100.0f));
-	fprintf(stderr, "new color: %d\n", color->blue);
+	assert(percent >= 0);
+
+	color->alpha  = 1.0f;
+
+	if (percent == 0) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x11);
+		return;
+	}
+
+	if (percent < 1) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x30);
+		return;
+	}
+
+	if (percent < 2) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x35);
+		return;
+	}
+
+	if (percent < 3) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x40);
+		return;
+	}
+
+	if (percent < 4) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x45);
+		return;
+	}
+
+	if (percent < 5) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x50);
+		return;
+	}
+
+	if (percent < 10) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x55);
+		return;
+	}
+
+	if (percent < 20) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x60);
+		return;
+	}
+
+	if (percent < 30) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x65);
+		return;
+	}
+
+	if (percent < 40) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x70);
+		return;
+	}
+
+	if (percent < 50) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x75);
+		return;
+	}
+
+	if (percent < 60) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x80);
+		return;
+	}
+
+	if (percent < 70) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x85);
+		return;
+	}
+
+	if (percent < 80) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0x90);
+		return;
+	}
+
+	if (percent < 90) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0xa0);
+		return;
+	}
+
+	if (percent < 100) {
+		color->red   = Hex8ToFloat(0x11);
+		color->green = Hex8ToFloat(0x11);
+		color->blue  = Hex8ToFloat(0xb0);
+		return;
+	}
+
+	color->red   = Hex8ToFloat(0x11);
+	color->green = Hex8ToFloat(0x11);
+	color->blue  = Hex8ToFloat(0xc0);
+
 }
 
 
@@ -52,7 +169,7 @@ void cpu_waterfall_add_data(struct ps *ps, struct cpu_waterfall *cw, struct syst
 {
 	int i;
 	GSList *tmp;
-	GdkColor waterfall_entry[cw->no_cpu];
+	struct ps_color waterfall_entry[cw->no_cpu];
 
 	(void) ps;
 
@@ -60,7 +177,7 @@ void cpu_waterfall_add_data(struct ps *ps, struct cpu_waterfall *cw, struct syst
 
 	if (cw->ring_buffer_elements >= CIRC_BUFFER_MAX_STEPS) {
 		/* remove last element */
-		ring_buffer_purge(cw->ring_buffer, cw->no_cpu * sizeof(GdkColor));
+		ring_buffer_purge(cw->ring_buffer, cw->no_cpu * sizeof(struct ps_color));
 		cw->ring_buffer_elements--;
 	}
 
@@ -77,11 +194,12 @@ void cpu_waterfall_add_data(struct ps *ps, struct cpu_waterfall *cw, struct syst
 				   cpu_data->user_time_percent;
 
 		cpu_waterfall_calc_color(sys_user_percent, &waterfall_entry[i]);
+		fprintf(stderr, "{%.2f,%.2f,%.2f}", waterfall_entry[i].red, waterfall_entry[i].green, waterfall_entry[i].blue);
 		tmp = g_slist_next(tmp);
 		i++;
 	}
 
-	ring_buffer_write(cw->ring_buffer, waterfall_entry, cw->no_cpu * sizeof(GdkColor));
+	ring_buffer_write(cw->ring_buffer, waterfall_entry, cw->no_cpu * sizeof(struct ps_color));
 	cw->ring_buffer_elements++;
 
 }

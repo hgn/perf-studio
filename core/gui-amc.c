@@ -357,26 +357,41 @@ static int draw_cpu_usage_chart(struct ps *ps, GtkWidget *widget,
 	return x_position;
 }
 
+
 static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
-				    cairo_t *cr, struct cpu_waterfall *cpu_waterfall)
+				    cairo_t *cr, struct cpu_waterfall *cpu_waterfall, int x_position)
 {
 	int i, j;
 	int ret, offset;
+	cairo_surface_t *image;
+
+	int y;
+
+	cairo_set_antialias(cr, CAIRO_ANTIALIAS_DEFAULT);
 
 	offset = 0;
 	for (i = 0; i < cpu_waterfall->ring_buffer_elements; i++) {
-		GdkColor waterfall_entry[cpu_waterfall->no_cpu];
-		//fprintf(stderr, "Time: %4d  ", i);
+		struct ps_color waterfall_entry[cpu_waterfall->no_cpu];
+		fprintf(stderr, "Time: %4d  ", i);
 		offset += ring_buffer_read_at(cpu_waterfall->ring_buffer,
 				              waterfall_entry,
-					      cpu_waterfall->no_cpu * sizeof(GdkColor), offset);
+					      cpu_waterfall->no_cpu * sizeof(struct ps_color), offset);
 		for (j = 0; j < cpu_waterfall->no_cpu; j++) {
-			//fprintf(stderr, " %5d", waterfall_entry[j].blue);
+
+			fprintf(stderr, " {%.2f, %.2f, %.2f}", waterfall_entry[j].red, waterfall_entry[j].green, waterfall_entry[j].blue);
+
+			cairo_set_source_rgba(cr, waterfall_entry[j].red, waterfall_entry[j].green, waterfall_entry[j].blue, waterfall_entry[j].alpha);
+			int x_pos_pos = x_position + 100 + (i * 10);
+			int y_pos = 40 + (j * 30);
+			cairo_rectangle(cr, x_pos_pos, y_pos, 10, 30);
+			cairo_fill(cr);
+
+
 		}
-		//fprintf(stderr, "\n");
+		fprintf(stderr, "\n");
 
 	}
-	//fprintf(stderr, "\n");
+	fprintf(stderr, "\n");
 }
 
 
@@ -465,7 +480,7 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 
 	/* draw CPU bar charts */
 	x_position = draw_cpu_usage_chart(ps, widget, cr, system_cpu);
-	x_position = draw_cpu_waterfall_chart(ps, widget, cr, cpu_waterfall);
+	x_position = draw_cpu_waterfall_chart(ps, widget, cr, cpu_waterfall, x_position);
 
 	//draw_interrupt_monitor_charts(ps, widget, cr, interrupt_monitor_data, x_position);
 
@@ -549,7 +564,7 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 	g_object_set_data(G_OBJECT(darea), "system-cpu", system_cpu);
 	g_object_set_data(G_OBJECT(darea), "interrupt-monitor-data", interrupt_monitor_data);
 	g_object_set_data(G_OBJECT(darea), "cpu-waterfall", cpu_waterfall);
-	g_timeout_add(CPU_USAGE_REFRESH, (GSourceFunc)draw_area_timer_cb, darea);
+	g_timeout_add(CPU_USAGE_REFRESH,(GSourceFunc)draw_area_timer_cb, darea);
 
 	return darea;
 }
