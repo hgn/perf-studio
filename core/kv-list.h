@@ -3,6 +3,8 @@
 
 #include "perf-studio.h"
 
+#define KV_LIST_HEAD(x) (x->kv_list_entry_list)
+
 
 enum {
         KV_LIST_TYPE_INT_STRING,

@@ -20,7 +20,7 @@ void kv_list_add_int_string(struct kv_list *kv_list, int key, char *value)
 
         e = g_malloc(sizeof(*e));
         e->key   = GINT_TO_POINTER(key);
-        e->value = value;
+        e->value = g_strdup(value);
 
         kv_list->kv_list_entry_list = g_slist_append(kv_list->kv_list_entry_list, e);
 }
