@@ -22,13 +22,12 @@ void kv_list_add_int_string(struct kv_list *kv_list, int key, char *value)
         e->key   = GINT_TO_POINTER(key);
         e->value = value;
 
-        kv_list = g_slist_append(kv_list, e);
+        kv_list->kv_list_entry_list = g_slist_append(kv_list->kv_list_entry_list, e);
 }
+
 
 static void kv_list_free_int_string(struct kv_list *kv_list)
 {
-        int *type;
-        char *value;
         GSList *tmp;
 
         tmp = kv_list->kv_list_entry_list;
@@ -37,6 +36,8 @@ static void kv_list_free_int_string(struct kv_list *kv_list)
 
                 e = tmp->data;
                 assert(e);
+		assert(e->value);
+		g_free(e->value);
                 g_free(e);
                 tmp = g_slist_next(tmp);
         }
@@ -51,6 +52,7 @@ void kv_list_free(struct kv_list *kv_list)
 
         switch (kv_list->type) {
         case KV_LIST_TYPE_INT_STRING:
+		kv_list_free_int_string(kv_list);
                 break;
         default:
                 assert(0);
