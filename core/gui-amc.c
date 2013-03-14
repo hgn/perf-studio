@@ -523,9 +523,9 @@ static gboolean draw_area_timer_cb(GtkWidget *widget)
 	cpu_waterfall = g_object_get_data(G_OBJECT(widget), "cpu-waterfall");
 	assert(cpu_waterfall);
 
-	system_cpu_checkpoint(ps, sc);
-	cpu_waterfall_checkpoint(ps, cpu_waterfall, sc);
-	interrupt_monitor_ctrl_checkpoint(ps, interrupt_monitor_data);
+	system_cpu_update(ps, sc);
+	cpu_waterfall_update(ps, cpu_waterfall, sc);
+	interrupt_monitor_ctrl_update(ps, interrupt_monitor_data);
 
 	width = gtk_widget_get_allocated_width(widget);
 	height = gtk_widget_get_allocated_height(widget);
@@ -554,8 +554,8 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 	if (!cpu_waterfall)
 		pr_error(ps, "Could not initilize waterfall gui");
 
-	system_cpu_checkpoint(ps, system_cpu);
-	interrupt_monitor_ctrl_checkpoint(ps, interrupt_monitor_data);
+	system_cpu_update(ps, system_cpu);
+	interrupt_monitor_ctrl_update(ps, interrupt_monitor_data);
 
 	g_signal_connect(darea, "draw", G_CALLBACK(draw_cb), NULL);
 	g_signal_connect(darea, "configure-event", G_CALLBACK(configure_cb), NULL);

@@ -20,7 +20,7 @@ struct system_cpu *system_cpu_new(struct ps *ps)
 
 	system_cpu = g_slice_alloc0(sizeof(*system_cpu));
 
-	ret = clock_gettime(CLOCK_REALTIME, &system_cpu->last_checkpointed);
+	ret = clock_gettime(CLOCK_REALTIME, &system_cpu->last_updated);
 	if (ret != 0)
 		err_msg_die(ps, EXIT_FAILURE, "cannot get system time!");
 
@@ -45,7 +45,7 @@ struct system_cpu *system_cpu_new(struct ps *ps)
 }
 
 
-void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu)
+void system_cpu_update(struct ps *ps, struct system_cpu *system_cpu)
 {
 	FILE *fp;
 	char *line = NULL;
@@ -161,7 +161,7 @@ void interrupt_monitor_ctrl_free(struct interrupt_monitor_data *imd)
 	g_slice_free1(sizeof(struct interrupt_monitor_data), imd);
 }
 
-void interrupt_monitor_ctrl_checkpoint(struct ps *ps, struct interrupt_monitor_data *imd)
+void interrupt_monitor_ctrl_update(struct ps *ps, struct interrupt_monitor_data *imd)
 {
 	int ret;
 	unsigned i, j;

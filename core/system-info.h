@@ -20,7 +20,7 @@ struct cpu_data {
 };
 
 struct system_cpu {
-	struct timespec last_checkpointed;
+	struct timespec last_updated;
 	/* index in list is number of cpu */
 	GSList *cpu_data_list;
 	long clock_tick;
@@ -28,7 +28,7 @@ struct system_cpu {
 
 struct system_cpu *system_cpu_new(struct ps *);
 void system_cpu_free(struct system_cpu *system_cpu);
-void system_cpu_checkpoint(struct ps *ps, struct system_cpu *system_cpu);
+void system_cpu_update(struct ps *ps, struct system_cpu *system_cpu);
 #define SYSTEM_CPU_NO_CPUS(system_cpu) (g_slist_length(system_cpu->cpu_data_list))
 
 struct irq_start_current {
@@ -57,7 +57,7 @@ struct interrupt_monitor_data {
 };
 
 struct interrupt_monitor_data *interrupt_monitor_data_new(struct ps *ps);
-void interrupt_monitor_ctrl_checkpoint(struct ps *, struct interrupt_monitor_data *);
+void interrupt_monitor_ctrl_update(struct ps *, struct interrupt_monitor_data *);
 void interrupt_monitor_ctrl_free(struct interrupt_monitor_data *);
 
 #endif

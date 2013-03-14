@@ -23,7 +23,7 @@ void cpu_waterfall_free(struct cpu_waterfall *);
  * here: the checkpointing is already done. CPU waterfall
  * just update the data, thats all. So I am not sure ...
  */
-static inline void cpu_waterfall_checkpoint(struct ps *ps, struct cpu_waterfall *cw,
+static inline void cpu_waterfall_update(struct ps *ps, struct cpu_waterfall *cw,
 				       struct system_cpu *sc)
 {
 	cpu_waterfall_add_data(ps, cw, sc);
