@@ -1,8 +1,12 @@
 /* area project overview */
 
+#include <assert.h>
+
 #include "gui-apo.h"
 #include "gui-toolkit.h"
 #include "shared.h"
+#include "str-parser.h"
+#include "kv-list.h"
 
 
 static void widget_set_title(GtkWidget *widget, const char *title)
@@ -250,6 +254,90 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 
 
 	return vbox;
+}
+
+
+struct kv_list *cmd_segment_size_create(const char *exec_path)
+{
+        int ret, i;
+        const char *argv[] = { "size", exec_path, NULL };
+        char *output = NULL;
+        GError *error = NULL;
+        int exit_status = 0;
+        struct kv_list *kv_list;
+        const char *keys[] = {"text", "data", "size"};
+        long values[3];
+
+        if (!g_spawn_sync(NULL, argv, NULL, 0, NULL, NULL,
+                          &output, NULL, &exit_status, &error)) {
+                // handle error here
+                return NULL;
+        }
+        fprintf(stderr, "output: %s\n", output);
+
+        struct str_parser str_parser;
+        str_parser_init(&str_parser, output);
+
+        kv_list = kv_list_new(KV_LIST_TYPE_INT_STRING);
+
+        for (i = 0; i < ARRAY_SIZE(keys); i++) {
+                long longval;
+                ret = str_parser_next_long(&str_parser, &longval);
+                if (ret != STR_PARSER_RET_SUCCESS) {
+                        goto err;
+                }
+
+		kv_list_add_int_string(kv_list, longval, keys[i]);
+
+        }
+
+        // great, we parsed the output of size cmd successfully
+
+
+        g_free(output);
+        return kv_list;
+err:
+        kv_list_free(kv_list);
+        g_free(output);
+
+        return NULL;
+}
+
+
+void cmd_segment_size_free(struct kv_list *kv_list)
+{
+
+}
+
+
+static void gui_apc_update_segment_size(struct ps *ps)
+{
+        struct kv_list *kv_list;
+
+        assert(ps);
+        assert(ps->project);
+
+        kv_list = cmd_segment_size_create("ls");
+        if (!kv_list) {
+                pr_error(ps, "Cannot get segment size");
+                return;
+        }
+
+        /* transform raw segment data in a pie chart */
+        //gui_apc_segment_set_update(ps, kv_list);
+        //gtk_redraw(darea);
+}
+
+/*
+ * ps->project is new (or replaced), update
+ * all views and related fields now
+ */
+void gui_apo_new_project_loaded(struct ps *ps)
+{
+        /* update project summary fields */
+
+        /* update exec segment view generated via size(1) */
+        gui_apc_update_segment_size(ps);
 }
 
 

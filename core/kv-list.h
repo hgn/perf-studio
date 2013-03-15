@@ -22,5 +22,9 @@ struct kv_list {
 };
 
 
+struct kv_list *kv_list_new(unsigned int type);
+void kv_list_add_int_string(struct kv_list *kv_list, int key, char *value);
+void kv_list_free(struct kv_list *kv_list);
+
 #endif /* KV_LIST_H */
 

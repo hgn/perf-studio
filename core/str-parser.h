@@ -13,6 +13,7 @@ struct str_parser {
 	const char *curr_ptr;
 };
 
+// FIXME rename to _create
 void str_parser_init(struct str_parser *str_parser, const char *new_str);
 void str_parser_reset(struct str_parser *str_parser);
 int str_parser_skip_spaces(struct str_parser *str_parser);
