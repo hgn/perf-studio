@@ -86,3 +86,51 @@ info:
   [time-00001.data]
     type = TIME
 
+
+
+
+Coding Style
+============
+
+Return Values:
+
+They are generally three kinds of function classes:
+
+1. Allocation functions return a pointer to a struct
+   or NULL in the case of error
+2. Status code with 0 (no error) or a negative value
+   to indicate a error (e.g. -ENOMEM)
+3. no success/error at all because the function can
+   never fail.
+
+
+Function Name Nomenclature
+==========================
+
+
+
+/* long there objects. They normally return a
+   pointer to a struct of type whatever_foo. To free
+   the data structure you call whatever_foo_free(struct)
+ */
+whatever_foo_new();
+
+/*
+ * Short therm objects. In difference to the long term object
+ * the create family of functions can return any data type:
+ * int, struct, GSList, ...
+ * Similarity is that both _new() and _create() will return a
+ * new data type/value/object
+ *
+ * Some of them have associated free function 
+ */
+whatever_foo_create();
+
+/* subsystem initialization without state. This class of
+ * functions do not return a allocated object. Rather they
+ * return success (0) or a negative failure code.  */
+whatever_foo_init();
+
+
+whatever_foo_update() functions are called in long term objects
+
