@@ -372,13 +372,13 @@ static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 	offset = 0;
 	for (i = 0; i < cpu_waterfall->ring_buffer_elements; i++) {
 		struct ps_color waterfall_entry[cpu_waterfall->no_cpu];
-		fprintf(stderr, "Time: %4d  ", i);
+		//fprintf(stderr, "Time: %4d  ", i);
 		offset += ring_buffer_read_at(cpu_waterfall->ring_buffer,
 				              waterfall_entry,
 					      cpu_waterfall->no_cpu * sizeof(struct ps_color), offset);
 		for (j = 0; j < cpu_waterfall->no_cpu; j++) {
 
-			fprintf(stderr, " {%.2f, %.2f, %.2f}", waterfall_entry[j].red, waterfall_entry[j].green, waterfall_entry[j].blue);
+			//fprintf(stderr, " {%.2f, %.2f, %.2f}", waterfall_entry[j].red, waterfall_entry[j].green, waterfall_entry[j].blue);
 
 			cairo_set_source_rgba(cr, waterfall_entry[j].red, waterfall_entry[j].green, waterfall_entry[j].blue, waterfall_entry[j].alpha);
 			int x_pos_pos = x_position + 100 + (i * 10);
@@ -388,10 +388,10 @@ static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 
 
 		}
-		fprintf(stderr, "\n");
+		//fprintf(stderr, "\n");
 
 	}
-	fprintf(stderr, "\n");
+	//fprintf(stderr, "\n");
 }
 
 

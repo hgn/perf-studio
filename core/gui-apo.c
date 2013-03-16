@@ -260,23 +260,22 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 struct kv_list *cmd_segment_size_create(const char *exec_path)
 {
         int ret, i;
-        const char *argv[] = { "size", exec_path, NULL };
+        const char *argv[] = { "/usr/bin/size", exec_path, NULL };
         char *output = NULL;
         GError *error = NULL;
         int exit_status = 0;
         struct kv_list *kv_list;
-        const char *keys[] = {"text", "data", "size"};
-        long values[3];
+        const char *keys[] = {"text", "data", "bss", "size"};
+        long values[4];
+        struct str_parser str_parser;
 
         if (!g_spawn_sync(NULL, argv, NULL, 0, NULL, NULL,
                           &output, NULL, &exit_status, &error)) {
                 // handle error here
                 return NULL;
         }
-        fprintf(stderr, "output: %s\n", output);
-
-        struct str_parser str_parser;
         str_parser_init(&str_parser, output);
+	str_parser_skip_line(&str_parser);
 
         kv_list = kv_list_new(KV_LIST_TYPE_INT_STRING);
 
@@ -290,9 +289,6 @@ struct kv_list *cmd_segment_size_create(const char *exec_path)
 		kv_list_add_int_string(kv_list, longval, keys[i]);
 
         }
-
-        // great, we parsed the output of size cmd successfully
-
 
         g_free(output);
         return kv_list;
@@ -317,7 +313,7 @@ static void gui_apc_update_segment_size(struct ps *ps)
         assert(ps);
         assert(ps->project);
 
-        kv_list = cmd_segment_size_create("ls");
+        kv_list = cmd_segment_size_create("/usr/bin/gcc");
         if (!kv_list) {
                 pr_error(ps, "Cannot get segment size");
                 return;
@@ -334,6 +330,7 @@ static void gui_apc_update_segment_size(struct ps *ps)
  */
 void gui_apo_new_project_loaded(struct ps *ps)
 {
+	assert(ps->project);
         /* update project summary fields */
 
         /* update exec segment view generated via size(1) */

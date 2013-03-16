@@ -194,7 +194,7 @@ void cpu_waterfall_add_data(struct ps *ps, struct cpu_waterfall *cw, struct syst
 				   cpu_data->user_time_percent;
 
 		cpu_waterfall_calc_color(sys_user_percent, &waterfall_entry[i]);
-		fprintf(stderr, "{%.2f,%.2f,%.2f}", waterfall_entry[i].red, waterfall_entry[i].green, waterfall_entry[i].blue);
+		//fprintf(stderr, "{%.2f,%.2f,%.2f}", waterfall_entry[i].red, waterfall_entry[i].green, waterfall_entry[i].blue);
 		tmp = g_slist_next(tmp);
 		i++;
 	}

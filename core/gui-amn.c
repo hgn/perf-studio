@@ -4,6 +4,7 @@
 
 #include "perf-studio.h"
 #include "gui-amn.h"
+#include "gui-apo.h"
 #include "gui-toolkit.h"
 #include "shared.h"
 
@@ -46,28 +47,50 @@ static void project_load_widget_add_artwork(struct ps *ps, GtkWidget *container)
 static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 		GtkTreePath *path, GtkTreeViewColumn *col, gpointer user_data)
 {
-	GtkTreeIter iter;
+	gchar *name, *project_path;
 	GtkTreeModel *model;
+	GSList *list_tmp;
+	GtkTreeIter iter;
 	struct ps *ps;
 
-	assert(user_data);
 	(void) col;
-
 	ps = user_data;
+	assert(ps);
 
 	model = gtk_tree_view_get_model(view);
-
-	if (gtk_tree_model_get_iter(model, &iter, path)) {
-		gchar *name, *project_path;
-		gtk_tree_model_get(model, &iter, 0, &name, -1);
-		gtk_tree_model_get(model, &iter, 1, &project_path, -1);
+	if (!gtk_tree_model_get_iter(model, &iter, path)) {
+		pr_error(ps, "Cannot get tree model");
 		gtk_widget_destroy(ps->s.project_load_window);
 		ps->s.project_load_window = NULL;
-		g_print("project selected: %s, path: %s\n", name, project_path);
-		//control_window_reload_new_project(xsc, project_path);
-		g_free(name);
-		g_free(project_path);
+		return;
 	}
+
+	gtk_tree_model_get(model, &iter, 0, &name, -1);
+	gtk_tree_model_get(model, &iter, 1, &project_path, -1);
+
+	list_tmp = ps->project_list;
+	while (list_tmp) {
+		struct project *project;
+		project = list_tmp->data;
+
+		if (streq(project->exec_path, name)) {
+			// found project
+			ps->project = project;
+			pr_info(ps, "project selected: %s, path: %s\n",
+				 name, project_path);
+			break;
+		}
+
+		list_tmp = g_slist_next(list_tmp);
+	}
+
+	/* inform APO panel */
+	gui_apo_new_project_loaded(ps);
+
+	gtk_widget_destroy(ps->s.project_load_window);
+	ps->s.project_load_window = NULL;
+	g_free(name);
+	g_free(project_path);
 }
 
 
