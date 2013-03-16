@@ -1,6 +1,8 @@
 #include <assert.h>
+#include <math.h>
 
 #include "gui-toolkit.h"
+#include "kv-list.h"
 
 /*
  * float: 4 byte + PIE_CHART_LABEL_MAX(8) = 12 byte
@@ -13,11 +15,9 @@ struct pie_data_slot {
 };
 
 
-struct gt_pie_chart *gt_pie_chart_new(struct ps *ps)
+struct gt_pie_chart *gt_pie_chart_new(void)
 {
         struct gt_pie_chart *gtpc;
-
-	(void)ps;
 
         gtpc = g_malloc(sizeof(*gtpc));
         gtpc->pie_data_slot_array = g_array_new(FALSE, FALSE, sizeof(struct pie_data_slot));
@@ -54,24 +54,49 @@ void gt_pie_chart_set_radius(struct gt_pie_chart *gt_pie_chart, int inner_radius
 }
 
 
-void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart, GSList *chart_data_list)
+void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart, struct kv_list *chart_data_list)
 {
-#if 0
-        int i;
-        int sum;
-        float percentages[length];
-        float angle[length];
+	long sum, max;
+	int elements, i;
+	float *percentages;
+	float *angles;
+	GSList *tmp;
 
-        sum = 0;
-        for (i = 0; i < lenght; i++) {
-                sum += values[i];
-        }
+	sum = elements = max = 0;
+	tmp = KV_LIST_HEAD(chart_data_list);
+	while (tmp) {
+		struct kv_list_entry *entry;
+		entry = tmp->data;
+		assert(entry);
 
-        for (i = 0; i < lenght; i++) {
-                percentages[i] = ((float)values[i] / max) * 360.0;
-                angle[i] = percentages[i] * (M_PI / 180.0);
-        }
-#endif
+		sum += GPOINTER_TO_INT(entry->key);
+		max = max(GPOINTER_TO_INT(entry->key), max);
+
+		fprintf(stderr, "sum: %d\n", sum);
+
+		elements++;
+		tmp = g_slist_next(tmp);
+	}
+
+	percentages = g_malloc(sizeof(float) * elements);
+	angles      = g_malloc(sizeof(float) * elements);
+
+	tmp = KV_LIST_HEAD(chart_data_list);
+	while (tmp) {
+		struct kv_list_entry *entry;
+		entry = tmp->data;
+		assert(entry);
+
+                percentages[i] = ((float)GPOINTER_TO_INT(entry->key) / max) * 360.0;
+                angles[i] = percentages[i] * (M_PI / 180.0);
+
+		fprintf(stderr, "angle: %f\n",  angles[i]);
+
+		tmp = g_slist_next(tmp);
+	}
+
+	g_free(percentages);
+	g_free(angles);
 }
 
 

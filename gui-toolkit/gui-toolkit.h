@@ -52,8 +52,10 @@ struct gt_pie_chart {
         struct ps_color *fg_color;
 };
 
-void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart, GSList *chart_data_list);
-struct gt_pie_chart *gt_pie_chart_new(struct ps *ps);
+struct kv_list;
+
+void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart, struct kv_list *);
+struct gt_pie_chart *gt_pie_chart_new(void);
 void gt_pie_chart_free(struct gt_pie_chart *gt_pie_chart);
 void gt_pie_chart_draw(struct ps *ps, struct gt_pie_chart *gt_pie_chart, cairo_t *cr);
 void gt_pie_chart_set_linewidth(struct gt_pie_chart *gt_pie_chart, int linewidth);

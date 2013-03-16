@@ -271,7 +271,7 @@ static void draw_cpu_usage_axis(cairo_t *cr, int x_position)
 
 
 static int draw_cpu_usage_chart(struct ps *ps, GtkWidget *widget,
-				  cairo_t *cr, struct system_cpu *system_cpu)
+		cairo_t *cr, struct system_cpu *system_cpu)
 {
 	float acc_system, acc_user;
 	int x_position;
@@ -304,7 +304,7 @@ static int draw_cpu_usage_chart(struct ps *ps, GtkWidget *widget,
 
 		/* draw chart */
 		system_user_time = min(100.0f, cpu_data->system_time_percent +
-				               cpu_data->user_time_percent);
+				cpu_data->user_time_percent);
 
 		acc_system += cpu_data->system_time_percent;
 		acc_user   += cpu_data->user_time_percent;
@@ -359,7 +359,7 @@ static int draw_cpu_usage_chart(struct ps *ps, GtkWidget *widget,
 
 
 static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
-				    cairo_t *cr, struct cpu_waterfall *cpu_waterfall, int x_position)
+		cairo_t *cr, struct cpu_waterfall *cpu_waterfall, int x_position)
 {
 	int i, j;
 	int ret, offset;
@@ -374,8 +374,8 @@ static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 		struct ps_color waterfall_entry[cpu_waterfall->no_cpu];
 		//fprintf(stderr, "Time: %4d  ", i);
 		offset += ring_buffer_read_at(cpu_waterfall->ring_buffer,
-				              waterfall_entry,
-					      cpu_waterfall->no_cpu * sizeof(struct ps_color), offset);
+				waterfall_entry,
+				cpu_waterfall->no_cpu * sizeof(struct ps_color), offset);
 		for (j = 0; j < cpu_waterfall->no_cpu; j++) {
 
 			//fprintf(stderr, " {%.2f, %.2f, %.2f}", waterfall_entry[j].red, waterfall_entry[j].green, waterfall_entry[j].blue);
@@ -396,9 +396,9 @@ static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 
 
 static void draw_interrupt_monitor_charts(struct ps *ps, GtkWidget *widget,
-				  cairo_t *cr,
-				  struct interrupt_monitor_data *imd,
-				  int x_position)
+		cairo_t *cr,
+		struct interrupt_monitor_data *imd,
+		int x_position)
 {
 	unsigned int i, j;
 	int y_position;

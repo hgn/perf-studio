@@ -198,16 +198,52 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 }
 
 
-static GtkWidget *object_section_size_widget_new(void)
+static gboolean segment_size_draw_cb(GtkWidget *widget, GdkEventExpose *event)
+{
+	cairo_t *cr;
+
+	cr = gdk_cairo_create(gtk_widget_get_window(widget));
+
+	cairo_destroy(cr);
+
+	gtk_widget_set_size_request(widget, 100, 75);
+
+	return FALSE;
+}
+
+
+static gboolean segment_size_configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
+{
+	(void)widget;
+	(void)event;
+	(void)data;
+
+	return FALSE;
+}
+
+static GtkWidget *segment_size_darea_create(void)
+{
+	GtkWidget *darea;
+	darea = gtk_drawing_area_new();
+
+	g_signal_connect(darea, "draw", G_CALLBACK(segment_size_draw_cb), NULL);
+	g_signal_connect(darea, "configure-event", G_CALLBACK(segment_size_configure_cb), NULL);
+
+	return darea;
+}
+
+
+static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 {
 	GtkWidget *expander;
-	GtkWidget *entry;
 
 	expander= gtk_expander_new("Section Size");
 
-	entry = gtk_entry_new();
-	gtk_container_add(GTK_CONTAINER(expander), entry);
-	gtk_expander_set_expanded(GTK_EXPANDER (expander), FALSE);
+	ps->s.project_info_segment_size.darea = segment_size_darea_create();
+	ps->d.project_info_segment_size.pie_chart_data = gt_pie_chart_new();
+
+	gtk_container_add(GTK_CONTAINER(expander), ps->s.project_info_segment_size.darea);
+	gtk_expander_set_expanded(GTK_EXPANDER(expander), FALSE);
 
 	return expander;
 }
@@ -246,7 +282,7 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 	header = header_status_widget(ps, " Object Details");
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 2);
 
-	widget = object_section_size_widget_new();
+	widget = object_segment_size_widget_new(ps);
 	gtk_box_pack_start(GTK_BOX(vbox), widget, FALSE, FALSE, 4);
 
 	widget = function_size_widget_new();
@@ -309,6 +345,7 @@ void cmd_segment_size_free(struct kv_list *kv_list)
 static void gui_apc_update_segment_size(struct ps *ps)
 {
         struct kv_list *kv_list;
+	struct gt_pie_chart *gt_pie_chart;
 
         assert(ps);
         assert(ps->project);
@@ -318,6 +355,11 @@ static void gui_apc_update_segment_size(struct ps *ps)
                 pr_error(ps, "Cannot get segment size");
                 return;
         }
+
+	gt_pie_chart = ps->d.project_info_segment_size.pie_chart_data;
+	assert(gt_pie_chart);
+
+	gt_pie_chart_set_data(gt_pie_chart, kv_list);
 
         /* transform raw segment data in a pie chart */
         //gui_apc_segment_set_update(ps, kv_list);

@@ -176,6 +176,9 @@ struct conf {
 	} ui;
 };
 
+/* forward decl */
+struct gt_pie_chart;
+
 struct screen {
 	GtkWidget *main_window;
 	GtkWidget *project_load_window;
@@ -184,6 +187,7 @@ struct screen {
 		GtkWidget *label;
 	} atitle;
 	GtkWidget *statusbar;
+	/* APO Section */
 	struct {
 		GtkWidget *name;
 		GtkWidget *description;
@@ -191,7 +195,17 @@ struct screen {
 		GtkWidget *exec_args;
 		GtkWidget *working_dir;
 	} project_info;
+	struct {
+		GtkWidget *darea;
+	} project_info_segment_size;
 };
+
+struct data {
+	struct {
+		struct gt_pie_chart *pie_chart_data;
+	} project_info_segment_size;
+};
+
 
 struct project {
 	/* values from .perf-studio/config */
@@ -227,6 +241,7 @@ struct ps {
 	gboolean screen_usable;
 	struct screen s;
 	struct screen_info si;
+	struct data d;
 	/* CLI args */
 	struct args args;
 	struct conf conf;
