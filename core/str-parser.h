@@ -21,6 +21,7 @@ int str_parser_long(struct str_parser *str_parser, long *retval);
 int str_parser_next_long(struct str_parser *str_parser, long *retval);
 int str_parser_next_alphanum(struct str_parser *str_parser, char *dest, size_t max_len);
 int str_parser_remain(struct str_parser *str_parser, char *dest, size_t max_len);
+int str_parser_skip_line(struct str_parser *str_parser);
 
 static inline void str_parser_skip_char(struct str_parser *str_parser, char x)
 {

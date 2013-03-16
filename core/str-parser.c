@@ -31,6 +31,27 @@ void str_parser_reset(struct str_parser *str_parser)
 }
 
 
+int str_parser_skip_line(struct str_parser *str_parser)
+{
+	assert(str_parser);
+
+	if (!*str_parser->curr_ptr)
+		return STR_PARSER_RET_EOL;
+
+	while (*str_parser->curr_ptr != '\n')
+		str_parser->curr_ptr++;
+
+	if (!*str_parser->curr_ptr)
+		return STR_PARSER_RET_EOL;
+
+	/* skip newline */
+	str_parser->curr_ptr++;
+	if (!*str_parser->curr_ptr)
+		return STR_PARSER_RET_EOL;
+
+	return STR_PARSER_RET_SUCCESS;
+}
+
 int str_parser_skip_spaces(struct str_parser *str_parser)
 {
 	assert(str_parser);
