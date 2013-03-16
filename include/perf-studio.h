@@ -178,6 +178,7 @@ struct conf {
 
 struct screen {
 	GtkWidget *main_window;
+	GtkWidget *project_load_window;
 	GtkWidget *vbox;
 	struct {
 		GtkWidget *label;

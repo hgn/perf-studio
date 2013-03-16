@@ -61,8 +61,8 @@ static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 		gchar *name, *project_path;
 		gtk_tree_model_get(model, &iter, 0, &name, -1);
 		gtk_tree_model_get(model, &iter, 1, &project_path, -1);
-		//gtk_widget_destroy(sc.screen.dialog_window);
-		//sc.screen.dialog_window = NULL;
+		gtk_widget_destroy(ps->s.project_load_window);
+		ps->s.project_load_window = NULL;
 		g_print("project selected: %s, path: %s\n", name, project_path);
 		//control_window_reload_new_project(xsc, project_path);
 		g_free(name);
@@ -116,14 +116,11 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
 void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 {
 	GtkWidget *vbox;
-	GtkWidget *dialog_window;
 
-	pr_info(ps, "Load project");
-
-	dialog_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_widget_set_size_request(dialog_window, 600, 400);
-	gtk_container_set_border_width(GTK_CONTAINER(dialog_window), 0);
-	gtk_window_set_modal((GtkWindow *)dialog_window, TRUE);
+	ps->s.project_load_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_widget_set_size_request(ps->s.project_load_window, 600, 400);
+	gtk_container_set_border_width(GTK_CONTAINER(ps->s.project_load_window), 0);
+	gtk_window_set_modal((GtkWindow *)ps->s.project_load_window, TRUE);
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
@@ -132,12 +129,11 @@ void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 	project_load_widget_add_project_list(ps, vbox);
 	gtk_widget_show(vbox);
 
-
-	gtk_container_add(GTK_CONTAINER(dialog_window), vbox);
-	gtk_window_set_position((GtkWindow *)dialog_window, GTK_WIN_POS_CENTER);
-	gtk_window_present((GtkWindow *)dialog_window);
-	gtk_widget_show((GtkWidget *)dialog_window);
-	gtk_widget_grab_focus(GTK_WIDGET(dialog_window));
+	gtk_container_add(GTK_CONTAINER(ps->s.project_load_window), vbox);
+	gtk_window_set_position((GtkWindow *)ps->s.project_load_window, GTK_WIN_POS_CENTER);
+	gtk_window_present((GtkWindow *)ps->s.project_load_window);
+	gtk_widget_show((GtkWidget *)ps->s.project_load_window);
+	gtk_widget_grab_focus(GTK_WIDGET(ps->s.project_load_window));
 }
 
 
