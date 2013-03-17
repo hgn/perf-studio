@@ -72,7 +72,7 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart, struct kv_list *ch
 		sum += GPOINTER_TO_INT(entry->key);
 		max = max(GPOINTER_TO_INT(entry->key), max);
 
-		fprintf(stderr, "sum: %d\n", sum);
+		fprintf(stderr, "sum: %d\n", GPOINTER_TO_INT(entry->key));
 
 		elements++;
 		tmp = g_slist_next(tmp);
@@ -87,10 +87,10 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart, struct kv_list *ch
 		entry = tmp->data;
 		assert(entry);
 
-                percentages[i] = ((float)GPOINTER_TO_INT(entry->key) / max) * 360.0;
+                percentages[i] = ((float)GPOINTER_TO_INT(entry->key) / sum) * 360.0;
                 angles[i] = percentages[i] * (M_PI / 180.0);
 
-		fprintf(stderr, "angle: %f\n",  angles[i]);
+		fprintf(stderr, "angle: %f\n",  percentages[i]);
 
 		tmp = g_slist_next(tmp);
 	}

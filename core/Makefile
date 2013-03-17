@@ -85,7 +85,7 @@ TARGET=perf-studio
 
 all: $(COBJECTS) $(TARGET)
 
-$(TARGET): $(COBJECTS)
+$(TARGET): $(COBJECTS) ../gui-toolkit/gui-toolkit.a
 	$(Q)$(do_app_build)
 
 $(obj)/%.o: %.c

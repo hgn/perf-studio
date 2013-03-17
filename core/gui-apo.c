@@ -301,8 +301,8 @@ struct kv_list *cmd_segment_size_create(const char *exec_path)
         GError *error = NULL;
         int exit_status = 0;
         struct kv_list *kv_list;
-        const char *keys[] = {"text", "data", "bss", "size"};
-        long values[4];
+        const char *keys[] = {"text", "data", "bss" };
+        long values[3];
         struct str_parser str_parser;
 
         if (!g_spawn_sync(NULL, argv, NULL, 0, NULL, NULL,
