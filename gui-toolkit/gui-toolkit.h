@@ -52,12 +52,14 @@ struct gt_pie_chart {
         struct ps_color *fg_color;
 };
 
+#define DEG_TO_RAD(x) (((float)x) * M_PI / 180.0)
+
 struct kv_list;
 
 void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart, struct kv_list *);
 struct gt_pie_chart *gt_pie_chart_new(void);
 void gt_pie_chart_free(struct gt_pie_chart *gt_pie_chart);
-void gt_pie_chart_draw(struct ps *ps, struct gt_pie_chart *gt_pie_chart, cairo_t *cr);
+void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct gt_pie_chart *gtpc);
 void gt_pie_chart_set_linewidth(struct gt_pie_chart *gt_pie_chart, int linewidth);
 void gt_pie_chart_set_offsets(struct gt_pie_chart *gt_pie_chart, int x_offset, int y_offset);
 void gt_pie_chart_set_radius(struct gt_pie_chart *gt_pie_chart, int inner_radius, int outer_radius);

@@ -198,13 +198,17 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 }
 
 
-static gboolean segment_size_draw_cb(GtkWidget *widget, GdkEventExpose *event)
+static gboolean segment_size_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
-	cairo_t *cr;
+	struct ps *ps;
 
-	cr = gdk_cairo_create(gtk_widget_get_window(widget));
+	ps = data;
 
-	cairo_destroy(cr);
+
+
+
+	gt_pie_chart_draw(ps, widget, cr, ps->d.project_info_segment_size.pie_chart_data);
+
 
 	gtk_widget_set_size_request(widget, 100, 75);
 
@@ -221,13 +225,13 @@ static gboolean segment_size_configure_cb(GtkWidget *widget, GdkEventConfigure *
 	return FALSE;
 }
 
-static GtkWidget *segment_size_darea_create(void)
+static GtkWidget *segment_size_darea_create(struct ps *ps)
 {
 	GtkWidget *darea;
 	darea = gtk_drawing_area_new();
 
-	g_signal_connect(darea, "draw", G_CALLBACK(segment_size_draw_cb), NULL);
-	g_signal_connect(darea, "configure-event", G_CALLBACK(segment_size_configure_cb), NULL);
+	g_signal_connect(darea, "draw", G_CALLBACK(segment_size_draw_cb), ps);
+	g_signal_connect(darea, "configure-event", G_CALLBACK(segment_size_configure_cb), ps);
 
 	return darea;
 }
@@ -239,7 +243,7 @@ static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 
 	expander= gtk_expander_new("Section Size");
 
-	ps->s.project_info_segment_size.darea = segment_size_darea_create();
+	ps->s.project_info_segment_size.darea = segment_size_darea_create(ps);
 	ps->d.project_info_segment_size.pie_chart_data = gt_pie_chart_new();
 
 	gtk_container_add(GTK_CONTAINER(expander), ps->s.project_info_segment_size.darea);
@@ -338,7 +342,7 @@ err:
 
 void cmd_segment_size_free(struct kv_list *kv_list)
 {
-
+	(void)kv_list;
 }
 
 
@@ -361,10 +365,10 @@ static void gui_apc_update_segment_size(struct ps *ps)
 
 	gt_pie_chart_set_data(gt_pie_chart, kv_list);
 
-        /* transform raw segment data in a pie chart */
-        //gui_apc_segment_set_update(ps, kv_list);
-        //gtk_redraw(darea);
+	/* force redraw */
+	gtk_widget_queue_draw_area(ps->s.project_info_segment_size.darea, 0, 0, -1, -1);
 }
+
 
 /*
  * ps->project is new (or replaced), update

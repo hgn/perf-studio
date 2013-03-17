@@ -128,26 +128,76 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart,
 }
 
 
-void gt_pie_chart_draw(struct ps *ps, struct gt_pie_chart *gtpc, cairo_t *cr)
+void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct gt_pie_chart *gtpc)
 {
-#if 0
+	guint width, height;
+	GdkRGBA color;
         double x_offset, y_offset;
+	double start_deg;
 
+	width = gtk_widget_get_allocated_width(widget);
+	height = gtk_widget_get_allocated_height(widget);
+
+        cairo_set_line_width (cr, 1.0);
+
+        cairo_set_source_rgba (cr, 1, 0.2, 0.2, 1.);
+
+	double xc = 100.0;
+	double yc = 50.0;
+	double radius = 20.0;
+	double angle1 = DEG_TO_RAD(0.0);
+	double angle2 = DEG_TO_RAD(45.0);
+
+	// https://code.google.com/p/homebank-maemo/source/browse/branches/4.2.1-maemo5/src/gtkchart.c#1481
+
+	fprintf(stderr, "angle: %f\n", angle2);
+
+	cairo_set_line_width (cr, 10.0);
+	cairo_arc(cr, xc, yc, radius, angle1, angle2);
+	cairo_fill(cr);
+
+	return;
+
+	/* draw helping lines */
+	cairo_set_source_rgba (cr, 1, 0.2, 0.2, 0.6);
+	cairo_set_line_width (cr, 6.0);
+
+	cairo_arc (cr, xc, yc, 10.0, 0, 2*M_PI);
+	cairo_fill (cr);
+
+	cairo_arc (cr, xc, yc, radius, angle1, angle1);
+	cairo_line_to (cr, xc, yc);
+	cairo_arc (cr, xc, yc, radius, angle2, angle2);
+	cairo_line_to (cr, xc, yc);
+	cairo_stroke (cr);
+
+#if 0
+
+	start_deg = 0.0;
+
+	cairo_arc(cr, width / 2.0, height / 2.0, min(width, height) / 2.0, start_deg, 2 * M_PI - 0.4);
+	cairo_stroke (cr);
+
+        //cairo_set_source_rgba (cr, .2, 1.0, 0.2, 1.);
+	//cairo_arc(cr, width / 2.0, height / 2.0, min(width, height) / 2.0, start_deg, .04);
+	//cairo_stroke(cr);
+
+	return
+
+        cairo_set_line_width (cr, 6.0);
         cairo_set_line_width (cr, 10.0);
-        cairo_arc (cr, gtpc->xo, gtpc->yo, gtpc->outer_radius, angle1, angle2);
+        cairo_arc (cr, gtpc->xo, gtpc->yo, gtpc->outer_radius, 0.0, .4);
         cairo_stroke (cr);
 
         /* draw helping lines */
-        cairo_set_source_rgba (cr, 1, 0.2, 0.2, 0.6);
-        cairo_set_line_width (cr, 6.0);
 
-        cairo_arc (cr, xc, yc, 10.0, 0, 2*M_PI);
-        cairo_fill (cr);
+        //cairo_arc (cr, xc, yc, 10.0, 0, 2*M_PI);
+        //cairo_fill (cr);
 
-        cairo_arc (cr, xc, yc, radius, angle1, angle1);
-        cairo_line_to (cr, xc, yc);
-        cairo_arc (cr, xc, yc, radius, angle2, angle2);
-        cairo_line_to (cr, xc, yc);
-        cairo_stroke (cr);
+        //cairo_arc (cr, xc, yc, radius, angle1, angle1);
+        //cairo_line_to (cr, xc, yc);
+        //cairo_arc (cr, xc, yc, radius, angle2, angle2);
+        //cairo_line_to (cr, xc, yc);
+        //cairo_stroke (cr);
 #endif
 }
