@@ -1,5 +1,6 @@
 /* area module navigation */
 
+#include <string.h>
 #include <assert.h>
 
 #include "perf-studio.h"
@@ -16,10 +17,13 @@ enum {
 	NUM_COLS
 };
 
-void project_load_widget_add_header(struct ps *ps, GtkWidget *container)
+
+static void project_load_widget_add_header(struct ps *ps, GtkWidget *container)
 {
 	GtkWidget *hbox;
 	GtkWidget *label;
+
+	(void)ps;
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	label = gtk_label_new("Open Project");
@@ -34,6 +38,8 @@ void project_load_widget_add_header(struct ps *ps, GtkWidget *container)
 static void project_load_widget_add_artwork(struct ps *ps, GtkWidget *container)
 {
         GtkWidget *event_box;
+
+	(void)ps;
 
         event_box = gtk_event_box_new();
 	gtk_widget_set_name(event_box, "header");
@@ -140,6 +146,8 @@ void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 {
 	GtkWidget *vbox;
 
+	(void) widget;
+
 	ps->s.project_load_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_widget_set_size_request(ps->s.project_load_window, 600, 400);
 	gtk_container_set_border_width(GTK_CONTAINER(ps->s.project_load_window), 0);
@@ -163,6 +171,7 @@ void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 static void row_activated(GtkTreeView *treeview, GtkTreePath *path,
 		   GtkTreeViewColumn *col, gpointer priv_data)
 {
+#if 0
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 	struct ps *ps;
@@ -174,7 +183,6 @@ static void row_activated(GtkTreeView *treeview, GtkTreePath *path,
 
 	pr_info(ps, "row activated");
 
-#if 0
 
 	model = gtk_tree_view_get_model(treeview);
 
@@ -209,9 +217,10 @@ static void row_activated(GtkTreeView *treeview, GtkTreePath *path,
 
 static GtkTreeModel *create_and_fill_model(struct ps *ps)
 {
-	GList *tmp;
 	GtkTreeStore *treestore;
 	GtkTreeIter toplevel, child;
+
+	(void)ps;
 
 	treestore = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
@@ -358,7 +367,6 @@ GtkWidget *gui_amn_new(struct ps *ps)
 {
 	GtkWidget *scroll_widget;
 	GtkWidget *view;
-	GtkTreeSelection *selection;
 
 	scroll_widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll_widget),
@@ -369,7 +377,7 @@ GtkWidget *gui_amn_new(struct ps *ps)
 	view = create_view_and_model(ps);
 	g_signal_connect(view, "row-activated", G_CALLBACK(row_activated), ps);
 
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
+	//selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), view);
 
 	return scroll_widget;
