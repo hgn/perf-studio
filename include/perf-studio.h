@@ -191,6 +191,7 @@ struct screen {
 	/* APO Section */
 	struct {
 		GtkWidget *name;
+		GtkWidget *id;
 		GtkWidget *description;
 		GtkWidget *exec_path;
 		GtkWidget *exec_args;

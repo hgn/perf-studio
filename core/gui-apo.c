@@ -64,6 +64,32 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	gtk_grid_attach(GTK_GRID(grid), label, 4, row, 1, 1);
 	row++;
 
+	/* id */
+	label = gtk_label_new("");
+	gtk_grid_attach(GTK_GRID (grid), label, 0, row, 1, 1);
+
+	label = gtk_label_new(" Project ID");
+	gtk_widget_set_name(GTK_WIDGET(label), "project_info_label");
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+	event_box = gtk_event_box_new();
+	gtk_container_add(GTK_CONTAINER(event_box), label);
+	gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(event_box), 1, row, 1, 1);
+
+	label = gtk_label_new("");
+	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
+
+	ps->s.project_info.id = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.id), 0, 0.5);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.id), "");
+	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.id), "project_info_label");
+	gtk_widget_set_hexpand(ps->s.project_info.id, TRUE);
+	event_box = gtk_event_box_new();
+	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.id);
+	gtk_grid_attach(GTK_GRID(grid), event_box, 3, row, 1, 1);
+	row++;
+
+
+
 
 	/* name */
 	label = gtk_label_new("");
@@ -88,7 +114,6 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.name);
 	gtk_grid_attach(GTK_GRID(grid), event_box, 3, row, 1, 1);
 	row++;
-
 
 
 	label = gtk_label_new("");
