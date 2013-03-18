@@ -187,6 +187,7 @@ struct screen {
 		GtkWidget *label;
 	} atitle;
 	GtkWidget *statusbar;
+
 	/* APO Section */
 	struct {
 		GtkWidget *name;
@@ -196,6 +197,7 @@ struct screen {
 		GtkWidget *working_dir;
 	} project_info;
 	struct {
+		GtkWidget *expander;
 		GtkWidget *darea;
 	} project_info_segment_size;
 };
