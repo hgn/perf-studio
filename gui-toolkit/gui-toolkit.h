@@ -48,8 +48,7 @@ struct gt_pie_chart {
         int inner_radius;
         int outer_radius;
         int line_width;
-        struct ps_color *bg_color;
-        struct ps_color *fg_color;
+        struct ps_color fg_color;
 };
 
 #define DEG_TO_RAD(x) (((float)x) * M_PI / 180.0)
@@ -63,5 +62,6 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct gt_
 void gt_pie_chart_set_linewidth(struct gt_pie_chart *gt_pie_chart, int linewidth);
 void gt_pie_chart_set_offsets(struct gt_pie_chart *gt_pie_chart, int x_offset, int y_offset);
 void gt_pie_chart_set_radius(struct gt_pie_chart *gt_pie_chart, int inner_radius, int outer_radius);
+void gt_pie_chart_set_fg_color(struct gt_pie_chart *gt_pie_chart, const struct ps_color *);
 
 #endif

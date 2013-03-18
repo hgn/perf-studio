@@ -80,7 +80,6 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile, const 
 		return NULL;
 	}
 
-
 	/* ok, project seems sane, create it */
 	project = project_new();
 	project->exec_path    = exec_path;

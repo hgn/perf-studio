@@ -1,8 +1,40 @@
-#include <assert.h>
+#include <string.h>
 #include <math.h>
+#include <assert.h>
 
 #include "gui-toolkit.h"
 #include "kv-list.h"
+
+#define DEFAULT_LINE_WIDTH 1
+#define DEFAULT_WIDGET_WIDTH -1
+#define DEFAULT_WIDGET_HEIGHT 100
+
+#define DEFAULT_LEFT_CIRC_PADDING 10
+
+/* http://html-color-codes.com/ */
+static const struct ps_color bg_fill_colors[] = {
+	/* #336699 */
+	[0] = { .red   = Hex8ToFloat(0x33),
+		.green = Hex8ToFloat(0x66),
+		.blue  = Hex8ToFloat(0x99),
+		.alpha = 1.0
+	},
+	[1] = { .red   = Hex8ToFloat(0x33),
+		.green = Hex8ToFloat(0x88),
+		.blue  = Hex8ToFloat(0x99),
+		.alpha = 1.0
+	},
+	[2] = { .red   = Hex8ToFloat(0x33),
+		.green = Hex8ToFloat(0x99),
+		.blue  = Hex8ToFloat(0x99),
+		.alpha = 1.0
+	},
+	[3] = { .red   = Hex8ToFloat(0x33),
+		.green = Hex8ToFloat(0xbb),
+		.blue  = Hex8ToFloat(0x99),
+		.alpha = 1.0
+	}
+};
 
 /*
  * float: 4 byte + PIE_CHART_LABEL_MAX(8) = 12 byte
@@ -22,6 +54,8 @@ struct gt_pie_chart *gt_pie_chart_new(void)
         gtpc = g_malloc(sizeof(*gtpc));
         gtpc->pie_data_slot_array = g_array_new(FALSE, FALSE,
 						sizeof(struct pie_data_slot));
+	gt_pie_chart_set_linewidth(gtpc, DEFAULT_LINE_WIDTH);
+
         return gtpc;
 }
 
@@ -61,13 +95,15 @@ void gt_pie_chart_set_radius(struct gt_pie_chart *gt_pie_chart,
 void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart,
 			   struct kv_list *chart_data_list)
 {
-	int elements, i, j;
-	long sum, max;
-	float *percentages;
-	float *angles;
+	int elements;
+	unsigned int j;
+	float sum;
+	float *percentages, *angles;
+	double deg;
 	GSList *tmp;
 
-	sum = elements = max = 0;
+	elements = 0;
+	sum = 0.0;
 	tmp = KV_LIST_HEAD(chart_data_list);
 	while (tmp) {
 		struct kv_list_entry *entry;
@@ -75,9 +111,6 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart,
 		assert(entry);
 
 		sum += GPOINTER_TO_INT(entry->key);
-		max = max(GPOINTER_TO_INT(entry->key), max);
-
-		fprintf(stderr, "sum: %d\n", GPOINTER_TO_INT(entry->key));
 
 		elements++;
 		tmp = g_slist_next(tmp);
@@ -87,6 +120,7 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart,
 	angles      = g_malloc(sizeof(float) * elements);
 
 	j = 0;
+	deg = 0.0;
 	tmp = KV_LIST_HEAD(chart_data_list);
 	while (tmp) {
 		struct pie_data_slot *pie_data_slot;
@@ -95,20 +129,18 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart,
 		entry = tmp->data;
 		assert(entry);
 
-                percentages[i] = ((float)GPOINTER_TO_INT(entry->key) / sum) * 360.0;
-                angles[i] = percentages[i] * (M_PI / 180.0);
-
+                percentages[j] = ((float)GPOINTER_TO_INT(entry->key) / sum) * 360.0;
+                angles[j] = DEG_TO_RAD(percentages[j]);
+		deg += percentages[j];
 
 		if (gt_pie_chart->pie_data_slot_array->len <= j)
 			g_array_set_size(gt_pie_chart->pie_data_slot_array, j + 1);
 
 		pie_data_slot = &g_array_index(gt_pie_chart->pie_data_slot_array,
 					       struct pie_data_slot, j);
-		pie_data_slot->angle = angles[i];
+		pie_data_slot->angle = angles[j];
 		memcpy(pie_data_slot->label, entry->value, sizeof(pie_data_slot->label));
 		pie_data_slot->label[sizeof(pie_data_slot->label) - 1] = '\0';
-
-		fprintf(stderr, "angle: %f %s\n",  angles[i], pie_data_slot->label);
 
 		tmp = g_slist_next(tmp);
 		j++;
@@ -128,76 +160,70 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart,
 }
 
 
-void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr, struct gt_pie_chart *gtpc)
+static void draw_widget_background(struct ps *ps, cairo_t *cr,
+					  int width, int height)
+{
+	gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR_DARKER]);
+	cairo_rectangle(cr, 0, 0, width, height);
+	cairo_fill(cr);
+}
+
+
+void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
+		       struct gt_pie_chart *gtpc)
 {
 	guint width, height;
-	GdkRGBA color;
-        double x_offset, y_offset;
-	double start_deg;
+	unsigned int i;
+	double xc;
+	double yc;
+	double radius;
+	double angle_start = DEG_TO_RAD(0.0);
+	const struct ps_color *bg_color;
 
 	width = gtk_widget_get_allocated_width(widget);
 	height = gtk_widget_get_allocated_height(widget);
 
-        cairo_set_line_width (cr, 1.0);
+	draw_widget_background(ps, cr, width, height);
 
-        cairo_set_source_rgba (cr, 1, 0.2, 0.2, 1.);
+	cairo_set_line_width (cr, 1.0);
 
-	double xc = 100.0;
-	double yc = 50.0;
-	double radius = 20.0;
-	double angle1 = DEG_TO_RAD(0.0);
-	double angle2 = DEG_TO_RAD(45.0);
+	yc = height / 2.0;
+	radius = yc - (2 * gtpc->line_width);
+	xc = radius + DEFAULT_LEFT_CIRC_PADDING;
 
-	// https://code.google.com/p/homebank-maemo/source/browse/branches/4.2.1-maemo5/src/gtkchart.c#1481
+	for (i = 0; i < gtpc->pie_data_slot_array->len; i++) {
+		struct pie_data_slot *pie_data_slot;
 
-	fprintf(stderr, "angle: %f\n", angle2);
+		pie_data_slot = &g_array_index(gtpc->pie_data_slot_array,
+					       struct pie_data_slot, i);
+		assert(angle_start + pie_data_slot->angle <= DEG_TO_RAD(360.1));
 
-	cairo_set_line_width (cr, 10.0);
-	cairo_arc(cr, xc, yc, radius, angle1, angle2);
-	cairo_fill(cr);
+		cairo_move_to(cr, xc, yc);
+		cairo_arc(cr, xc, yc, radius, angle_start, pie_data_slot->angle);
+		cairo_line_to(cr, xc, yc);
+		cairo_stroke_preserve(cr);
 
-	return;
+		bg_color = &bg_fill_colors[i % ARRAY_SIZE(bg_fill_colors)];
+		cairo_set_source_rgba(cr,
+				      bg_color->red,
+				      bg_color->green,
+				      bg_color->blue,
+				      bg_color->alpha);
+		cairo_fill(cr);
 
-	/* draw helping lines */
-	cairo_set_source_rgba (cr, 1, 0.2, 0.2, 0.6);
-	cairo_set_line_width (cr, 6.0);
+		cairo_set_source_rgba(cr,
+				      gtpc->fg_color.red,
+				      gtpc->fg_color.green,
+				      gtpc->fg_color.blue,
+				      gtpc->fg_color.alpha);
+		cairo_stroke(cr);
 
-	cairo_arc (cr, xc, yc, 10.0, 0, 2*M_PI);
-	cairo_fill (cr);
+		angle_start += pie_data_slot->angle;
+	}
+}
 
-	cairo_arc (cr, xc, yc, radius, angle1, angle1);
-	cairo_line_to (cr, xc, yc);
-	cairo_arc (cr, xc, yc, radius, angle2, angle2);
-	cairo_line_to (cr, xc, yc);
-	cairo_stroke (cr);
 
-#if 0
-
-	start_deg = 0.0;
-
-	cairo_arc(cr, width / 2.0, height / 2.0, min(width, height) / 2.0, start_deg, 2 * M_PI - 0.4);
-	cairo_stroke (cr);
-
-        //cairo_set_source_rgba (cr, .2, 1.0, 0.2, 1.);
-	//cairo_arc(cr, width / 2.0, height / 2.0, min(width, height) / 2.0, start_deg, .04);
-	//cairo_stroke(cr);
-
-	return
-
-        cairo_set_line_width (cr, 6.0);
-        cairo_set_line_width (cr, 10.0);
-        cairo_arc (cr, gtpc->xo, gtpc->yo, gtpc->outer_radius, 0.0, .4);
-        cairo_stroke (cr);
-
-        /* draw helping lines */
-
-        //cairo_arc (cr, xc, yc, 10.0, 0, 2*M_PI);
-        //cairo_fill (cr);
-
-        //cairo_arc (cr, xc, yc, radius, angle1, angle1);
-        //cairo_line_to (cr, xc, yc);
-        //cairo_arc (cr, xc, yc, radius, angle2, angle2);
-        //cairo_line_to (cr, xc, yc);
-        //cairo_stroke (cr);
-#endif
+void gt_pie_chart_set_fg_color(struct gt_pie_chart *gtpc, const struct ps_color *c)
+{
+	memcpy(&gtpc->fg_color, c, sizeof(gtpc->fg_color));
 }

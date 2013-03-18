@@ -204,11 +204,7 @@ static gboolean segment_size_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer da
 
 	ps = data;
 
-
-
-
 	gt_pie_chart_draw(ps, widget, cr, ps->d.project_info_segment_size.pie_chart_data);
-
 
 	gtk_widget_set_size_request(widget, 100, 75);
 
@@ -240,11 +236,22 @@ static GtkWidget *segment_size_darea_create(struct ps *ps)
 static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 {
 	GtkWidget *expander;
+	struct gt_pie_chart *pie_chart;
+	const struct ps_color fg_color = {
+		.red   = 0.0,
+		.green = 0.0,
+		.blue  = 0.0,
+		.alpha = 1.0
+	};
 
 	expander= gtk_expander_new("Section Size");
 
 	ps->s.project_info_segment_size.darea = segment_size_darea_create(ps);
-	ps->d.project_info_segment_size.pie_chart_data = gt_pie_chart_new();
+
+	pie_chart = gt_pie_chart_new();
+	gt_pie_chart_set_fg_color(pie_chart, &fg_color);
+	gt_pie_chart_set_linewidth(pie_chart, 2.0);
+	ps->d.project_info_segment_size.pie_chart_data = pie_chart;
 
 	gtk_container_add(GTK_CONTAINER(expander), ps->s.project_info_segment_size.darea);
 	gtk_expander_set_expanded(GTK_EXPANDER(expander), FALSE);
