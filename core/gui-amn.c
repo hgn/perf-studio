@@ -82,7 +82,7 @@ static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 		if (streq(project->exec_path, name)) {
 			// found project
 			ps->project = project;
-			pr_info(ps, "project selected: %s, path: %s\n",
+			pr_info(ps, "project selected: %s, path: %s",
 				 name, project_path);
 			break;
 		}
