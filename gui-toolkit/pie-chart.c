@@ -11,6 +11,10 @@
 
 #define DEFAULT_LEFT_CIRC_PADDING 10
 
+#define DEFAULT_LABEL_FONT "sans 8"
+#define PIE_CHART_TO_LABEL_PADDING 50
+
+
 /* http://html-color-codes.com/ */
 static const struct ps_color bg_fill_colors[] = {
 	/* #336699 */
@@ -36,11 +40,6 @@ static const struct ps_color bg_fill_colors[] = {
 	}
 };
 
-/*
- * float: 4 byte + PIE_CHART_LABEL_MAX(8) = 12 byte
- * Standard cacheline: 64 byte, thus 5 entries will
- * fit into one cacheline
- */
 struct pie_data_slot {
         float angle;
         char label[PIE_CHART_LABEL_MAX];
@@ -169,6 +168,26 @@ static void draw_widget_background(struct ps *ps, cairo_t *cr,
 }
 
 
+static inline void draw_labels(cairo_t *cr, const char *text, int x, int y)
+{
+	PangoLayout *layout;
+
+	cairo_save(cr);
+
+	cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
+	layout = create_pango_layout(cr, DEFAULT_LABEL_FONT);
+	pango_layout_set_text(layout, text, -1);
+	cairo_move_to(cr, x, y);
+	pango_cairo_show_layout(cr, layout);
+
+	cairo_stroke(cr);
+
+	g_object_unref(layout);
+
+	cairo_restore(cr);
+}
+
+
 void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 		       struct gt_pie_chart *gtpc)
 {
@@ -185,7 +204,7 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 
 	draw_widget_background(ps, cr, width, height);
 
-	cairo_set_line_width (cr, 1.0);
+	cairo_set_line_width(cr, gtpc->line_width);
 
 	yc = height / 2.0;
 	radius = yc - (2 * gtpc->line_width);
@@ -201,7 +220,6 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 		cairo_move_to(cr, xc, yc);
 		cairo_arc(cr, xc, yc, radius, angle_start, pie_data_slot->angle);
 		cairo_line_to(cr, xc, yc);
-		cairo_stroke_preserve(cr);
 
 		bg_color = &bg_fill_colors[i % ARRAY_SIZE(bg_fill_colors)];
 		cairo_set_source_rgba(cr,
@@ -209,7 +227,7 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 				      bg_color->green,
 				      bg_color->blue,
 				      bg_color->alpha);
-		cairo_fill(cr);
+		cairo_fill_preserve(cr);
 
 		cairo_set_source_rgba(cr,
 				      gtpc->fg_color.red,
@@ -217,6 +235,13 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 				      gtpc->fg_color.blue,
 				      gtpc->fg_color.alpha);
 		cairo_stroke(cr);
+
+		fprintf(stderr, "angle: %lf\n", pie_data_slot->angle);
+
+		draw_labels(cr,
+			    pie_data_slot->label,
+			    radius * 2 + PIE_CHART_TO_LABEL_PADDING + DEFAULT_LEFT_CIRC_PADDING,
+			    10 + (i * 20));
 
 		angle_start += pie_data_slot->angle;
 	}

@@ -238,9 +238,9 @@ static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 	GtkWidget *expander;
 	struct gt_pie_chart *pie_chart;
 	const struct ps_color fg_color = {
-		.red   = 0.0,
-		.green = 0.0,
-		.blue  = 0.0,
+		.red   = .4,
+		.green = .4,
+		.blue  = .4,
 		.alpha = 1.0
 	};
 
@@ -250,7 +250,7 @@ static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 
 	pie_chart = gt_pie_chart_new();
 	gt_pie_chart_set_fg_color(pie_chart, &fg_color);
-	gt_pie_chart_set_linewidth(pie_chart, 2.0);
+	gt_pie_chart_set_linewidth(pie_chart, 2);
 	ps->d.project_info_segment_size.pie_chart_data = pie_chart;
 
 	gtk_container_add(GTK_CONTAINER(expander), ps->s.project_info_segment_size.darea);
@@ -315,6 +315,7 @@ struct kv_list *cmd_segment_size_create(const char *exec_path)
         const char *keys[] = {"text", "data", "bss" };
         long values[3];
         struct str_parser str_parser;
+	char label[32];
 
         if (!g_spawn_sync(NULL, argv, NULL, 0, NULL, NULL,
                           &output, NULL, &exit_status, &error)) {
@@ -333,7 +334,9 @@ struct kv_list *cmd_segment_size_create(const char *exec_path)
                         goto err;
                 }
 
-		kv_list_add_int_string(kv_list, longval, keys[i]);
+		snprintf(label, sizeof(label) - 1, "%s: %ld byte", keys[i], longval);
+		label[sizeof(label) - 1] = '\0';
+		kv_list_add_int_string(kv_list, longval, label);
 
         }
 
@@ -366,7 +369,6 @@ static void gui_apc_update_segment_size(struct ps *ps)
                 pr_error(ps, "Cannot get segment size");
                 return;
         }
-
 	gt_pie_chart = ps->d.project_info_segment_size.pie_chart_data;
 	assert(gt_pie_chart);
 

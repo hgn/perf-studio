@@ -30,12 +30,7 @@ void gui_err_dialog(struct ps *ps, const gchar *format, ...);
 
 
 /* pie-chart.h */
-#define PIE_CHART_LABEL_MAX 8
-
-struct chart_data {
-	unsigned long value;
-	char *label;
-};
+#define PIE_CHART_LABEL_MAX 32
 
 struct gt_pie_chart {
         GArray *pie_data_slot_array;
