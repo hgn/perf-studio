@@ -236,8 +236,6 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 				      gtpc->fg_color.alpha);
 		cairo_stroke(cr);
 
-		fprintf(stderr, "angle: %lf\n", pie_data_slot->angle);
-
 		draw_labels(cr,
 			    pie_data_slot->label,
 			    radius * 2 + PIE_CHART_TO_LABEL_PADDING + DEFAULT_LEFT_CIRC_PADDING,
