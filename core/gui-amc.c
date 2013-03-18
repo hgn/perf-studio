@@ -324,7 +324,7 @@ static int draw_cpu_usage_chart(struct ps *ps, GtkWidget *widget,
 		cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
 		layout = create_pango_layout(cr, "Sans 7");
 		cairo_set_line_width(cr, 0);
-		sprintf(buf, "CPU%d", cpu_data->cpu_no);
+		sprintf(buf, "CPU %d", cpu_data->cpu_no);
 
 		pango_layout_set_text(layout, buf, -1);
 		pango_cairo_update_layout(cr, layout);
@@ -361,37 +361,38 @@ static int draw_cpu_usage_chart(struct ps *ps, GtkWidget *widget,
 static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 		cairo_t *cr, struct cpu_waterfall *cpu_waterfall, int x_position)
 {
-	int i, j;
-	int ret, offset;
-	cairo_surface_t *image;
+	unsigned int i, j;
+	int offset;
+	int x_pos_pos;
 
-	int y;
+	(void)ps;
+	(void)widget;
 
 	cairo_set_antialias(cr, CAIRO_ANTIALIAS_DEFAULT);
 
 	offset = 0;
+	x_pos_pos = x_position + 100;
 	for (i = 0; i < cpu_waterfall->ring_buffer_elements; i++) {
 		struct ps_color waterfall_entry[cpu_waterfall->no_cpu];
-		//fprintf(stderr, "Time: %4d  ", i);
 		offset += ring_buffer_read_at(cpu_waterfall->ring_buffer,
 				waterfall_entry,
 				cpu_waterfall->no_cpu * sizeof(struct ps_color), offset);
 		for (j = 0; j < cpu_waterfall->no_cpu; j++) {
+			int y_pos;
 
-			//fprintf(stderr, " {%.2f, %.2f, %.2f}", waterfall_entry[j].red, waterfall_entry[j].green, waterfall_entry[j].blue);
-
-			cairo_set_source_rgba(cr, waterfall_entry[j].red, waterfall_entry[j].green, waterfall_entry[j].blue, waterfall_entry[j].alpha);
-			int x_pos_pos = x_position + 100 + (i * 10);
-			int y_pos = 40 + (j * 30);
+			cairo_set_source_rgba(cr,
+					      waterfall_entry[j].red,
+					      waterfall_entry[j].green,
+					      waterfall_entry[j].blue,
+					      waterfall_entry[j].alpha);
+			y_pos = 40 + (j * 30);
 			cairo_rectangle(cr, x_pos_pos, y_pos, 10, 30);
 			cairo_fill(cr);
-
-
 		}
-		//fprintf(stderr, "\n");
-
+		x_pos_pos += 10;
 	}
-	//fprintf(stderr, "\n");
+
+	return x_pos_pos;
 }
 
 
