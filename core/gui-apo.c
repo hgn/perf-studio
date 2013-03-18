@@ -306,18 +306,18 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 
 struct kv_list *cmd_segment_size_create(const char *exec_path)
 {
-        int ret, i;
-        const char *argv[] = { "/usr/bin/size", exec_path, NULL };
-        char *output = NULL;
+        int ret;
+	unsigned int i;
+        const gchar *argv[] = { "/usr/bin/size", exec_path, NULL };
+        gchar *output = NULL;
         GError *error = NULL;
         int exit_status = 0;
         struct kv_list *kv_list;
         const char *keys[] = {"text", "data", "bss" };
-        long values[3];
         struct str_parser str_parser;
 	char label[32];
 
-        if (!g_spawn_sync(NULL, argv, NULL, 0, NULL, NULL,
+        if (!g_spawn_sync(NULL, (gchar **)argv, NULL, 0, NULL, NULL,
                           &output, NULL, &exit_status, &error)) {
                 // handle error here
                 return NULL;
