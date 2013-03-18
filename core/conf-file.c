@@ -82,8 +82,8 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile, const 
 
 	/* ok, project seems sane, create it */
 	project = project_new();
-	project->exec_path    = exec_path;
-	project->project_path = g_strdup(path);
+	project->exec_path       = exec_path;
+	project->project_db_path = g_strdup(path);
 
 	/* optional arguments */
 	project->exec_args = g_key_file_get_string_list(keyfile, "common", "exec-args", NULL, NULL);

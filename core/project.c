@@ -13,7 +13,7 @@ struct project *project_new(void)
 void project_free(struct project *e)
 {
 	if (e->exec_path) g_free(e->exec_path);
-	if (e->project_path) g_free(e->project_path);
+	if (e->project_db_path) g_free(e->project_db_path);
 	if (e->exec_args) g_strfreev(e->exec_args);
 	g_free(e);
 }
@@ -51,7 +51,7 @@ void project_show(struct ps *ps, struct project *p)
 	gchar **tmp;
 	int i = 1;
 
-	pr_info(ps, " project path:      %s", p->project_path);
+	pr_info(ps, " project path:      %s", p->project_db_path);
 	pr_info(ps, " exec-path:         %s", p->exec_path);
 	tmp = p->exec_args;
 	while (tmp && *tmp) {

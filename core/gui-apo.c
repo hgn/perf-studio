@@ -41,7 +41,6 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	GtkWidget *event_box;
 	GtkWidget *grid;
 	GtkWidget *label;
-	GtkWidget *e;
 	guint row;
 
 	grid = gtk_grid_new();
@@ -81,6 +80,7 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
 	ps->s.project_info.name = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.name), 0, 0.5);
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.name), "");
 	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.name), "project_info_label");
 	gtk_widget_set_hexpand(ps->s.project_info.name, TRUE);
@@ -105,6 +105,7 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
 	ps->s.project_info.description = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.description), 0, 0.5);
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.description), "");
 	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.description), "project_info_label");
 	gtk_widget_set_hexpand(ps->s.project_info.description, TRUE);
@@ -128,6 +129,7 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
 	ps->s.project_info.exec_path = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.exec_path), 0, 0.5);
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_path), "");
 	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.exec_path), "project_info_label");
 	gtk_widget_set_hexpand(ps->s.project_info.exec_path, TRUE);
@@ -152,6 +154,7 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
 	ps->s.project_info.exec_args = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.exec_args), 0, 0.5);
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_args), "");
 	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.exec_args), "project_info_label");
 	gtk_widget_set_hexpand(ps->s.project_info.exec_args, TRUE);
@@ -176,6 +179,7 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
 	ps->s.project_info.working_dir = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.working_dir), 0, 0.5);
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.working_dir), "");
 	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.working_dir), "project_info_label");
 	gtk_widget_set_hexpand(ps->s.project_info.working_dir, TRUE);
@@ -204,15 +208,23 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	return grid;
 }
 
+static void gui_apc_update_overview_panel(struct ps *ps)
+{
+	assert(ps);
+	assert(ps->project);
+
+	if (ps->project->exec_path)
+		gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_path),
+				   ps->project->exec_path);
+}
+
 
 static gboolean segment_size_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
 	struct ps *ps;
 
 	ps = data;
-
 	gt_pie_chart_draw(ps, widget, cr, ps->d.project_info_segment_size.pie_chart_data);
-
 	gtk_widget_set_size_request(widget, 100, 75);
 
 	return FALSE;
@@ -394,6 +406,7 @@ void gui_apo_new_project_loaded(struct ps *ps)
 {
 	assert(ps->project);
         /* update project summary fields */
+	gui_apc_update_overview_panel(ps);
 
         /* update exec segment view generated via size(1) */
         gui_apc_update_segment_size(ps);

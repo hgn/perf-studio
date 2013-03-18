@@ -213,7 +213,7 @@ struct project {
 	gchar **exec_args;
 
 	/* $HOME/.cache/perf-studio/projects/0001 */
-	gchar *project_path;
+	gchar *project_db_path;
 
 	/* current sha1 of executable */
 	unsigned long sha1;
