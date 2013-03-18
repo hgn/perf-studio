@@ -107,11 +107,18 @@ class ProjectCmd(Command):
             self.logger.warning("No project available!")
 
 
+    def set_common_defaults(self, config):
+        config['common'] = {}
+        config['common']['exec-path'] = '/usr/bin/gcc'
+
+
     def create_project_conf(self, project_path):
         conf_path = os.path.join(project_path, "config")
         self.logger.warning("Write config file to: {}".format(conf_path))
 
         config = configparser.ConfigParser()
+        self.set_common_defaults(config)
+
         for argument in self.args.args:
             (key, valval) = argument.split('=')
             (group, val) = key.split('.')
