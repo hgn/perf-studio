@@ -230,8 +230,7 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 		cairo_fill(cr);
 
 
-		draw_labels(cr,
-			    pie_data_slot->label,
+		draw_labels(cr, pie_data_slot->label,
 			    radius * 2 + PIE_CHART_TO_LABEL_PADDING + DEFAULT_LEFT_CIRC_PADDING,
 			    10 + (i * 20));
 
@@ -247,6 +246,8 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 			gtpc->fg_color.alpha);
 	cairo_arc(cr, xc, yc, radius, angle_start, 2. * M_PI);
 	cairo_stroke(cr);
+
+	gtk_widget_set_size_request(widget, radius * 2 + PIE_CHART_TO_LABEL_PADDING + DEFAULT_LEFT_CIRC_PADDING + 50, 150);
 
 }
 

@@ -250,7 +250,7 @@ static gboolean segment_size_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer da
 
 	ps = data;
 	gt_pie_chart_draw(ps, widget, cr, ps->d.project_info_segment_size.pie_chart_data);
-	gtk_widget_set_size_request(widget, 100, 75);
+	//gtk_widget_set_size_request(widget, 100, 75);
 
 	return FALSE;
 }
@@ -269,6 +269,7 @@ static GtkWidget *segment_size_darea_create(struct ps *ps)
 {
 	GtkWidget *darea;
 	darea = gtk_drawing_area_new();
+	gtk_widget_set_size_request(darea, 200, 150);
 
 	g_signal_connect(darea, "draw", G_CALLBACK(segment_size_draw_cb), ps);
 	g_signal_connect(darea, "configure-event", G_CALLBACK(segment_size_configure_cb), ps);
@@ -276,9 +277,55 @@ static GtkWidget *segment_size_darea_create(struct ps *ps)
 	return darea;
 }
 
+static GtkWidget *object_segment_size_label_panel_setup(struct ps *ps)
+{
+	GtkWidget *grid;
+	GtkWidget *label;
+
+	(void)ps;
+
+	grid = gtk_grid_new();
+	gtk_grid_set_row_spacing(GTK_GRID(grid), 10);
+	gtk_grid_set_column_spacing(GTK_GRID(grid), 20);
+
+	label = gtk_label_new("Segment");
+	gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);
+
+	label = gtk_label_new("Size [byte]");
+	gtk_grid_attach(GTK_GRID(grid), label, 1, 0, 1, 1);
+
+	label = gtk_label_new("Size [%]");
+	gtk_grid_attach(GTK_GRID(grid), label, 2, 0, 1, 1);
+
+	label = gtk_label_new(".text");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
+	gtk_grid_attach(GTK_GRID(grid), label, 0, 1, 1, 1);
+
+	label = gtk_label_new(" ");
+	gtk_grid_attach(GTK_GRID(grid), label, 1, 1, 1, 1);
+
+	label = gtk_label_new(".data");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
+	gtk_grid_attach(GTK_GRID(grid), label, 0, 2, 1, 1);
+
+	label = gtk_label_new(" ");
+	gtk_grid_attach(GTK_GRID(grid), label, 1, 2, 1, 1);
+
+	label = gtk_label_new(".bss");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
+	gtk_grid_attach(GTK_GRID(grid), label, 0, 3, 1, 1);
+
+	label = gtk_label_new(" ");
+	gtk_grid_attach(GTK_GRID(grid), label, 1, 3, 1, 1);
+
+	return grid;
+}
+
 
 static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 {
+	GtkWidget *hbox;
+	GtkWidget *label;
 	struct gt_pie_chart *pie_chart;
 	const struct ps_color fg_color = {
 		.red   = .05,
@@ -290,13 +337,20 @@ static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 	ps->s.project_info_segment_size.expander = gtk_expander_new("Section Size");
 	ps->s.project_info_segment_size.darea = segment_size_darea_create(ps);
 
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+
 	pie_chart = gt_pie_chart_new();
 	gt_pie_chart_set_fg_color(pie_chart, &fg_color);
 	gt_pie_chart_set_linewidth(pie_chart, 1);
 	ps->d.project_info_segment_size.pie_chart_data = pie_chart;
+	gtk_box_pack_start(GTK_BOX(hbox), ps->s.project_info_segment_size.darea, FALSE, FALSE, 20);
+
+	gtk_box_pack_start(GTK_BOX(hbox), object_segment_size_label_panel_setup(ps), FALSE, FALSE, 20);
+
 
 	gtk_container_add(GTK_CONTAINER(ps->s.project_info_segment_size.expander),
-			  ps->s.project_info_segment_size.darea);
+			  hbox);
+
 	gtk_expander_set_expanded(GTK_EXPANDER(ps->s.project_info_segment_size.expander),
 			          FALSE);
 
