@@ -425,6 +425,7 @@ static void gui_apc_update_segment_size(struct ps *ps)
 	gtk_expander_set_expanded(GTK_EXPANDER(ps->s.project_info_segment_size.expander),
 				  TRUE);
 
+	kv_list_free(kv_list);
 }
 
 
