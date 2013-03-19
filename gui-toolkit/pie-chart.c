@@ -18,19 +18,19 @@
 /* http://html-color-codes.com/ */
 static const struct ps_color bg_fill_colors[] = {
 	/* #336699 */
-	[0] = { .red   = Hex8ToFloat(0x33),
-		.green = Hex8ToFloat(0x66),
-		.blue  = Hex8ToFloat(0x99),
+	[0] = { .red   = Hex8ToFloat(0x40),
+		.green = Hex8ToFloat(0x40),
+		.blue  = Hex8ToFloat(0x40),
 		.alpha = 1.0
 	},
-	[1] = { .red   = Hex8ToFloat(0x33),
-		.green = Hex8ToFloat(0x88),
-		.blue  = Hex8ToFloat(0x99),
+	[1] = { .red   = Hex8ToFloat(0x80),
+		.green = Hex8ToFloat(0x80),
+		.blue  = Hex8ToFloat(0x80),
 		.alpha = 1.0
 	},
-	[2] = { .red   = Hex8ToFloat(0x33),
-		.green = Hex8ToFloat(0x99),
-		.blue  = Hex8ToFloat(0x99),
+	[2] = { .red   = Hex8ToFloat(0x60),
+		.green = Hex8ToFloat(0x60),
+		.blue  = Hex8ToFloat(0x60),
 		.alpha = 1.0
 	},
 	[3] = { .red   = Hex8ToFloat(0x33),
@@ -204,7 +204,7 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 
 	draw_widget_background(ps, cr, width, height);
 
-	cairo_set_line_width(cr, gtpc->line_width);
+	cairo_set_line_width(cr, 0);
 
 	yc = height / 2.0;
 	radius = yc - (2 * gtpc->line_width);
@@ -227,14 +227,8 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 				      bg_color->green,
 				      bg_color->blue,
 				      bg_color->alpha);
-		cairo_fill_preserve(cr);
+		cairo_fill(cr);
 
-		cairo_set_source_rgba(cr,
-				      gtpc->fg_color.red,
-				      gtpc->fg_color.green,
-				      gtpc->fg_color.blue,
-				      gtpc->fg_color.alpha);
-		cairo_stroke(cr);
 
 		draw_labels(cr,
 			    pie_data_slot->label,
@@ -243,6 +237,17 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 
 		angle_start += pie_data_slot->angle;
 	}
+
+	/* draw cicle around pie chart */
+	cairo_set_line_width(cr, gtpc->line_width);
+	cairo_set_source_rgba(cr,
+			gtpc->fg_color.red,
+			gtpc->fg_color.green,
+			gtpc->fg_color.blue,
+			gtpc->fg_color.alpha);
+	cairo_arc(cr, xc, yc, radius, angle_start, 2. * M_PI);
+	cairo_stroke(cr);
+
 }
 
 

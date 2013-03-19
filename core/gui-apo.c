@@ -281,9 +281,9 @@ static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 {
 	struct gt_pie_chart *pie_chart;
 	const struct ps_color fg_color = {
-		.red   = .4,
-		.green = .4,
-		.blue  = .4,
+		.red   = .05,
+		.green = .05,
+		.blue  = .05,
 		.alpha = 1.0
 	};
 
@@ -292,7 +292,7 @@ static GtkWidget *object_segment_size_widget_new(struct ps *ps)
 
 	pie_chart = gt_pie_chart_new();
 	gt_pie_chart_set_fg_color(pie_chart, &fg_color);
-	gt_pie_chart_set_linewidth(pie_chart, 2);
+	gt_pie_chart_set_linewidth(pie_chart, 1);
 	ps->d.project_info_segment_size.pie_chart_data = pie_chart;
 
 	gtk_container_add(GTK_CONTAINER(ps->s.project_info_segment_size.expander),
