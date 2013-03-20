@@ -109,7 +109,9 @@ class ProjectCmd(Command):
 
     def set_common_defaults(self, config):
         config['common'] = {}
-        config['common']['exec-path'] = '/usr/bin/gcc'
+        config['common']['cmd'] = '/usr/bin/gcc'
+        config['common']['cmd-args'] = ''
+        config['common']['description'] = 'Unnamed'
 
 
     def create_project_conf(self, project_path):
