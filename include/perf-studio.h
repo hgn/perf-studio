@@ -212,6 +212,7 @@ struct data {
 
 struct project {
 	/* values from .perf-studio/config */
+	gchar *id;
 	gchar *cmd;
 	gchar *description;
 	gchar **cmd_args;

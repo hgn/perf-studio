@@ -1,4 +1,5 @@
 #include <string.h>
+#include <assert.h>
 
 #include "project.h"
 
@@ -12,10 +13,19 @@ struct project *project_new(void)
 
 void project_free(struct project *e)
 {
-	if (e->cmd) g_free(e->cmd);
+	assert(e);
+	assert(e->id);
+	assert(e->cmd);
+
+	/* required */
+	g_free(e->id);
+	g_free(e->cmd);
+
+	/* optional */
 	if (e->description) g_free(e->description);
 	if (e->project_db_path) g_free(e->project_db_path);
 	if (e->cmd_args) g_strfreev(e->cmd_args);
+
 	g_free(e);
 }
 
@@ -52,7 +62,7 @@ void project_show(struct ps *ps, struct project *p)
 	gchar **tmp;
 	int i = 1;
 
-	pr_info(ps, " project path:      %s", p->project_db_path);
+	pr_info(ps, " id:         %s", p->id);
 	pr_info(ps, " cmd:         %s", p->cmd);
 	pr_info(ps, " description: %s", p->description);
 	tmp = p->cmd_args;
@@ -65,5 +75,5 @@ void project_show(struct ps *ps, struct project *p)
 	pr_info(ps, " nice level:          ");
 	pr_info(ps, " scheduler policy:    ");
 	pr_info(ps, " IO scheduler:        ");
-
+	pr_info(ps, " project path:      %s", p->project_db_path);
 }

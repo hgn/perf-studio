@@ -69,10 +69,13 @@ out:
 
 
 /* foo/bar/project-foo/.perf-studio/config */
-static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile, const char *path)
+static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
+					const char *project_id, const char *path)
 {
 	gchar *cmd;
 	struct project *project;
+
+	assert(project_id);
 
 	cmd = g_key_file_get_string(keyfile, "common", "cmd", NULL);
 	if (!cmd) {
@@ -83,10 +86,14 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile, const 
 	/* ok, project seems sane, create it */
 	project = project_new();
 	project->cmd = cmd;
+	project->id = g_strdup(project_id);
 	project->project_db_path = g_strdup(path);
 
 	/* optional arguments */
 	project->cmd_args = g_key_file_get_string_list(keyfile, "common", "cmd-args", NULL, NULL);
+
+	/* optional arguments */
+	project->description = g_key_file_get_string(keyfile, "common", "description", NULL);
 
 	project_show(ps, project);
 
@@ -137,7 +144,7 @@ static void load_check_conf(struct ps *ps,  const char *file_name, gchar *projec
 	 * If this is successfull we consider this project
 	 * as sane, problems with refs/db are handled properly
 	 */
-	project = load_new_project(ps, keyfile, project_path);
+	project = load_new_project(ps, keyfile, file_name, project_path);
 	if (!project) {
 		pr_error(ps, "Project %s seems corrupt, ignoring it", project_path_name);
 		goto out2;
