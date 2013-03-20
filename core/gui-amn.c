@@ -107,18 +107,20 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
 	GSList *list_tmp;
 
 
-	lista1 = gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+	lista1 = gtk_list_store_new(4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 	tree1 = gtk_tree_view_new_with_model(GTK_TREE_MODEL(lista1));
 	gtk_widget_show(tree1);
 
 	g_signal_connect(tree1, "row-activated", G_CALLBACK(screen_intro_dialog_existing_activated), ps);
 
 	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes("  Id  ", renderer, "text", 0,NULL);
+	column = gtk_tree_view_column_new_with_attributes("  Project Id  ", renderer, "text", 0, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
-	column = gtk_tree_view_column_new_with_attributes("  Command  ", renderer, "text" ,1,NULL);
+	column = gtk_tree_view_column_new_with_attributes("  Command  ", renderer, "text" , 1, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
-	column = gtk_tree_view_column_new_with_attributes("  Description  ", renderer, "text",2,NULL);
+	column = gtk_tree_view_column_new_with_attributes("  Description  ", renderer, "text", 2, NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
+	column = gtk_tree_view_column_new_with_attributes("  Last used  ", renderer, "text", 3, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
 
 	list_tmp = ps->project_list;
@@ -129,6 +131,7 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
 		gtk_list_store_set(lista1, &iter, 0, project->id,
 						  1, project->cmd,
 						  2, project->description,
+						  3, "3 days ago",
 						  -1);
 
 		list_tmp = g_slist_next(list_tmp);
