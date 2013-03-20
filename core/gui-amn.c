@@ -53,7 +53,7 @@ static void project_load_widget_add_artwork(struct ps *ps, GtkWidget *container)
 static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 		GtkTreePath *path, GtkTreeViewColumn *col, gpointer user_data)
 {
-	gchar *name, *project_path;
+	gchar *id;
 	GtkTreeModel *model;
 	GSList *list_tmp;
 	GtkTreeIter iter;
@@ -71,19 +71,17 @@ static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 		return;
 	}
 
-	gtk_tree_model_get(model, &iter, 0, &name, -1);
-	gtk_tree_model_get(model, &iter, 1, &project_path, -1);
+	gtk_tree_model_get(model, &iter, 0, &id, -1);
 
 	list_tmp = ps->project_list;
 	while (list_tmp) {
 		struct project *project;
 		project = list_tmp->data;
 
-		if (streq(project->cmd, name)) {
+		if (streq(project->id, id)) {
 			// found project
 			ps->project = project;
-			pr_info(ps, "project selected: %s, path: %s",
-				 name, project_path);
+			pr_info(ps, "project %s selected", id);
 			break;
 		}
 
@@ -95,8 +93,7 @@ static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 
 	gtk_widget_destroy(ps->s.project_load_window);
 	ps->s.project_load_window = NULL;
-	g_free(name);
-	g_free(project_path);
+	g_free(id);
 }
 
 
@@ -117,11 +114,11 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
 	g_signal_connect(tree1, "row-activated", G_CALLBACK(screen_intro_dialog_existing_activated), ps);
 
 	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes("  Name  ", renderer, "text", 0,NULL);
+	column = gtk_tree_view_column_new_with_attributes("  Id  ", renderer, "text", 0,NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
-	column = gtk_tree_view_column_new_with_attributes("  Path  ", renderer, "text" ,1,NULL);
+	column = gtk_tree_view_column_new_with_attributes("  Command  ", renderer, "text" ,1,NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
-	column = gtk_tree_view_column_new_with_attributes("  Last Used  ", renderer, "text",2,NULL);
+	column = gtk_tree_view_column_new_with_attributes("  Description  ", renderer, "text",2,NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
 
 	list_tmp = ps->project_list;
@@ -129,9 +126,9 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
 		struct project *project;
 		project = list_tmp->data;
 		gtk_list_store_append(lista1, &iter);
-		gtk_list_store_set(lista1, &iter, 0, project->cmd,
+		gtk_list_store_set(lista1, &iter, 0, project->id,
 						  1, project->cmd,
-						  2, project->cmd,
+						  2, project->description,
 						  -1);
 
 		list_tmp = g_slist_next(list_tmp);
