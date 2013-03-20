@@ -212,8 +212,9 @@ struct data {
 
 struct project {
 	/* values from .perf-studio/config */
-	gchar *exec_path;
-	gchar **exec_args;
+	gchar *cmd;
+	gchar *description;
+	gchar **cmd_args;
 
 	/* $HOME/.cache/perf-studio/projects/0001 */
 	gchar *project_db_path;

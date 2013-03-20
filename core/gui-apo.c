@@ -233,14 +233,15 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	return grid;
 }
 
+
 static void gui_apc_update_overview_panel(struct ps *ps)
 {
 	assert(ps);
 	assert(ps->project);
 
-	if (ps->project->exec_path)
+	if (ps->project->cmd)
 		gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_path),
-				   ps->project->exec_path);
+				   ps->project->cmd);
 }
 
 

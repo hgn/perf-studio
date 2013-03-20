@@ -79,7 +79,7 @@ static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 		struct project *project;
 		project = list_tmp->data;
 
-		if (streq(project->exec_path, name)) {
+		if (streq(project->cmd, name)) {
 			// found project
 			ps->project = project;
 			pr_info(ps, "project selected: %s, path: %s",
@@ -129,9 +129,9 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
 		struct project *project;
 		project = list_tmp->data;
 		gtk_list_store_append(lista1, &iter);
-		gtk_list_store_set(lista1, &iter, 0, project->exec_path,
-						  1, project->exec_path,
-						  2, project->exec_path,
+		gtk_list_store_set(lista1, &iter, 0, project->cmd,
+						  1, project->cmd,
+						  2, project->cmd,
 						  -1);
 
 		list_tmp = g_slist_next(list_tmp);

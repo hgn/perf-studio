@@ -71,22 +71,22 @@ out:
 /* foo/bar/project-foo/.perf-studio/config */
 static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile, const char *path)
 {
-	gchar *exec_path;
+	gchar *cmd;
 	struct project *project;
 
-	exec_path = g_key_file_get_string(keyfile, "common", "exec-path", NULL);
-	if (!exec_path) {
+	cmd = g_key_file_get_string(keyfile, "common", "cmd", NULL);
+	if (!cmd) {
 		pr_error(ps, "Project has not command!");
 		return NULL;
 	}
 
 	/* ok, project seems sane, create it */
 	project = project_new();
-	project->exec_path       = exec_path;
+	project->cmd = cmd;
 	project->project_db_path = g_strdup(path);
 
 	/* optional arguments */
-	project->exec_args = g_key_file_get_string_list(keyfile, "common", "exec-args", NULL, NULL);
+	project->cmd_args = g_key_file_get_string_list(keyfile, "common", "cmd-args", NULL, NULL);
 
 	project_show(ps, project);
 
