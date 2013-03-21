@@ -11,6 +11,39 @@
 
 #include "project.h"
 
+/* return 0: success, <0 error */
+static int check_create_refs_path(struct ps *ps, struct project *project)
+{
+	int ret = 0;
+	gchar *path;
+
+	assert(ps);
+	assert(project);
+	assert(project->db_path);
+	assert(project->checksum);
+
+	path = g_build_filename(project->db_path, "refs", NULL);
+
+	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
+		pr_info(ps, "%s already created", path);
+		ret = 0; /* no failure */
+		goto out;
+	}
+
+	pr_info(ps, "Create refs directory %s", path);
+	ret = g_mkdir(path, 0755);
+	if (ret != 0) {
+		pr_error(ps, "Failed to create refs directory %s", path);
+		ret = -EINVAL;
+		goto out;
+	}
+
+	ret = 0;
+out:
+	g_free(path);
+	return ret;
+}
+
 
 /* return 0: success, <0 error */
 static int check_create_db_path(struct ps *ps, struct project *project)
@@ -23,7 +56,7 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 	assert(project->db_path);
 	assert(project->checksum);
 
-	path = g_build_filename(project->db_path, project->checksum, NULL);
+	path = g_build_filename(project->db_path, "db", project->checksum, NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
 		pr_info(ps, "%s already created", path);
@@ -47,7 +80,7 @@ out:
 
 
 /* return 0: success, <0 error */
-static int check_create_db_conf(struct ps *ps, struct project *project)
+static int check_create_db_info(struct ps *ps, struct project *project)
 {
 	int ret = 0;
 	gchar *path;
@@ -57,7 +90,7 @@ static int check_create_db_conf(struct ps *ps, struct project *project)
 	assert(project->db_path);
 	assert(project->checksum);
 
-	path = g_build_filename(project->db_path, project->checksum, "conf",  NULL);
+	path = g_build_filename(project->db_path, project->checksum, "info",  NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_REGULAR)) {
 		pr_info(ps, "project conf %s already created", path);
@@ -80,8 +113,6 @@ out:
 	g_free(path);
 	return ret;
 }
-
-
 
 
 struct project *project_new(void)
@@ -208,6 +239,8 @@ void project_activate(struct ps *ps, struct project *project)
 	ps->project = project;
 	project->status = PROJECT_STATUS_SOMEHOW_INVALID;
 
+	pr_info(ps, "activate project %s", project->id);
+
 	if (!is_absolute_path(project->cmd)) {
 		pr_error(ps, "%s must be a absolute path", project->cmd);
 		project->status = PROJECT_STATUS_CMD_PATH_INVALID;
@@ -229,7 +262,13 @@ void project_activate(struct ps *ps, struct project *project)
 		return;
 	}
 
-	ret = check_create_db_conf(ps, project);
+	ret = check_create_refs_path(ps, project);
+	if (ret < 0) {
+		project->status = PROJECT_STATUS_SOMEHOW_INVALID;
+		return;
+	}
+
+	ret = check_create_db_info(ps, project);
 	if (ret < 0) {
 		project->status = PROJECT_STATUS_SOMEHOW_INVALID;
 		return;
