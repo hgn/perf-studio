@@ -49,7 +49,8 @@ out:
 static int check_create_db_path(struct ps *ps, struct project *project)
 {
 	int ret = 0;
-	gchar *path;
+	GDateTime *date_time;
+	gchar *path, *refs_path, *date_time_fmt;
 
 	assert(ps);
 	assert(project);
@@ -72,6 +73,58 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 		goto out;
 	}
 
+	/* now symblink to new DB dir */
+	date_time = g_date_time_new_now_local();
+	date_time_fmt = g_date_time_format(date_time, "%Y-%m-%d-%H:%M:%S");
+	refs_path = g_build_filename(project->db_path, "refs", date_time_fmt, NULL);
+
+	ret = symlink(path, refs_path);
+	if (ret != 0) {
+		pr_error(ps, "Could not create symlink (%s) to db", refs_path);
+		goto out2;
+	}
+
+	ret = 0;
+
+out2:
+	g_free(date_time_fmt);
+	g_date_time_unref(date_time);
+	g_free(refs_path);
+
+out:
+	g_free(path);
+	return ret;
+}
+
+
+/* return 0: success, <0 error */
+static int check_create_db_parent_dir(struct ps *ps, struct project *project)
+{
+	int ret = 0;
+	gchar *path;
+
+	assert(ps);
+	assert(project);
+	assert(project->db_path);
+	assert(project->checksum);
+
+	path = g_build_filename(project->db_path, "db", NULL);
+
+	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
+		pr_info(ps, "project db directory %s already created", path);
+		ret = 0; /* no failure */
+		goto out;
+	}
+
+	pr_info(ps, "Create db parent directory %s", path);
+	ret = g_mkdir(path, 0755);
+	if (ret != 0) {
+		pr_error(ps, "Failed to create DB parent dir %s", path);
+		ret = -EINVAL;
+		goto out;
+	}
+
+
 	ret = 0;
 out:
 	g_free(path);
@@ -90,7 +143,7 @@ static int check_create_db_info(struct ps *ps, struct project *project)
 	assert(project->db_path);
 	assert(project->checksum);
 
-	path = g_build_filename(project->db_path, project->checksum, "info",  NULL);
+	path = g_build_filename(project->db_path, "db", project->checksum, "info",  NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_REGULAR)) {
 		pr_info(ps, "project conf %s already created", path);
@@ -98,15 +151,14 @@ static int check_create_db_info(struct ps *ps, struct project *project)
 		goto out;
 	}
 
-#if 0
 	pr_info(ps, "Create db conf file %s", path);
-	ret = g_touch(path, 0644);
-	if (ret != 0) {
+	ret = g_creat(path, 0644);
+	if (ret < 0) {
 		pr_error(ps, "Failed to create config in DB dir %s", path);
 		ret = -EINVAL;
 		goto out;
 	}
-#endif
+	close(ret);
 
 	ret = 0;
 out:
@@ -256,7 +308,7 @@ void project_activate(struct ps *ps, struct project *project)
 	project->checksum = build_checksum(G_CHECKSUM_MD5, project->cmd);
 	assert(project->checksum);
 
-	ret = check_create_db_path(ps, project);
+	ret = check_create_db_parent_dir(ps, project);
 	if (ret < 0) {
 		project->status = PROJECT_STATUS_SOMEHOW_INVALID;
 		return;
@@ -268,17 +320,21 @@ void project_activate(struct ps *ps, struct project *project)
 		return;
 	}
 
+
+	ret = check_create_db_path(ps, project);
+	if (ret < 0) {
+		project->status = PROJECT_STATUS_SOMEHOW_INVALID;
+		return;
+	}
+
 	ret = check_create_db_info(ps, project);
 	if (ret < 0) {
 		project->status = PROJECT_STATUS_SOMEHOW_INVALID;
 		return;
 	}
 
-
 	project->status = PROJECT_STATUS_OK;
 }
-
-
 
 
 void project_show(struct ps *ps, struct project *p)
