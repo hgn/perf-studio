@@ -40,13 +40,9 @@ export data_dir
 export img_install img_install_SQ
 export DESTDIR DESTDIR_SQ
 
-ifeq ($(prefix),$(HOME))
-module_dir = $(HOME)/.perf-studio/modules
-else
 module_dir = $(prefix)/lib/perf-studio/modules
 MODULE_DIR = -DMODULE_DIR="\"$(module_dir)\""
 MODULE_DIR_SQ = '$(subst ','\'',$(MODULE_DIR))'
-endif
 
 DATA_DIR = -DDATA_DIR="\"$(data_dir)\""
 

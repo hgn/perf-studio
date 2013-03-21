@@ -147,8 +147,8 @@ ifneq ($(dep_includes),)
 endif
 
 
-install: all 
-	install $(TARGET) $(DESTDIR)$(BINDIR)
+install: all
+	install $(TARGET) $(bindir)
 
 do_clean =						\
 	($(print_rm)				\

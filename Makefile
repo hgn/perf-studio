@@ -38,7 +38,7 @@ install: all
 	$(RM) $(prefix)/bin/perf-studio-ctrl
 	ln -s $(prefix)/share/perf-studio/perf-studio-ctrl.py $(prefix)/bin/perf-studio-ctrl
 
-	@for dir in data; do \
+	@for dir in data core; do \
 					(cd $$dir && $(MAKE) install) \
 	done
 
