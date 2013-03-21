@@ -138,7 +138,8 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart,
 		pie_data_slot = &g_array_index(gt_pie_chart->pie_data_slot_array,
 					       struct pie_data_slot, j);
 		pie_data_slot->angle = angles[j];
-		memcpy(pie_data_slot->label, entry->value, sizeof(pie_data_slot->label));
+		memcpy(pie_data_slot->label, entry->value,
+		       min(strlen(pie_data_slot->label) + 1, sizeof(pie_data_slot->label)));
 		pie_data_slot->label[sizeof(pie_data_slot->label) - 1] = '\0';
 
 		tmp = g_slist_next(tmp);
