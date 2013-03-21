@@ -203,7 +203,7 @@ class ProjectCmd(Command):
     def show_projects(self):
         self.logger.warning("Show all project under {}".format(PROJECTS_DIR))
         if self.which("tree"):
-            os.system("tree {}".format(PROJECTS_DIR))
+            os.system("tree -n {}".format(PROJECTS_DIR))
         else:
             self.show_dir(PROJECTS_DIR, '','');
 
