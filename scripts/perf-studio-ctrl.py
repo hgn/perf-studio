@@ -162,6 +162,22 @@ class ProjectCmd(Command):
         self.logger.debug("project_dirs {}, new pid {}".format(project_dirs, pid))
         return pid
 
+    def which(self, cmd):
+        def is_exe(fpath):
+            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+        fpath, fname = os.path.split(cmd)
+        if fpath:
+            if is_exe(cmd):
+                return cmd
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                path = path.strip('"')
+                exe_file = os.path.join(path, cmd)
+                if is_exe(exe_file):
+                    return exe_file
+        return None
+
 
     def show_dir(self, dir, prefix, path):
         items = glob.glob(dir + '/*')
@@ -186,7 +202,10 @@ class ProjectCmd(Command):
 
     def show_projects(self):
         self.logger.warning("Show all project under {}".format(PROJECTS_DIR))
-        self.show_dir(PROJECTS_DIR, '','');
+        if self.which("tree"):
+            os.system("tree {}".format(PROJECTS_DIR))
+        else:
+            self.show_dir(PROJECTS_DIR, '','');
 
 
     def create_project(self):
