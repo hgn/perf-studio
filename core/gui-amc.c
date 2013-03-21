@@ -11,7 +11,6 @@
 #include "shared.h"
 
 #if 0
-
 inner: padding
 outer: margin
 #endif
@@ -49,6 +48,14 @@ outer: margin
 #define PADDING_TOP 10
 
 #define PADDING_LEFT 20
+
+enum {
+	SYSTEM_TAB_CPU_WIDGET,
+	SYSTEM_TAB_INTR_WIDGET,
+	SYSTEM_TAB_MEM_WIDGET,
+
+	SYSTEM_TAB_MAX
+};
 
 
 static void draw_user_vs_system_axis(cairo_t *cr, int x_position)
@@ -501,7 +508,7 @@ static gboolean configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpoint
 }
 
 
-static gboolean draw_area_timer_cb(GtkWidget *widget)
+static void system_tab_timer_cpu_cb(GtkWidget *widget)
 {
 	int width, height;
 	struct ps *ps;
@@ -511,7 +518,6 @@ static gboolean draw_area_timer_cb(GtkWidget *widget)
 
 	if (!gtk_widget_get_visible(widget)) {
 		fprintf(stderr, "not visible\n");
-		return TRUE;
 	}
 
 	/* get data first */
@@ -533,11 +539,23 @@ static gboolean draw_area_timer_cb(GtkWidget *widget)
 
 	gtk_widget_queue_draw_area(widget, 0, 0, width, height);
 
+	return;
+}
+
+/*
+ * timer multiplexer into each panel within
+ * the system tab to unify the timer and do not
+ * trigger three different timers.
+ */
+static gboolean system_tab_timer_cb(GtkWidget **widget)
+{
+	system_tab_timer_cpu_cb(widget[SYSTEM_TAB_CPU_WIDGET]);
+
 	return TRUE;
 }
 
 
-static GtkWidget *cpu_usage_new(struct ps *ps)
+static GtkWidget *cpu_usage_widget_new(struct ps *ps)
 {
 	GtkWidget *darea;
 	struct system_cpu *system_cpu;
@@ -565,7 +583,6 @@ static GtkWidget *cpu_usage_new(struct ps *ps)
 	g_object_set_data(G_OBJECT(darea), "system-cpu", system_cpu);
 	g_object_set_data(G_OBJECT(darea), "interrupt-monitor-data", interrupt_monitor_data);
 	g_object_set_data(G_OBJECT(darea), "cpu-waterfall", cpu_waterfall);
-	g_timeout_add(CPU_USAGE_REFRESH,(GSourceFunc)draw_area_timer_cb, darea);
 
 	return darea;
 }
@@ -600,10 +617,11 @@ static GtkWidget *header_status_widget(struct ps *ps, const char *text)
 	return hbox;
 }
 
+
 static GtkWidget *system_tab_new(struct ps *ps)
 {
+	static GtkWidget *widgets[SYSTEM_TAB_MAX];
 	GtkWidget *vbox;
-	GtkWidget *darea;
 	GtkWidget *header;
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -612,9 +630,11 @@ static GtkWidget *system_tab_new(struct ps *ps)
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
 	gtk_widget_show_all(header);
 
-	darea = cpu_usage_new(ps);
-	gtk_box_pack_start(GTK_BOX(vbox), darea, FALSE, TRUE, 0);
-	gtk_widget_show_all(darea);
+	widgets[SYSTEM_TAB_CPU_WIDGET] = cpu_usage_widget_new(ps);
+	gtk_box_pack_start(GTK_BOX(vbox), widgets[SYSTEM_TAB_CPU_WIDGET],
+			   FALSE, TRUE, 0);
+	gtk_widget_show_all(widgets[SYSTEM_TAB_CPU_WIDGET]);
+
 
 	header = header_status_widget(ps, " Memory and Slab Info");
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
@@ -623,6 +643,8 @@ static GtkWidget *system_tab_new(struct ps *ps)
 	header = header_status_widget(ps, " SoftIRQ");
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
 	gtk_widget_show_all(header);
+
+	g_timeout_add(CPU_USAGE_REFRESH,(GSourceFunc)system_tab_timer_cb, widgets);
 
 	return vbox;
 }

@@ -80,7 +80,7 @@ static void setup_main_row_artwork_image(struct ps *ps)
 static void resize_main_window(struct ps *ps, GtkWidget *window)
 {
 	gtk_window_resize(GTK_WINDOW(window),
-			  ps->info.width * 3 / 4,
+			  ps->info.width   * 5 / 6,
 			  ps->info.height  * 3 / 4);
 }
 
