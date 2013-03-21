@@ -210,6 +210,13 @@ struct data {
 };
 
 
+enum {
+	PROJECT_STATUS_OK = 0,
+	PROJECT_STATUS_CMD_PATH_INVALID,
+	PROJECT_STATUS_CMD_NOT_EXECUTABLE,
+	PROJECT_STATUS_SOMEHOW_INVALID,
+};
+
 struct project {
 	/* values from .perf-studio/config */
 	gchar *id;
@@ -217,11 +224,13 @@ struct project {
 	gchar *description;
 	gchar **cmd_args;
 
-	/* $HOME/.cache/perf-studio/projects/0001 */
-	gchar *project_db_path;
+	int status;
 
-	/* current sha1 of executable */
-	unsigned long sha1;
+	/* $HOME/.cache/perf-studio/projects/0001 */
+	gchar *db_path;
+
+	/* current checksum (MD5, SHA1, ...) of executable */
+	gchar *checksum;
 };
 
 /* forward declaration, see cpu-fueatures.{c,h) */

@@ -6,13 +6,15 @@
 #include "shared.h"
 #include "gui-apo.h"
 #include "gui-project-load.h"
+#include "project.h"
+
 
 static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 		GtkTreePath *path, GtkTreeViewColumn *col, gpointer user_data)
 {
+	int ret;
 	gchar *id;
 	GtkTreeModel *model;
-	GSList *list_tmp;
 	GtkTreeIter iter;
 	struct ps *ps;
 
@@ -29,30 +31,21 @@ static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 	}
 
 	gtk_tree_model_get(model, &iter, 0, &id, -1);
-
-	list_tmp = ps->project_list;
-	while (list_tmp) {
-		struct project *project;
-		project = list_tmp->data;
-
-		if (streq(project->id, id)) {
-			// found project
-			ps->project = project;
-			pr_info(ps, "project %s selected", id);
-			break;
-		}
-
-		list_tmp = g_slist_next(list_tmp);
+	pr_info(ps, "project %s selected", id);
+	ret = project_load_by_id(ps, id);
+	if (ret != 0) {
+		pr_error(ps, "Failed to load project %s", id);
+		goto out;
 	}
 
 	/* inform APO panel */
 	gui_apo_new_project_loaded(ps);
 
+out:
 	gtk_widget_destroy(ps->s.project_load_window);
 	ps->s.project_load_window = NULL;
 	g_free(id);
 }
-
 
 
 static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *container)
@@ -99,6 +92,7 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
         gtk_widget_show_all(tree1);
 }
 
+
 static void project_load_widget_add_header(struct ps *ps, GtkWidget *container)
 {
 	GtkWidget *hbox;
@@ -115,6 +109,7 @@ static void project_load_widget_add_header(struct ps *ps, GtkWidget *container)
 	gtk_widget_show_all(hbox);
 }
 
+
 static void project_load_widget_add_artwork(struct ps *ps, GtkWidget *container)
 {
         GtkWidget *event_box;
@@ -130,11 +125,11 @@ static void project_load_widget_add_artwork(struct ps *ps, GtkWidget *container)
 }
 
 
-
-
 void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 {
 	GtkWidget *vbox;
+
+	(void)widget;
 
 	ps->s.project_load_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_widget_set_size_request(ps->s.project_load_window, 600, 400);
