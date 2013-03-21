@@ -23,6 +23,7 @@ FILES += gui-atitle.c
 FILES += gui-statusbar.c
 FILES += gui-about.c
 FILES += gui-waterfall.c
+FILES += gui-project-load.c
 
 FILES += disect-core.c
 FILES += disect-perf.c

@@ -14,6 +14,7 @@
 #include "gui-toolkit.h"
 #include "gui-about.h"
 #include "gui-help.h"
+#include "gui-project-load.h"
 
 
 static GdkScreen *get_default_screen(void)
@@ -134,6 +135,7 @@ static void setup_menu(struct ps *ps)
 	project         = gtk_menu_item_new_with_mnemonic("_Projects");
 	project_recent  = gtk_menu_item_new_with_mnemonic("_Open project");
 	g_signal_connect(G_OBJECT(project_recent), "activate", G_CALLBACK(gui_amc_load_project), ps);
+
 	project_new     = gtk_menu_item_new_with_mnemonic("_Create projects");
 	project_manage  = gtk_menu_item_new_with_mnemonic("_Manage projects");
 
