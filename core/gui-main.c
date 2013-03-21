@@ -16,9 +16,24 @@
 #include "gui-help.h"
 
 
+static GdkScreen *get_default_screen(void)
+{
+	return gdk_display_get_default_screen(gdk_display_get_default());
+}
+
+
+static void query_screen_info(struct ps *ps)
+{
+	GdkScreen *screen;
+
+	screen = get_default_screen();
+	ps->info.width = gdk_screen_get_width(screen);
+	ps->info.height = gdk_screen_get_height(screen);
+}
+
+
 static void init_styles(struct ps *ps)
 {
-	GdkDisplay *display;
 	GdkScreen *screen;
 	gboolean ret;
 	GtkCssProvider *provider;
@@ -31,8 +46,7 @@ static void init_styles(struct ps *ps)
 		goto out;
 	}
 
-	display = gdk_display_get_default();
-	screen = gdk_display_get_default_screen(display);
+	screen = get_default_screen();
 
 	gtk_style_context_add_provider_for_screen(screen,
 			GTK_STYLE_PROVIDER(provider),
@@ -63,22 +77,11 @@ static void setup_main_row_artwork_image(struct ps *ps)
 }
 
 
-static GdkScreen* get_default_screen(void)
+static void resize_main_window(struct ps *ps, GtkWidget *window)
 {
-	return gdk_display_get_default_screen(gdk_display_get_default());
-}
-
-
-static void resize_main_window(GtkWidget *window)
-{
-	gint width, height;
-	GdkScreen*screen;
-
-	screen = get_default_screen();
-	width = gdk_screen_get_width(screen);
-	height = gdk_screen_get_height(screen);
-
-	gtk_window_resize(GTK_WINDOW(window), width * 3 / 4, height  * 3 / 4);
+	gtk_window_resize(GTK_WINDOW(window),
+			  ps->info.width * 3 / 4,
+			  ps->info.height  * 3 / 4);
 }
 
 static void setup_menu(struct ps *ps)
@@ -223,6 +226,8 @@ int gui_init(struct ps *ps, int ac, char **av)
 	ps->s.main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	init_styles(ps);
 
+	query_screen_info(ps);
+
 	gtk_window_set_title(GTK_WINDOW(ps->s.main_window), "perf-studio");
 
 
@@ -253,7 +258,7 @@ int gui_init(struct ps *ps, int ac, char **av)
 	}
 
 
-	resize_main_window(ps->s.main_window);
+	resize_main_window(ps, ps->s.main_window);
 	gtk_window_set_position(GTK_WINDOW(ps->s.main_window), GTK_WIN_POS_CENTER);
 
 	gtk_widget_show_all(ps->s.main_window);

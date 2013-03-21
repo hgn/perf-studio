@@ -236,6 +236,11 @@ enum {
 };
 
 struct screen_info {
+	gint width;
+	gint height;
+};
+
+struct screen_data {
 	gchar *pixmapdir;
 	gchar *buttondir;
 	gchar *theme_style_path;
@@ -245,7 +250,8 @@ struct screen_info {
 struct ps {
 	gboolean screen_usable;
 	struct screen s;
-	struct screen_info si;
+	struct screen_info info;
+	struct screen_data si;
 	struct data d;
 	/* CLI args */
 	struct args args;
