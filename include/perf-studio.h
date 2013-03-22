@@ -229,6 +229,12 @@ struct project {
 	/* $HOME/.cache/perf-studio/projects/0001 */
 	gchar *project_path;
 
+	/* $HOME/.cache/perf-studio/projects/0001/db/8476e28e5.. */
+	gchar *project_db_path;
+
+	/* $HOME/.cache/perf-studio/projects/0001/refs */
+	gchar *project_refs_path;
+
 	/* current checksum (MD5, SHA1, ...) of executable */
 	gchar *checksum;
 };

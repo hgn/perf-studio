@@ -22,25 +22,24 @@ static int check_create_refs_path(struct ps *ps, struct project *project)
 	assert(project->project_path);
 	assert(project->checksum);
 
-	path = g_build_filename(project->project_path, "refs", NULL);
+	project->project_refs_path = g_build_filename(project->project_path, "refs", NULL);
 
-	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
-		pr_info(ps, "%s already created", path);
+	if (g_file_test(project->project_refs_path, G_FILE_TEST_IS_DIR)) {
+		pr_info(ps, "%s already created", project->project_refs_path);
 		ret = 0; /* no failure */
 		goto out;
 	}
 
-	pr_info(ps, "Create refs directory %s", path);
-	ret = g_mkdir(path, 0755);
+	pr_info(ps, "Create refs directory %s", project->project_refs_path);
+	ret = g_mkdir(project->project_refs_path, 0755);
 	if (ret != 0) {
-		pr_error(ps, "Failed to create refs directory %s", path);
+		pr_error(ps, "Failed to create refs directory %s", project->project_refs_path);
 		ret = -EINVAL;
 		goto out;
 	}
 
 	ret = 0;
 out:
-	g_free(path);
 	return ret;
 }
 
@@ -50,25 +49,26 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 {
 	int ret = 0;
 	GDateTime *date_time;
-	gchar *path, *refs_path, *date_time_fmt;
+	gchar *refs_path, *date_time_fmt;
 
 	assert(ps);
 	assert(project);
 	assert(project->project_path);
 	assert(project->checksum);
+	assert(project->project_refs_path);
 
-	path = g_build_filename(project->project_path, "db", project->checksum, NULL);
+	project->project_db_path = g_build_filename(project->project_path, "db", project->checksum, NULL);
 
-	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
-		pr_info(ps, "%s already created", path);
+	if (g_file_test(project->project_db_path, G_FILE_TEST_IS_DIR)) {
+		pr_info(ps, "%s already created", project->project_db_path);
 		ret = 0; /* no failure */
 		goto out;
 	}
 
-	pr_info(ps, "Create DB-VERSION path %s", path);
-	ret = g_mkdir(path, 0755);
+	pr_info(ps, "Create project db path %s (0755)", project->project_db_path);
+	ret = g_mkdir(project->project_db_path, 0755);
 	if (ret != 0) {
-		pr_error(ps, "Failed to create DB dir %s", path);
+		pr_error(ps, "Failed to create project db dir %s", project->project_db_path);
 		ret = -EINVAL;
 		goto out;
 	}
@@ -76,9 +76,9 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 	/* now symblink to new DB dir */
 	date_time = g_date_time_new_now_local();
 	date_time_fmt = g_date_time_format(date_time, "%Y-%m-%d-%H:%M:%S");
-	refs_path = g_build_filename(project->project_path, "refs", date_time_fmt, NULL);
+	refs_path = g_build_filename(project->project_refs_path, date_time_fmt, NULL);
 
-	ret = symlink(path, refs_path);
+	ret = symlink(project->project_db_path, refs_path);
 	if (ret != 0) {
 		pr_error(ps, "Could not create symlink (%s) to db", refs_path);
 		goto out2;
@@ -92,7 +92,6 @@ out2:
 	g_free(refs_path);
 
 out:
-	g_free(path);
 	return ret;
 }
 
@@ -186,11 +185,14 @@ void project_free(struct project *e)
 	/* optional */
 	if (e->description) g_free(e->description);
 	if (e->project_path) g_free(e->project_path);
+	if (e->project_refs_path) g_free(e->project_refs_path);
+	if (e->project_db_path) g_free(e->project_db_path);
 	if (e->checksum) g_free(e->checksum);
 	if (e->cmd_args) g_strfreev(e->cmd_args);
 
 	g_free(e);
 }
+
 
 void project_purge_all(struct ps *ps)
 {
