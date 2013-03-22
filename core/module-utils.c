@@ -1,5 +1,6 @@
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 
 #include "perf-studio.h"
 #include "event.h"
@@ -14,7 +15,10 @@ struct module *module_new(void)
 
 void module_free(struct module *m)
 {
-	module_purge_all_events(m);
+	assert(m);
+	assert(m->events);
+
+	events_purge_all(m->events);
 	g_free(m);
 }
 
@@ -56,41 +60,15 @@ char *module_get_description(struct module *m)
 }
 
 
-int module_add_event(struct module *m, struct event *e)
+int module_add_events(struct module *m, struct events *e)
 {
 	if (!m || !e)
 		return -EINVAL;
 
-	m->event_list = g_slist_append(m->event_list, e);
+	m->events = e;
 
 	return 0;
 }
 
 
-void module_purge_all_events(struct module *m)
-{
-	GSList *tmp;
-
-	tmp = m->event_list;
-	while (tmp) {
-		struct event *e = tmp->data;
-		event_free(e);
-		tmp = g_slist_next(tmp);
-	}
-
-	g_slist_free(m->event_list);
-}
-
-
-void module_print_registered_events(struct ps *ps, struct module *module)
-{
-	GSList *tmp;
-
-	tmp = module->event_list;
-	while (tmp) {
-		struct event *e = tmp->data;
-		event_print(ps, e);
-		tmp = g_slist_next(tmp);
-	}
-}
 

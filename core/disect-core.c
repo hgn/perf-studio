@@ -6,6 +6,7 @@
 #include "perf-studio.h"
 #include "shared.h"
 #include "disect-perf.h"
+#include "event.h"
 
 
 /* if the function return != something goes wrong. The caller MUST

@@ -314,6 +314,11 @@ enum update_type {
 	UPDATE_TYPE_PERF_DATA_PATHS,
 };
 
+
+
+/* forward decl, see events.h */
+struct events;
+
 struct module {
 
 	/* elements controlled by modules */
@@ -325,7 +330,7 @@ struct module {
 	unsigned int module_group;
 
 	/* list or registered events */
-	GSList *event_list;
+	struct events *events;
 
 	/*
 	 * update receive data and should transform
@@ -370,41 +375,6 @@ struct module {
 #define PERF_STUDIO_MODULE_REGISTER_FUNC "register_module"
 typedef int (*module_register_fn_t)(struct ps *, struct module **);
 
-/* event specific data */
-
-enum {
-	EVENT_TYPE_COUNTER = 0,
-	EVENT_TYPE_SAMPLING,
-
-	EVENT_TYPE_PERF_RECORD,
-
-	EVENT_TYPE_MAX
-};
-
-enum {
-	USERKERNELSPACE,
-	USERSPACE,
-	KERNELSPACE,
-	HYPERVISOR,
-};
-
-struct event_counting {
-	int event;
-	int where;
-};
-
-struct event_sampling {
-	int event;
-	int where;
-};
-
-struct event {
-	guint type;
-	union {
-		struct event_sampling sampling;
-		struct event_counting counting;
-	};
-};
 
 
 /* Disector Section */

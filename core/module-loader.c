@@ -91,7 +91,6 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 	pr_info(ps, " module description: \"%s\"", module_get_description(module));
 	if (MSG_LEVEL_INFO(ps)) {
 		pr_info(ps, " registred events:");
-		module_print_registered_events(ps, module);
 	}
 
 	module->dl_handle = handle;
