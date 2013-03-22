@@ -19,10 +19,10 @@ static int check_create_refs_path(struct ps *ps, struct project *project)
 
 	assert(ps);
 	assert(project);
-	assert(project->db_path);
+	assert(project->project_path);
 	assert(project->checksum);
 
-	path = g_build_filename(project->db_path, "refs", NULL);
+	path = g_build_filename(project->project_path, "refs", NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
 		pr_info(ps, "%s already created", path);
@@ -54,10 +54,10 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 
 	assert(ps);
 	assert(project);
-	assert(project->db_path);
+	assert(project->project_path);
 	assert(project->checksum);
 
-	path = g_build_filename(project->db_path, "db", project->checksum, NULL);
+	path = g_build_filename(project->project_path, "db", project->checksum, NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
 		pr_info(ps, "%s already created", path);
@@ -76,7 +76,7 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 	/* now symblink to new DB dir */
 	date_time = g_date_time_new_now_local();
 	date_time_fmt = g_date_time_format(date_time, "%Y-%m-%d-%H:%M:%S");
-	refs_path = g_build_filename(project->db_path, "refs", date_time_fmt, NULL);
+	refs_path = g_build_filename(project->project_path, "refs", date_time_fmt, NULL);
 
 	ret = symlink(path, refs_path);
 	if (ret != 0) {
@@ -105,10 +105,10 @@ static int check_create_db_parent_dir(struct ps *ps, struct project *project)
 
 	assert(ps);
 	assert(project);
-	assert(project->db_path);
+	assert(project->project_path);
 	assert(project->checksum);
 
-	path = g_build_filename(project->db_path, "db", NULL);
+	path = g_build_filename(project->project_path, "db", NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
 		pr_info(ps, "project db directory %s already created", path);
@@ -140,10 +140,10 @@ static int check_create_db_info(struct ps *ps, struct project *project)
 
 	assert(ps);
 	assert(project);
-	assert(project->db_path);
+	assert(project->project_path);
 	assert(project->checksum);
 
-	path = g_build_filename(project->db_path, "db", project->checksum, "info",  NULL);
+	path = g_build_filename(project->project_path, "db", project->checksum, "info",  NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_REGULAR)) {
 		pr_info(ps, "project conf %s already created", path);
@@ -185,7 +185,7 @@ void project_free(struct project *e)
 
 	/* optional */
 	if (e->description) g_free(e->description);
-	if (e->db_path) g_free(e->db_path);
+	if (e->project_path) g_free(e->project_path);
 	if (e->checksum) g_free(e->checksum);
 	if (e->cmd_args) g_strfreev(e->cmd_args);
 
@@ -355,7 +355,7 @@ void project_show(struct ps *ps, struct project *p)
 	pr_info(ps, " nice level:          ");
 	pr_info(ps, " scheduler policy:    ");
 	pr_info(ps, " IO scheduler:        ");
-	pr_info(ps, " project path:      %s", p->db_path);
+	pr_info(ps, " project path:      %s", p->project_path);
 }
 
 

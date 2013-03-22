@@ -227,7 +227,7 @@ struct project {
 	int status;
 
 	/* $HOME/.cache/perf-studio/projects/0001 */
-	gchar *db_path;
+	gchar *project_path;
 
 	/* current checksum (MD5, SHA1, ...) of executable */
 	gchar *checksum;

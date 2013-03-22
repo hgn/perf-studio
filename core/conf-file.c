@@ -87,7 +87,7 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
 	project = project_new();
 	project->cmd = cmd;
 	project->id = g_strdup(project_id);
-	project->db_path = g_strdup(path);
+	project->project_path = g_strdup(path);
 
 	/* optional arguments */
 	project->cmd_args = g_key_file_get_string_list(keyfile, "common", "cmd-args", NULL, NULL);
