@@ -278,6 +278,8 @@ struct ps {
 	 * of project_list
 	 */
 	struct project *project;
+	GSList *project_load_cb_list;
+	GSList *project_unload_cb_list;
 	/* list of all available projects */
 	GSList *project_list;
 

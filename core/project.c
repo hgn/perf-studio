@@ -388,3 +388,70 @@ int project_load_by_id(struct ps *ps, const char *id)
 
 	return -EINVAL;
 }
+
+/*
+ * Called after a project is loaded/activated and ps->project
+ * is a valid project pointer. Currently there is no unregister
+ * function just because there is no need currently to support
+ * this. Most important: modules are triggered by the core if
+ * new projects are loaded. The core is the active component,
+ * not the module. So there core will register here and call
+ * loaded modules afterwards.
+ *
+ */
+void project_register_load_cb(struct ps *ps, void (*cb)(struct ps *ps))
+{
+	assert(ps);
+	assert(cb);
+
+	pr_debug(ps, "Register project load callback");
+	ps->project_load_cb_list = g_slist_append(ps->project_load_cb_list, cb);
+}
+
+static void call_registered_load_cb(struct ps *ps)
+{
+	GSList *tmp;
+
+	tmp = ps->project_load_cb_list;
+	while (tmp) {
+		void (*load_callback)(struct ps *ps);
+
+		load_callback = tmp->data;
+		pr_debug(ps, "Call project load callback");
+		load_callback(ps);
+
+		tmp = g_slist_next(tmp);
+	}
+}
+
+
+/*
+ * Callbacks shortly called before a project is unloaded. This
+ * callback can be used to disable drawing, unset GtkLabels and
+ * so on
+ */
+void project_register_unload_cb(struct ps *ps,  void (*cb)(struct ps *ps))
+{
+	assert(ps);
+	assert(cb);
+
+	pr_debug(ps, "Register project unload callback");
+	ps->project_unload_cb_list = g_slist_append(ps->project_unload_cb_list, cb);
+}
+
+
+static void call_registered_unload_cb(struct ps *ps)
+{
+	GSList *tmp;
+
+	tmp = ps->project_unload_cb_list;
+	while (tmp) {
+		void (*unload_callback)(struct ps *ps);
+
+		unload_callback = tmp->data;
+		pr_debug(ps, "Call project unload callback");
+		unload_callback(ps);
+
+		tmp = g_slist_next(tmp);
+	}
+}
