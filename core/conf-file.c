@@ -90,7 +90,10 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
 	project->project_path = g_strdup(path);
 
 	/* optional arguments */
-	project->cmd_args = g_key_file_get_string_list(keyfile, "common", "cmd-args", NULL, NULL);
+	project->cmd_args_full = g_key_file_get_string(keyfile, "common", "cmd-args", NULL);
+	if (project->cmd_args_full) {
+		project->cmd_args_splitted = g_strsplit_set(project->cmd_args_full,  " \t", -1);
+	}
 
 	/* optional arguments */
 	project->description = g_key_file_get_string(keyfile, "common", "description", NULL);

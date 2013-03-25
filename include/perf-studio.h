@@ -222,7 +222,8 @@ struct project {
 	gchar *id;
 	gchar *cmd;
 	gchar *description;
-	gchar **cmd_args;
+	gchar *cmd_args_full;
+	gchar **cmd_args_splitted;
 
 	int status;
 

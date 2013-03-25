@@ -256,7 +256,8 @@ void project_free(struct project *e)
 	if (e->project_refs_path) g_free(e->project_refs_path);
 	if (e->project_db_path) g_free(e->project_db_path);
 	if (e->checksum) g_free(e->checksum);
-	if (e->cmd_args) g_strfreev(e->cmd_args);
+	if (e->cmd_args_full) g_free(e->cmd_args_full);
+	if (e->cmd_args_splitted) g_strfreev(e->cmd_args_splitted);
 
 	g_free(e);
 }
@@ -415,12 +416,13 @@ void project_show(struct ps *ps, struct project *p)
 	gchar **tmp;
 	int i = 1;
 
-	pr_info(ps, " id:         %s", p->id);
+	pr_info(ps, " id:          %s", p->id);
 	pr_info(ps, " cmd:         %s", p->cmd);
 	pr_info(ps, " description: %s", p->description);
-	tmp = p->cmd_args;
+	pr_info(ps, " cmd-args:    %s", p->cmd_args_full);
+	tmp = p->cmd_args_splitted;
 	while (tmp && *tmp) {
-		pr_info(ps, " cmd-args %d:        %s", i, *tmp);
+		pr_info(ps, " cmd-arg %d:        %s", i, *tmp);
 		tmp++; i++;
 	}
 	pr_info(ps, " working directory:   ");
