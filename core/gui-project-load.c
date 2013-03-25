@@ -38,9 +38,6 @@ static void screen_intro_dialog_existing_activated(GtkTreeView *view,
 		goto out;
 	}
 
-	/* inform APO panel */
-	gui_apo_new_project_loaded(ps);
-
 out:
 	gtk_widget_destroy(ps->s.project_load_window);
 	ps->s.project_load_window = NULL;

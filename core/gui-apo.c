@@ -493,7 +493,7 @@ static void gui_apc_update_segment_size(struct ps *ps)
  * ps->project is new (or replaced), update
  * all views and related fields now
  */
-void gui_apo_new_project_loaded(struct ps *ps)
+static void gui_apo_new_project_loaded(struct ps *ps)
 {
 	assert(ps->project);
         /* update project summary fields */
@@ -518,6 +518,10 @@ GtkWidget *gui_apo_new(struct ps *ps)
 
 	main_widget = apo_main_widget_new(ps);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), main_widget);
+
+	/* register callback called if a project is
+	 * successful loaded */
+	project_register_activate_cb(ps, gui_apo_new_project_loaded);
 
 	return scroll_widget;
 }
