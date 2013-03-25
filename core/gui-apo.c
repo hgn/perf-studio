@@ -2,6 +2,7 @@
 
 #include <assert.h>
 
+#include "project.h"
 #include "gui-apo.h"
 #include "gui-toolkit.h"
 #include "shared.h"
