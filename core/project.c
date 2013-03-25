@@ -5,11 +5,79 @@
 #include <assert.h>
 #include <errno.h>
 
-
 #include <glib.h>
 #include <glib/gstdio.h>
 
 #include "project.h"
+
+
+static void call_registered_activate_cb(struct ps *ps)
+{
+	GSList *tmp;
+
+	tmp = ps->project_activate_cb_list;
+	while (tmp) {
+		void (*activate_callback)(struct ps *ps);
+
+		activate_callback = tmp->data;
+		pr_debug(ps, "Call project activate callback");
+		activate_callback(ps);
+
+		tmp = g_slist_next(tmp);
+	}
+}
+
+
+/*
+ * Called after a project is activated and ps->project
+ * is a valid project pointer. Currently there is no unregister
+ * function just because there is no need currently to support
+ * this. Most important: modules are triggered by the core if
+ * new projects are activated. The core is the active component,
+ * not the module. So there core will register here and call
+ * activated modules afterwards.
+ *
+ */
+void project_register_activate_cb(struct ps *ps, void (*cb)(struct ps *ps))
+{
+	assert(ps);
+	assert(cb);
+
+	pr_debug(ps, "Register project activate callback");
+	ps->project_activate_cb_list = g_slist_append(ps->project_activate_cb_list, cb);
+}
+
+
+/*
+ * Callbacks shortly called before a project is deactivated. This
+ * callback can be used to disable drawing, unset GtkLabels and
+ * so on
+ */
+void project_register_deactivate_cb(struct ps *ps,  void (*cb)(struct ps *ps))
+{
+	assert(ps);
+	assert(cb);
+
+	pr_debug(ps, "Register project deactivate callback");
+	ps->project_deactivate_cb_list = g_slist_append(ps->project_deactivate_cb_list, cb);
+}
+
+
+static void call_registered_deactivate_cb(struct ps *ps)
+{
+	GSList *tmp;
+
+	tmp = ps->project_deactivate_cb_list;
+	while (tmp) {
+		void (*deactivate_callback)(struct ps *ps);
+
+		deactivate_callback = tmp->data;
+		pr_debug(ps, "Call project deactivate callback");
+		deactivate_callback(ps);
+
+		tmp = g_slist_next(tmp);
+	}
+}
 
 /* return 0: success, <0 error */
 static int check_create_refs_path(struct ps *ps, struct project *project)
@@ -279,7 +347,6 @@ static gboolean is_absolute_path(const gchar *cmd)
         return FALSE;
 }
 
-
 /* called when ps->project becomes valid. We check
  * some values (sanity) and compute temp values */
 void project_activate(struct ps *ps, struct project *project)
@@ -389,69 +456,3 @@ int project_load_by_id(struct ps *ps, const char *id)
 	return -EINVAL;
 }
 
-/*
- * Called after a project is loaded/activated and ps->project
- * is a valid project pointer. Currently there is no unregister
- * function just because there is no need currently to support
- * this. Most important: modules are triggered by the core if
- * new projects are loaded. The core is the active component,
- * not the module. So there core will register here and call
- * loaded modules afterwards.
- *
- */
-void project_register_load_cb(struct ps *ps, void (*cb)(struct ps *ps))
-{
-	assert(ps);
-	assert(cb);
-
-	pr_debug(ps, "Register project load callback");
-	ps->project_load_cb_list = g_slist_append(ps->project_load_cb_list, cb);
-}
-
-static void call_registered_load_cb(struct ps *ps)
-{
-	GSList *tmp;
-
-	tmp = ps->project_load_cb_list;
-	while (tmp) {
-		void (*load_callback)(struct ps *ps);
-
-		load_callback = tmp->data;
-		pr_debug(ps, "Call project load callback");
-		load_callback(ps);
-
-		tmp = g_slist_next(tmp);
-	}
-}
-
-
-/*
- * Callbacks shortly called before a project is unloaded. This
- * callback can be used to disable drawing, unset GtkLabels and
- * so on
- */
-void project_register_unload_cb(struct ps *ps,  void (*cb)(struct ps *ps))
-{
-	assert(ps);
-	assert(cb);
-
-	pr_debug(ps, "Register project unload callback");
-	ps->project_unload_cb_list = g_slist_append(ps->project_unload_cb_list, cb);
-}
-
-
-static void call_registered_unload_cb(struct ps *ps)
-{
-	GSList *tmp;
-
-	tmp = ps->project_unload_cb_list;
-	while (tmp) {
-		void (*unload_callback)(struct ps *ps);
-
-		unload_callback = tmp->data;
-		pr_debug(ps, "Call project unload callback");
-		unload_callback(ps);
-
-		tmp = g_slist_next(tmp);
-	}
-}

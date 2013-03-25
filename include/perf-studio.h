@@ -1,4 +1,4 @@
-/*
+/*;
 ** Copyright (C) 2013 - Hagen Paul Pfeifer <hagen@jauu.net>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -278,8 +278,8 @@ struct ps {
 	 * of project_list
 	 */
 	struct project *project;
-	GSList *project_load_cb_list;
-	GSList *project_unload_cb_list;
+	GSList *project_activate_cb_list;
+	GSList *project_deactivate_cb_list;
 	/* list of all available projects */
 	GSList *project_list;
 
