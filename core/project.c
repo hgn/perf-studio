@@ -295,6 +295,8 @@ void project_deactivate(struct ps *ps)
 
         pr_info(ps, "deactivate project %s", project->id);
 
+	call_registered_deactivate_cb(ps);
+
         /*
          * we free/deactive all values which we previously
          * generated at active state
@@ -403,6 +405,8 @@ void project_activate(struct ps *ps, struct project *project)
 	}
 
 	project->status = PROJECT_STATUS_OK;
+
+	call_registered_activate_cb(ps);
 }
 
 
