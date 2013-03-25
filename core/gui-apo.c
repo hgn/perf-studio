@@ -409,7 +409,7 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 }
 
 
-struct kv_list *cmd_segment_size_create(const char *exec_path)
+struct kv_list *cmd_segment_size_create(struct ps *ps, const char *exec_path)
 {
         int ret;
 	unsigned int i;
@@ -438,7 +438,7 @@ struct kv_list *cmd_segment_size_create(const char *exec_path)
                 if (ret != STR_PARSER_RET_SUCCESS) {
                         goto err;
                 }
-
+		pr_debug(ps, "segment: %s byte: %ld",  keys[i], longval);
 		snprintf(label, sizeof(label) - 1, "%s: %ld byte", keys[i], longval);
 		label[sizeof(label) - 1] = '\0';
 		kv_list_add_int_string(kv_list, longval, label);
@@ -469,7 +469,7 @@ static void gui_apc_update_segment_size(struct ps *ps)
         assert(ps);
         assert(ps->project);
 
-        kv_list = cmd_segment_size_create("/usr/bin/gcc");
+        kv_list = cmd_segment_size_create(ps, ps->project->cmd);
         if (!kv_list) {
                 pr_error(ps, "Cannot get segment size");
                 return;
