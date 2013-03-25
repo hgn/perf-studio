@@ -424,7 +424,7 @@ struct kv_list *cmd_segment_size_create(struct ps *ps, const char *exec_path)
 
         if (!g_spawn_sync(NULL, (gchar **)argv, NULL, 0, NULL, NULL,
                           &output, NULL, &exit_status, &error)) {
-                // handle error here
+                // FIXME handle error here
                 return NULL;
         }
         str_parser_init(&str_parser, output);
