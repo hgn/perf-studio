@@ -372,17 +372,43 @@ static int draw_cpu_usage_chart(struct ps *ps, GtkWidget *widget,
 static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 		cairo_t *cr, struct cpu_waterfall *cpu_waterfall, int x_position)
 {
-	unsigned int i, j;
+	unsigned int i, j, uninitialized_steps;
+	int draw_cpu_auxiliary_lines;
+	struct ps_color zero_color;
 	int offset;
 	int x_pos_pos;
 
 	(void)ps;
 	(void)widget;
 
+	draw_cpu_auxiliary_lines = 0;
+
 	cairo_set_antialias(cr, CAIRO_ANTIALIAS_DEFAULT);
 
 	offset = 0;
 	x_pos_pos = x_position + 100;
+
+	uninitialized_steps = cpu_waterfall->max_elements - cpu_waterfall->ring_buffer_elements;
+
+	if (uninitialized_steps > 0) {
+		/* partial filled (we are at start phase)
+		 * and draw background instead */
+		cpu_waterfall_zero_color(&zero_color);
+		ps_set_source_rgba(cr, &zero_color);
+
+
+		for (i = 0; i < uninitialized_steps; i++) {
+			int y_pos;
+
+			y_pos = 40;
+			cairo_rectangle(cr, x_pos_pos, y_pos, 10, (cpu_waterfall->no_cpu * 30));
+			cairo_fill(cr);
+
+			x_pos_pos += 10;
+		}
+	}
+
+
 	for (i = 0; i < cpu_waterfall->ring_buffer_elements; i++) {
 		struct ps_color waterfall_entry[cpu_waterfall->no_cpu];
 		offset += ring_buffer_read_at(cpu_waterfall->ring_buffer,
@@ -401,6 +427,25 @@ static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 			cairo_fill(cr);
 		}
 		x_pos_pos += 10;
+	}
+
+	if (draw_cpu_auxiliary_lines) {
+		int x_start = x_position + 100;
+		int x_end   = x_start + cpu_waterfall->max_elements * 10;
+
+		cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
+		cairo_set_line_width(cr, 1.0);
+
+		for (j = 0; j < cpu_waterfall->no_cpu + 1; j++) {
+			int y_pos;
+
+			y_pos = 40 + (j * 30);
+
+			cairo_set_source_rgba(cr, .1, .1, .1, 1.);
+			cairo_move_to(cr, x_start, y_pos);
+			cairo_line_to(cr, x_end, y_pos);
+			cairo_stroke(cr);
+		}
 	}
 
 	return x_pos_pos;
@@ -605,6 +650,19 @@ static GtkWidget *cpu_usage_widget_new(struct ps *ps)
 }
 
 
+static void draw_interrupt_monitor_charts_bg(struct ps *ps, GtkWidget *widget, cairo_t *cr)
+{
+	guint width, height;
+
+	width = gtk_widget_get_allocated_width(widget);
+	height = gtk_widget_get_allocated_height(widget);
+
+	gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR_DARKER]);
+	cairo_rectangle(cr, 0, 0, width, height);
+	cairo_fill(cr);
+}
+
+
 static gboolean intr_usage_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
 	int x_position;
@@ -615,7 +673,7 @@ static gboolean intr_usage_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data
 	assert(ps);
 	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
 	assert(interrupt_monitor_data);
-
+	draw_interrupt_monitor_charts_bg(ps, widget, cr);
 	draw_interrupt_monitor_charts(ps, widget, cr, interrupt_monitor_data, 0);
 
 	return FALSE;
@@ -696,7 +754,7 @@ static GtkWidget *system_tab_new(struct ps *ps)
 	GtkWidget *vbox;
 	GtkWidget *header;
 
-	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
 	header = header_status_widget(ps, " CPU Information");
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);

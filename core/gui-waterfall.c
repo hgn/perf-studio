@@ -31,12 +31,22 @@ struct cpu_waterfall *cpu_waterfall_new(struct ps *ps)
 			   CIRC_BUFFER_MAX_STEPS *
 			   sizeof(struct ps_color);
 	cpu_waterfall->ring_buffer = ring_buffer_new(req_circ_buf_mem);
+	cpu_waterfall->max_elements = CIRC_BUFFER_MAX_STEPS;
 
 	return cpu_waterfall;
 
 err:
 	g_slice_free1(sizeof(*cpu_waterfall), cpu_waterfall);
 	return NULL;
+}
+
+
+void cpu_waterfall_zero_color(struct ps_color *color)
+{
+	color->red   = Hex8ToFloat(0x11);
+	color->green = Hex8ToFloat(0x11);
+	color->blue  = Hex8ToFloat(0x11);
+	color->alpha  = 1.0f;
 }
 
 
