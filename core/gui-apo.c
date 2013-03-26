@@ -246,10 +246,15 @@ static void gui_apc_update_overview_panel(struct ps *ps)
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.id), ps->project->id);
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_path), ps->project->cmd);
 
+#define COND_LABEL_SET(x, y) if (x) gtk_label_set_text(GTK_LABEL(y), x);
+
 	/* optional, thus conditional */
-	if (ps->project->description)
-		gtk_label_set_text(GTK_LABEL(ps->s.project_info.description), ps->project->description);
+	COND_LABEL_SET(ps->project->description, ps->s.project_info.description)
+	COND_LABEL_SET(ps->project->cmd_args_full, ps->s.project_info.exec_args)
+
+#undef COND_LABEL_SET
 }
+
 
 
 static gboolean segment_size_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
