@@ -16,24 +16,13 @@ int load_user_conf_file(struct ps *ps)
 	GKeyFile *keyfile;
 	GKeyFileFlags flags;
 	gsize length;
-	const gchar *data_dir;
 	gchar *full_path;
 	gchar **iter;
 
-	data_dir = g_get_user_config_dir();
-	full_path = g_malloc(strlen(data_dir) +
-			1 + /* "/" */
-			strlen(PERF_STUDIO_USER_CONF_DIR) +
-			1 + /* "/" */
-			strlen(PERF_STUDIO_USER_GLOBAL_CONF_NAME) +
-			1); /* "\0" */
-
-	strcpy(full_path, data_dir);
-	strcat(full_path, "/");
-	strcat(full_path, PERF_STUDIO_USER_CONF_DIR);
-	strcat(full_path, "/");
-	strcat(full_path, PERF_STUDIO_USER_GLOBAL_CONF_NAME);
-
+	full_path = g_build_filename(g_get_user_config_dir(),
+				     PERF_STUDIO_USER_CONF_DIR,
+				     PERF_STUDIO_USER_GLOBAL_CONF_NAME,
+				     NULL);
 	keyfile = g_key_file_new();
 	flags = G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS;
 
