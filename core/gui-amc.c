@@ -464,11 +464,13 @@ static void draw_interrupt_monitor_charts(struct ps *ps, GtkWidget *widget,
 		y_position += 10;
 	}
 
+	gtk_widget_set_size_request(widget, x_position, y_position);
+
 	g_object_unref(layout);
 }
 
 
-static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
+static gboolean cpu_usage_draw_cb(GtkWidget *widget, GdkEventExpose *event)
 {
 	cairo_t *cr;
 	int x_position;
@@ -494,15 +496,13 @@ static gboolean draw_cb(GtkWidget *widget, GdkEventExpose *event)
 	x_position = draw_cpu_usage_chart(ps, widget, cr, system_cpu);
 	x_position = draw_cpu_waterfall_chart(ps, widget, cr, cpu_waterfall, x_position);
 
-	//draw_interrupt_monitor_charts(ps, widget, cr, interrupt_monitor_data, x_position);
-
 	cairo_destroy(cr);
 
 	return FALSE;
 }
 
 
-static gboolean configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
+static gboolean cpu_usage_configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
 	(void)widget;
 	(void)event;
@@ -546,6 +546,33 @@ static void system_tab_timer_cpu_cb(GtkWidget *widget)
 	return;
 }
 
+
+static void system_tab_timer_intr_cb(GtkWidget *widget)
+{
+	int width, height;
+	struct ps *ps;
+	struct interrupt_monitor_data *interrupt_monitor_data;
+
+	if (!gtk_widget_get_visible(widget)) {
+		fprintf(stderr, "not visible\n");
+	}
+
+	/* get data first */
+	ps = g_object_get_data(G_OBJECT(widget), "ps");
+	assert(ps);
+	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
+	assert(interrupt_monitor_data);
+
+	interrupt_monitor_ctrl_update(ps, interrupt_monitor_data);
+
+	width = gtk_widget_get_allocated_width(widget);
+	height = gtk_widget_get_allocated_height(widget);
+
+	gtk_widget_queue_draw_area(widget, 0, 0, width, height);
+
+	return;
+}
+
 /*
  * timer multiplexer into each panel within
  * the system tab to unify the timer and do not
@@ -554,6 +581,7 @@ static void system_tab_timer_cpu_cb(GtkWidget *widget)
 static gboolean system_tab_timer_cb(GtkWidget **widget)
 {
 	system_tab_timer_cpu_cb(widget[SYSTEM_TAB_CPU_WIDGET]);
+	system_tab_timer_intr_cb(widget[SYSTEM_TAB_INTR_WIDGET]);
 
 	return TRUE;
 }
@@ -580,8 +608,8 @@ static GtkWidget *cpu_usage_widget_new(struct ps *ps)
 	system_cpu_update(ps, system_cpu);
 	interrupt_monitor_ctrl_update(ps, interrupt_monitor_data);
 
-	g_signal_connect(darea, "draw", G_CALLBACK(draw_cb), NULL);
-	g_signal_connect(darea, "configure-event", G_CALLBACK(configure_cb), NULL);
+	g_signal_connect(darea, "draw", G_CALLBACK(cpu_usage_draw_cb), NULL);
+	g_signal_connect(darea, "configure-event", G_CALLBACK(cpu_usage_configure_cb), NULL);
 
 	g_object_set_data(G_OBJECT(darea), "ps", ps);
 	g_object_set_data(G_OBJECT(darea), "system-cpu", system_cpu);
@@ -590,6 +618,60 @@ static GtkWidget *cpu_usage_widget_new(struct ps *ps)
 
 	return darea;
 }
+
+
+static gboolean intr_usage_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
+{
+	int x_position;
+	struct ps *ps;
+	struct interrupt_monitor_data *interrupt_monitor_data;
+
+	ps = g_object_get_data(G_OBJECT(widget), "ps");
+	assert(ps);
+	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
+	assert(interrupt_monitor_data);
+
+	draw_interrupt_monitor_charts(ps, widget, cr, interrupt_monitor_data, 0);
+
+	return FALSE;
+}
+
+
+static gboolean intr_usage_configure_cb(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
+{
+	(void)widget;
+	(void)event;
+	(void)data;
+
+	return FALSE;
+}
+
+
+static GtkWidget *intr_usage_widget_new(struct ps *ps)
+{
+	GtkWidget *darea;
+	struct interrupt_monitor_data *interrupt_monitor_data;
+
+	darea = gtk_drawing_area_new();
+
+	interrupt_monitor_data = interrupt_monitor_data_new(ps);
+	if (!interrupt_monitor_data) {
+		pr_error(ps, "Could not initilize interrupt monitor");
+		gtk_widget_destroy(darea);
+		return NULL;
+	}
+
+	interrupt_monitor_ctrl_update(ps, interrupt_monitor_data);
+
+	g_signal_connect(darea, "draw", G_CALLBACK(intr_usage_draw_cb), NULL);
+	g_signal_connect(darea, "configure-event", G_CALLBACK(intr_usage_configure_cb), NULL);
+
+	g_object_set_data(G_OBJECT(darea), "ps", ps);
+	g_object_set_data(G_OBJECT(darea), "interrupt-monitor-data", interrupt_monitor_data);
+
+	return darea;
+}
+
 
 void header_status_widget_set_title(GtkWidget *widget, const char *title)
 {
@@ -601,6 +683,7 @@ void header_status_widget_set_title(GtkWidget *widget, const char *title)
 
 	gtk_label_set_markup(GTK_LABEL(widget), buf);
 }
+
 
 static GtkWidget *header_status_widget(struct ps *ps, const char *text)
 {
@@ -630,21 +713,26 @@ static GtkWidget *system_tab_new(struct ps *ps)
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
-	header = header_status_widget(ps, " CPU and Interrupt Info");
+	header = header_status_widget(ps, " CPU Information");
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
 	gtk_widget_show_all(header);
-
 	widgets[SYSTEM_TAB_CPU_WIDGET] = cpu_usage_widget_new(ps);
 	gtk_box_pack_start(GTK_BOX(vbox), widgets[SYSTEM_TAB_CPU_WIDGET],
 			   FALSE, TRUE, 0);
 	gtk_widget_show_all(widgets[SYSTEM_TAB_CPU_WIDGET]);
 
 
-	header = header_status_widget(ps, " Memory and Slab Info");
+	header = header_status_widget(ps, " Interrupt Information");
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
 	gtk_widget_show_all(header);
+	widgets[SYSTEM_TAB_INTR_WIDGET] = intr_usage_widget_new(ps);
+	gtk_box_pack_start(GTK_BOX(vbox), widgets[SYSTEM_TAB_INTR_WIDGET],
+			   FALSE, TRUE, 0);
+	gtk_widget_show_all(widgets[SYSTEM_TAB_INTR_WIDGET]);
 
-	header = header_status_widget(ps, " SoftIRQ");
+
+
+	header = header_status_widget(ps, " Memory and Slab Information");
 	gtk_box_pack_start(GTK_BOX(vbox), header, FALSE, TRUE, 0);
 	gtk_widget_show_all(header);
 
