@@ -54,6 +54,7 @@ struct gt_pie_chart *gt_pie_chart_new(void)
         gtpc->pie_data_slot_array = g_array_new(FALSE, FALSE,
 						sizeof(struct pie_data_slot));
 	gt_pie_chart_set_linewidth(gtpc, DEFAULT_LINE_WIDTH);
+	gtpc->mode = GT_PIE_CHART_MODE_PIE;
 
         return gtpc;
 }
@@ -73,6 +74,13 @@ void gt_pie_chart_set_linewidth(struct gt_pie_chart *gt_pie_chart,
 				int line_width)
 {
         gt_pie_chart->line_width = line_width;
+}
+
+
+void gt_pie_chart_set_mode(struct gt_pie_chart *gt_pie_chart,
+				int mode)
+{
+        gt_pie_chart->mode = mode;
 }
 
 
@@ -235,6 +243,13 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 			    10 + (i * 20));
 
 		angle_start += pie_data_slot->angle;
+	}
+
+	if (gtpc->mode == GT_PIE_CHART_MODE_DONUT) {
+		/* draw inner circle to emulate donus mode */
+		gdk_cairo_set_source_rgba(cr, &ps->si.color[BG_COLOR_DARKER]);
+		cairo_arc(cr, xc, yc, 40, angle_start, 2. * M_PI);
+		cairo_fill(cr);
 	}
 
 	/* draw cicle around pie chart */

@@ -32,6 +32,11 @@ void gui_err_dialog(struct ps *ps, const gchar *format, ...);
 /* pie-chart.h */
 #define PIE_CHART_LABEL_MAX 32
 
+enum {
+	GT_PIE_CHART_MODE_PIE,
+	GT_PIE_CHART_MODE_DONUT
+};
+
 struct gt_pie_chart {
         GArray *pie_data_slot_array;
 
@@ -44,6 +49,7 @@ struct gt_pie_chart {
         int outer_radius;
         int line_width;
         struct ps_color fg_color;
+	int mode;
 };
 
 #define DEG_TO_RAD(x) (((float)x) * M_PI / 180.0)
