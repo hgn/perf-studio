@@ -21,9 +21,10 @@ gchar *rand_hex_string(struct ps *ps, gsize length)
 
 void rand_init(struct ps *ps)
 {
-	pr_info(ps, "initialize PRNG");
+	pr_info(ps, "Initialize PRNG");
 	ps->rand = g_rand_new();
 }
+
 
 void rand_free(struct ps *ps)
 {
