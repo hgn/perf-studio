@@ -470,33 +470,25 @@ static void draw_interrupt_monitor_charts(struct ps *ps, GtkWidget *widget,
 }
 
 
-static gboolean cpu_usage_draw_cb(GtkWidget *widget, GdkEventExpose *event)
+static gboolean cpu_usage_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
-	cairo_t *cr;
 	int x_position;
 	struct ps *ps;
 	struct system_cpu *system_cpu;
-	struct interrupt_monitor_data *interrupt_monitor_data;
 	struct cpu_waterfall *cpu_waterfall;
 
-	(void) event;
+	(void) data;
 
 	ps = g_object_get_data(G_OBJECT(widget), "ps");
 	assert(ps);
 	system_cpu = g_object_get_data(G_OBJECT(widget), "system-cpu");
 	assert(system_cpu);
-	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
-	assert(interrupt_monitor_data);
 	cpu_waterfall = g_object_get_data(G_OBJECT(widget), "cpu-waterfall");
 	assert(cpu_waterfall);
-
-	cr = gdk_cairo_create(gtk_widget_get_window(widget));
 
 	/* draw CPU bar charts */
 	x_position = draw_cpu_usage_chart(ps, widget, cr, system_cpu);
 	x_position = draw_cpu_waterfall_chart(ps, widget, cr, cpu_waterfall, x_position);
-
-	cairo_destroy(cr);
 
 	return FALSE;
 }
@@ -517,7 +509,6 @@ static void system_tab_timer_cpu_cb(GtkWidget *widget)
 	int width, height;
 	struct ps *ps;
 	struct system_cpu *sc;
-	struct interrupt_monitor_data *interrupt_monitor_data;
 	struct cpu_waterfall *cpu_waterfall;
 
 	if (!gtk_widget_get_visible(widget)) {
@@ -529,14 +520,11 @@ static void system_tab_timer_cpu_cb(GtkWidget *widget)
 	assert(ps);
 	sc = g_object_get_data(G_OBJECT(widget), "system-cpu");
 	assert(sc);
-	interrupt_monitor_data = g_object_get_data(G_OBJECT(widget), "interrupt-monitor-data");
-	assert(interrupt_monitor_data);
 	cpu_waterfall = g_object_get_data(G_OBJECT(widget), "cpu-waterfall");
 	assert(cpu_waterfall);
 
 	system_cpu_update(ps, sc);
 	cpu_waterfall_update(ps, cpu_waterfall, sc);
-	interrupt_monitor_ctrl_update(ps, interrupt_monitor_data);
 
 	width = gtk_widget_get_allocated_width(widget);
 	height = gtk_widget_get_allocated_height(widget);
@@ -573,6 +561,7 @@ static void system_tab_timer_intr_cb(GtkWidget *widget)
 	return;
 }
 
+
 /*
  * timer multiplexer into each panel within
  * the system tab to unify the timer and do not
@@ -591,29 +580,25 @@ static GtkWidget *cpu_usage_widget_new(struct ps *ps)
 {
 	GtkWidget *darea;
 	struct system_cpu *system_cpu;
-	struct interrupt_monitor_data *interrupt_monitor_data;
 	struct cpu_waterfall *cpu_waterfall;
 
 	darea = gtk_drawing_area_new();
 
 	system_cpu = system_cpu_new(ps);
-	interrupt_monitor_data = interrupt_monitor_data_new(ps);
-	if (!interrupt_monitor_data)
-		pr_error(ps, "Could not initilize interrupt monitor");
+	if (!system_cpu)
+		pr_error(ps, "Could not initilize system CPU monitor");
 
 	cpu_waterfall = cpu_waterfall_new(ps);
 	if (!cpu_waterfall)
 		pr_error(ps, "Could not initilize waterfall gui");
 
 	system_cpu_update(ps, system_cpu);
-	interrupt_monitor_ctrl_update(ps, interrupt_monitor_data);
 
 	g_signal_connect(darea, "draw", G_CALLBACK(cpu_usage_draw_cb), NULL);
 	g_signal_connect(darea, "configure-event", G_CALLBACK(cpu_usage_configure_cb), NULL);
 
 	g_object_set_data(G_OBJECT(darea), "ps", ps);
 	g_object_set_data(G_OBJECT(darea), "system-cpu", system_cpu);
-	g_object_set_data(G_OBJECT(darea), "interrupt-monitor-data", interrupt_monitor_data);
 	g_object_set_data(G_OBJECT(darea), "cpu-waterfall", cpu_waterfall);
 
 	return darea;
