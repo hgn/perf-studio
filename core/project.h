@@ -8,17 +8,10 @@ void project_free(struct project *e);
 void project_purge_all(struct ps *ps);
 void project_deactivate(struct ps *ps);
 void project_show(struct ps *ps, struct project *p);
+int project_load_by_id(struct ps *ps, const char *id);
+void project_register_activate_cb(struct ps *ps, void (*cb)(struct ps *ps));
+void project_register_deactivate_cb(struct ps *ps,  void (*cb)(struct ps *ps));
 
-
-static inline void project_activate(struct ps *ps, struct project *project)
-{
-	/* if a new project is activated, the previous
-	 * project must be deactived first (unload)
-	 */
-	assert(ps->project == 0);
-
-	ps->project = project;
-}
 
 static inline void project_add(struct ps *ps, struct project *project)
 {

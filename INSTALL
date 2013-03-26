@@ -8,5 +8,5 @@ Dependencies
 Installation
 ============
 
-make
-su -c "make install"
+make prefix=/tmp
+su -c "make prefix=/tmp install"

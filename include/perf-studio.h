@@ -1,4 +1,4 @@
-/*
+/*;
 ** Copyright (C) 2013 - Hagen Paul Pfeifer <hagen@jauu.net>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -190,11 +190,10 @@ struct screen {
 
 	/* APO Section */
 	struct {
-		GtkWidget *name;
 		GtkWidget *id;
 		GtkWidget *description;
-		GtkWidget *exec_path;
-		GtkWidget *exec_args;
+		GtkWidget *cmd_path;
+		GtkWidget *cmd_args;
 		GtkWidget *working_dir;
 	} project_info;
 	struct {
@@ -210,18 +209,34 @@ struct data {
 };
 
 
+enum {
+	PROJECT_STATUS_OK = 0,
+	PROJECT_STATUS_CMD_PATH_INVALID,
+	PROJECT_STATUS_CMD_NOT_EXECUTABLE,
+	PROJECT_STATUS_SOMEHOW_INVALID,
+};
+
 struct project {
 	/* values from .perf-studio/config */
 	gchar *id;
 	gchar *cmd;
 	gchar *description;
-	gchar **cmd_args;
+	gchar *cmd_args_full;
+	gchar **cmd_args_splitted;
+
+	int status;
 
 	/* $HOME/.cache/perf-studio/projects/0001 */
+	gchar *project_path;
+
+	/* $HOME/.cache/perf-studio/projects/0001/db/8476e28e5.. */
 	gchar *project_db_path;
 
-	/* current sha1 of executable */
-	unsigned long sha1;
+	/* $HOME/.cache/perf-studio/projects/0001/refs */
+	gchar *project_refs_path;
+
+	/* current checksum (MD5, SHA1, ...) of executable */
+	gchar *checksum;
 };
 
 /* forward declaration, see cpu-fueatures.{c,h) */
@@ -263,6 +278,8 @@ struct ps {
 	 * of project_list
 	 */
 	struct project *project;
+	GSList *project_activate_cb_list;
+	GSList *project_deactivate_cb_list;
 	/* list of all available projects */
 	GSList *project_list;
 
@@ -299,6 +316,11 @@ enum update_type {
 	UPDATE_TYPE_PERF_DATA_PATHS,
 };
 
+
+
+/* forward decl, see events.h */
+struct events;
+
 struct module {
 
 	/* elements controlled by modules */
@@ -310,7 +332,7 @@ struct module {
 	unsigned int module_group;
 
 	/* list or registered events */
-	GSList *event_list;
+	struct events *events;
 
 	/*
 	 * update receive data and should transform
@@ -355,41 +377,6 @@ struct module {
 #define PERF_STUDIO_MODULE_REGISTER_FUNC "register_module"
 typedef int (*module_register_fn_t)(struct ps *, struct module **);
 
-/* event specific data */
-
-enum {
-	EVENT_TYPE_COUNTER = 0,
-	EVENT_TYPE_SAMPLING,
-
-	EVENT_TYPE_PERF_RECORD,
-
-	EVENT_TYPE_MAX
-};
-
-enum {
-	USERKERNELSPACE,
-	USERSPACE,
-	KERNELSPACE,
-	HYPERVISOR,
-};
-
-struct event_counting {
-	int event;
-	int where;
-};
-
-struct event_sampling {
-	int event;
-	int where;
-};
-
-struct event {
-	guint type;
-	union {
-		struct event_sampling sampling;
-		struct event_counting counting;
-	};
-};
 
 
 /* Disector Section */

@@ -4,7 +4,7 @@
 
 #include "perf-studio.h"
 
-struct event;
+struct events;
 
 /* module basic operations */
 struct module *module_new(void);
@@ -15,11 +15,7 @@ void module_set_description(struct module *m, const char *desc);
 char *module_get_description(struct module *m);
 
 /* event handling */
-int module_add_event(struct module *m, struct event *e);
-void module_purge_all_events(struct module *m);
-
-/* statistic and debug */
-void module_print_registered_events(struct ps *ps, struct module *module);
+int module_add_events(struct module *m, struct events *e);
 
 
 #endif

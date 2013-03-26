@@ -16,6 +16,7 @@ import difflib
 import pwd
 import collections
 import re
+import glob
 
 
 
@@ -81,13 +82,14 @@ class ProjectCmd(Command):
         self.parser = argparse.ArgumentParser(description='Create/modify/show perf-studio projects')
         self.parser.add_argument('-c', '--create', help='Create project', action="store_true")
         self.parser.add_argument('-l', '--list', help='List all available projects', action="store_true")
+        self.parser.add_argument('-s', '--show', help='Show project directory structure', action="store_true")
         self.parser.add_argument('-e', '--edit', help='Spawn editor to edit project configuration', action="store_true")
         self.parser.add_argument('-v', '--verbose', help='Verbose output', action="store_true")
         self.parser.add_argument('args', nargs=argparse.REMAINDER)
         self.args = self.parser.parse_args(sys.argv[2:])
         self.logger.setLevel(logging.DEBUG) if self.args.verbose else None
 
-        if not self.args.list and not self.args.create and not self.args.edit:
+        if not self.args.list and not self.args.create and not self.args.edit and not self.args.show:
             self.parser.print_help()
             self.logger.error("")
             self.logger.error("create/list/set option missing")
@@ -160,6 +162,51 @@ class ProjectCmd(Command):
         self.logger.debug("project_dirs {}, new pid {}".format(project_dirs, pid))
         return pid
 
+    def which(self, cmd):
+        def is_exe(fpath):
+            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+        fpath, fname = os.path.split(cmd)
+        if fpath:
+            if is_exe(cmd):
+                return cmd
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                path = path.strip('"')
+                exe_file = os.path.join(path, cmd)
+                if is_exe(exe_file):
+                    return exe_file
+        return None
+
+
+    def show_dir(self, dir, prefix, path):
+        items = glob.glob(dir + '/*')
+        for name in items:
+            basename = name[len(dir)+1:]
+            if name == items[0]:
+                newpath = path+ '`-' +basename
+            else:
+                newpath = prefix + '`-' +basename
+
+            if name == items[-1]:
+                newprefix = prefix + '   ' + ' '*len(basename)
+            else:
+                newprefix = prefix + '|  ' + ' '*len(basename)
+
+            if glob.glob('%s/*' % name):
+                self.show_dir(name, newprefix, newpath + '-')
+
+            else:
+                print(newpath)
+
+
+    def show_projects(self):
+        self.logger.warning("Show all project under {}".format(PROJECTS_DIR))
+        if self.which("tree"):
+            os.system("tree -n {}".format(PROJECTS_DIR))
+        else:
+            self.show_dir(PROJECTS_DIR, '','');
+
 
     def create_project(self):
         self.logger.warning("Create new project in {}".format(PROJECTS_DIR))
@@ -205,6 +252,9 @@ class ProjectCmd(Command):
             return
         if self.args.edit:
             self.edit_project_conf()
+            return
+        if self.args.show:
+            self.show_projects()
             return
 
         self.parser.print_help()

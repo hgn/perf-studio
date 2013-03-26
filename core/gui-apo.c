@@ -2,6 +2,7 @@
 
 #include <assert.h>
 
+#include "project.h"
 #include "gui-apo.h"
 #include "gui-toolkit.h"
 #include "shared.h"
@@ -89,30 +90,6 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	row++;
 
 
-	/* name */
-	label = gtk_label_new("");
-	gtk_grid_attach(GTK_GRID (grid), label, 0, row, 1, 1);
-
-	label = gtk_label_new(" Project Name");
-	gtk_widget_set_name(GTK_WIDGET(label), "project_info_label");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-	event_box = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(event_box), label);
-	gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(event_box), 1, row, 1, 1);
-
-	label = gtk_label_new("");
-	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
-
-	ps->s.project_info.name = gtk_label_new(NULL);
-	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.name), 0, 0.5);
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.name), "");
-	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.name), "project_info_label");
-	gtk_widget_set_hexpand(ps->s.project_info.name, TRUE);
-	event_box = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.name);
-	gtk_grid_attach(GTK_GRID(grid), event_box, 3, row, 1, 1);
-	row++;
-
 	/* cmd */
 	label = gtk_label_new("");
 	gtk_grid_attach(GTK_GRID (grid), label, 0, row, 1, 1);
@@ -127,13 +104,13 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	label = gtk_label_new("");
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
-	ps->s.project_info.exec_path = gtk_label_new(NULL);
-	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.exec_path), 0, 0.5);
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_path), "");
-	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.exec_path), "project_info_label");
-	gtk_widget_set_hexpand(ps->s.project_info.exec_path, TRUE);
+	ps->s.project_info.cmd_path = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.cmd_path), 0, 0.5);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_path), "");
+	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.cmd_path), "project_info_label");
+	gtk_widget_set_hexpand(ps->s.project_info.cmd_path, TRUE);
 	event_box = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.exec_path);
+	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.cmd_path);
 	gtk_grid_attach(GTK_GRID(grid), event_box, 3, row, 1, 1);
 	row++;
 
@@ -178,13 +155,13 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	label = gtk_label_new("");
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
-	ps->s.project_info.exec_args = gtk_label_new(NULL);
-	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.exec_args), 0, 0.5);
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_args), "");
-	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.exec_args), "project_info_label");
-	gtk_widget_set_hexpand(ps->s.project_info.exec_args, TRUE);
+	ps->s.project_info.cmd_args = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.cmd_args), 0, 0.5);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_args), "");
+	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.cmd_args), "project_info_label");
+	gtk_widget_set_hexpand(ps->s.project_info.cmd_args, TRUE);
 	event_box = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.exec_args);
+	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.cmd_args);
 	gtk_grid_attach(GTK_GRID(grid), event_box, 3, row, 1, 1);
 	row++;
 
@@ -243,12 +220,17 @@ static void gui_apc_update_overview_panel(struct ps *ps)
 
 	/* required data */
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.id), ps->project->id);
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_path), ps->project->cmd);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_path), ps->project->cmd);
+
+#define COND_LABEL_SET(x, y) if (x) gtk_label_set_text(GTK_LABEL(y), x);
 
 	/* optional, thus conditional */
-	if (ps->project->description)
-		gtk_label_set_text(GTK_LABEL(ps->s.project_info.description), ps->project->description);
+	COND_LABEL_SET(ps->project->description, ps->s.project_info.description)
+	COND_LABEL_SET(ps->project->cmd_args_full, ps->s.project_info.cmd_args)
+
+#undef COND_LABEL_SET
 }
+
 
 
 static gboolean segment_size_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
@@ -408,7 +390,7 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 }
 
 
-struct kv_list *cmd_segment_size_create(const char *exec_path)
+struct kv_list *cmd_segment_size_create(struct ps *ps, const char *exec_path)
 {
         int ret;
 	unsigned int i;
@@ -423,7 +405,7 @@ struct kv_list *cmd_segment_size_create(const char *exec_path)
 
         if (!g_spawn_sync(NULL, (gchar **)argv, NULL, 0, NULL, NULL,
                           &output, NULL, &exit_status, &error)) {
-                // handle error here
+                // FIXME handle error here
                 return NULL;
         }
         str_parser_init(&str_parser, output);
@@ -437,7 +419,7 @@ struct kv_list *cmd_segment_size_create(const char *exec_path)
                 if (ret != STR_PARSER_RET_SUCCESS) {
                         goto err;
                 }
-
+		pr_debug(ps, "segment: %s byte: %ld",  keys[i], longval);
 		snprintf(label, sizeof(label) - 1, "%s: %ld byte", keys[i], longval);
 		label[sizeof(label) - 1] = '\0';
 		kv_list_add_int_string(kv_list, longval, label);
@@ -468,7 +450,7 @@ static void gui_apc_update_segment_size(struct ps *ps)
         assert(ps);
         assert(ps->project);
 
-        kv_list = cmd_segment_size_create("/usr/bin/gcc");
+        kv_list = cmd_segment_size_create(ps, ps->project->cmd);
         if (!kv_list) {
                 pr_error(ps, "Cannot get segment size");
                 return;
@@ -493,7 +475,7 @@ static void gui_apc_update_segment_size(struct ps *ps)
  * ps->project is new (or replaced), update
  * all views and related fields now
  */
-void gui_apo_new_project_loaded(struct ps *ps)
+static void gui_apo_new_project_loaded(struct ps *ps)
 {
 	assert(ps->project);
         /* update project summary fields */
@@ -518,6 +500,10 @@ GtkWidget *gui_apo_new(struct ps *ps)
 
 	main_widget = apo_main_widget_new(ps);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), main_widget);
+
+	/* register callback called if a project is
+	 * successful loaded */
+	project_register_activate_cb(ps, gui_apo_new_project_loaded);
 
 	return scroll_widget;
 }
