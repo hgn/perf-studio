@@ -250,6 +250,27 @@ enum {
 	COLOR_MAX
 };
 
+/*
+ * Cairo use double, we just use a reduced
+ * set of floats to be cacheline friendly
+ * The high resolution is not required here
+ */
+struct ps_color {
+	float red;
+	float green;
+	float blue;
+	float alpha;
+};
+
+#define Hex8ToFloat(x) ((float)x / 0xff)
+#define Hex16ToFloat(x) ((float)x / 0xffff)
+
+static inline void ps_set_source_rgba(cairo_t *cr, struct ps_color *c)
+{
+	cairo_set_source_rgba(cr, c->red, c->green, c->blue, c->alpha);
+}
+
+
 struct screen_info {
 	gint width;
 	gint height;

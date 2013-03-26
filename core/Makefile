@@ -149,7 +149,7 @@ ifneq ($(dep_includes),)
 endif
 
 
-install: all
+install: $(TARGET)
 	install $(TARGET) $(bindir)
 
 do_clean =						\

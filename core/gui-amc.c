@@ -73,6 +73,9 @@ static void draw_user_vs_system_axis(cairo_t *cr, int x_position)
 	pango_cairo_show_layout(cr, layout);
 	cairo_stroke(cr);
 
+	g_object_unref(layout);
+	layout = create_pango_layout(cr, "Sans 5");
+
 	axis_x_start = x_position + CPU_USAGE_AXIS_MARGIN;
 	axis_x_end   = axis_x_start + CPU_USAGE_AXIS_LINE_LENGTH;
 
@@ -140,7 +143,8 @@ static void draw_user_vs_system_axis(cairo_t *cr, int x_position)
 }
 
 
-static int draw_user_vs_system_char(cairo_t *cr, int x_position, float acc_system, float acc_user)
+static int draw_user_vs_system_char(cairo_t *cr, int x_position,
+				    float acc_system, float acc_user)
 {
 	int height;
 	float ratio;
