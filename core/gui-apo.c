@@ -128,13 +128,13 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	label = gtk_label_new("");
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
-	ps->s.project_info.exec_path = gtk_label_new(NULL);
-	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.exec_path), 0, 0.5);
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_path), "");
-	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.exec_path), "project_info_label");
-	gtk_widget_set_hexpand(ps->s.project_info.exec_path, TRUE);
+	ps->s.project_info.cmd_path = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.cmd_path), 0, 0.5);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_path), "");
+	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.cmd_path), "project_info_label");
+	gtk_widget_set_hexpand(ps->s.project_info.cmd_path, TRUE);
 	event_box = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.exec_path);
+	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.cmd_path);
 	gtk_grid_attach(GTK_GRID(grid), event_box, 3, row, 1, 1);
 	row++;
 
@@ -179,13 +179,13 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 	label = gtk_label_new("");
 	gtk_grid_attach(GTK_GRID (grid), label, 2, row, 1, 1);
 
-	ps->s.project_info.exec_args = gtk_label_new(NULL);
-	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.exec_args), 0, 0.5);
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_args), "");
-	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.exec_args), "project_info_label");
-	gtk_widget_set_hexpand(ps->s.project_info.exec_args, TRUE);
+	ps->s.project_info.cmd_args = gtk_label_new(NULL);
+	gtk_misc_set_alignment(GTK_MISC(ps->s.project_info.cmd_args), 0, 0.5);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_args), "");
+	gtk_widget_set_name(GTK_WIDGET(ps->s.project_info.cmd_args), "project_info_label");
+	gtk_widget_set_hexpand(ps->s.project_info.cmd_args, TRUE);
 	event_box = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.exec_args);
+	gtk_container_add(GTK_CONTAINER(event_box), ps->s.project_info.cmd_args);
 	gtk_grid_attach(GTK_GRID(grid), event_box, 3, row, 1, 1);
 	row++;
 
@@ -244,13 +244,13 @@ static void gui_apc_update_overview_panel(struct ps *ps)
 
 	/* required data */
 	gtk_label_set_text(GTK_LABEL(ps->s.project_info.id), ps->project->id);
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.exec_path), ps->project->cmd);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_path), ps->project->cmd);
 
 #define COND_LABEL_SET(x, y) if (x) gtk_label_set_text(GTK_LABEL(y), x);
 
 	/* optional, thus conditional */
 	COND_LABEL_SET(ps->project->description, ps->s.project_info.description)
-	COND_LABEL_SET(ps->project->cmd_args_full, ps->s.project_info.exec_args)
+	COND_LABEL_SET(ps->project->cmd_args_full, ps->s.project_info.cmd_args)
 
 #undef COND_LABEL_SET
 }

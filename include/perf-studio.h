@@ -193,8 +193,8 @@ struct screen {
 		GtkWidget *name;
 		GtkWidget *id;
 		GtkWidget *description;
-		GtkWidget *exec_path;
-		GtkWidget *exec_args;
+		GtkWidget *cmd_path;
+		GtkWidget *cmd_args;
 		GtkWidget *working_dir;
 	} project_info;
 	struct {
