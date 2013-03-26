@@ -139,8 +139,8 @@ void gt_pie_chart_set_data(struct gt_pie_chart *gt_pie_chart,
 					       struct pie_data_slot, j);
 		pie_data_slot->angle = angles[j];
 		memcpy(pie_data_slot->label, entry->value,
-		       min(strlen(pie_data_slot->label) + 1, sizeof(pie_data_slot->label)));
-		pie_data_slot->label[sizeof(pie_data_slot->label) - 1] = '\0';
+		       min(strlen(entry->value) + 1, sizeof(pie_data_slot->label)));
+		pie_data_slot->label[PIE_CHART_LABEL_MAX - 1] = '\0';
 
 		tmp = g_slist_next(tmp);
 		j++;
@@ -229,7 +229,6 @@ void gt_pie_chart_draw(struct ps *ps, GtkWidget *widget, cairo_t *cr,
 				      bg_color->blue,
 				      bg_color->alpha);
 		cairo_fill(cr);
-
 
 		draw_labels(cr, pie_data_slot->label,
 			    radius * 2 + PIE_CHART_TO_LABEL_PADDING + DEFAULT_LEFT_CIRC_PADDING,
