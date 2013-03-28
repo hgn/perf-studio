@@ -129,6 +129,21 @@ static void gui_main_content_pane_init(struct ps *ps)
 }
 
 
+void accel_f1_pressed(struct ps *ps)
+{
+	gui_help_overview_window(NULL, ps);
+}
+
+
+static void accelerator_init(struct ps *ps)
+{
+	GClosure *closure = g_cclosure_new_swap((GCallback)accel_f1_pressed, ps, 0);
+	GtkAccelGroup* accel_group = gtk_accel_group_new();
+	gtk_accel_group_connect(accel_group, GDK_KEY_F1, 0, 0, closure);
+	gtk_window_add_accel_group(GTK_WINDOW(ps->s.main_window), accel_group);
+}
+
+
 int gui_init(struct ps *ps, int ac, char **av)
 {
 	gtk_init(&ac, &av);
@@ -167,9 +182,10 @@ int gui_init(struct ps *ps, int ac, char **av)
 		gui_statusbar_init(ps);
 	}
 
-
 	resize_main_window(ps, ps->s.main_window);
 	gtk_window_set_position(GTK_WINDOW(ps->s.main_window), GTK_WIN_POS_CENTER);
+
+	accelerator_init(ps);
 
 	gtk_widget_show_all(ps->s.main_window);
 
