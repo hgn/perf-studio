@@ -47,7 +47,7 @@ void gui_help_overview_window(GtkWidget *widget, struct ps *ps)
 	webkit_web_view_load_uri(web_view, url);
 	gtk_widget_grab_focus(GTK_WIDGET(web_view));
 
-	gtk_window_set_decorated(GTK_WINDOW(help_window), FALSE);
+	gtk_window_set_decorated(GTK_WINDOW(help_window), TRUE);
 	gtk_window_set_position((GtkWindow *)help_window, GTK_WIN_POS_CENTER);
 	gtk_window_present((GtkWindow *)help_window);
 	gtk_widget_show_all((GtkWidget *)help_window);
