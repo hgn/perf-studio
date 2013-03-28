@@ -6,7 +6,7 @@
 
 
 enum {
-	EVENT_TYPE_COUNTER = 0,
+	EVENT_TYPE_COUNTING = 0,
 	EVENT_TYPE_SAMPLING,
 
 	EVENT_TYPE_PERF_RECORD,
@@ -22,13 +22,26 @@ enum {
 };
 
 struct event_counting {
-	int event;
+	int event_code;
 	int where;
 };
 
 struct event_sampling {
-	int event;
+	int event_code;
 	int where;
+};
+
+enum {
+	EVENT_PERF_CYCLES,
+	EVENT_PERF_INSTRUCTIONS,
+	EVENT_PERF_CONTEXT_SWITCHES,
+	EVENT_PERF_TAKS_CLOCKS,
+	EVENT_PERF_CPU_MIGRATIONS,
+	EVENT_PERF_PAGE_FAULTS,
+	EVENT_PERF_STALLED_CYCLES_FRONTEND,
+	EVENT_PERF_STALLED_CYCLES_BACKEND,
+
+	EVENT_PERF_MAX
 };
 
 struct event {

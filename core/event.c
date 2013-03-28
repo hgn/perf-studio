@@ -1,4 +1,5 @@
 #include <string.h>
+#include <errno.h>
 #include <assert.h>
 
 #include "perf-studio.h"
@@ -52,10 +53,88 @@ void events_purge_all(struct events *e)
 }
 
 
-/* must be freed via g_char() */
-const gchar *events_repr(struct events *events)
+int event_perf_opt(int type, char *opt, size_t opt_max)
 {
-	return "";
+	if (opt_max < 1)
+		return -ENOBUFS;
+
+	if (type >= EVENT_PERF_MAX)
+		return -ERANGE;
+
+	switch (type)
+	{
+	case EVENT_PERF_CYCLES:
+		memcpy(opt, "c", 2);
+		break;
+	case EVENT_PERF_INSTRUCTIONS:
+		memcpy(opt, "c", 2);
+		break;
+	case EVENT_PERF_CONTEXT_SWITCHES:
+		memcpy(opt, "c", 2);
+		break;
+	case EVENT_PERF_TAKS_CLOCKS:
+		memcpy(opt, "c", 2);
+		break;
+	case EVENT_PERF_CPU_MIGRATIONS:
+		memcpy(opt, "c", 2);
+		break;
+	case EVENT_PERF_PAGE_FAULTS:
+		memcpy(opt, "c", 2);
+		break;
+	case EVENT_PERF_STALLED_CYCLES_FRONTEND:
+		memcpy(opt, "c", 2);
+		break;
+	case EVENT_PERF_STALLED_CYCLES_BACKEND:
+		memcpy(opt, "c", 2);
+		break;
+	default:
+		return -ERANGE;
+	}
+
+	return 0;
+}
+
+
+/* must be freed via g_char() */
+gchar *events_repr(struct events *events)
+{
+	int ret;
+	GSList *tmp_list;
+	char buf[128], event_repr[8];
+
+	assert(events);
+
+	if (!events->event_list)
+		return NULL;
+
+	buf[0] = '\0';
+	tmp_list = events->event_list;
+	while (tmp_list) {
+		struct event *event;
+		int event_code;
+		struct event_counting *event_counting;
+
+		event = tmp_list->data;
+		assert(event);
+
+		assert(event->type == EVENT_TYPE_COUNTING);
+
+		event_counting = &event->counting;
+
+		event_code = event_counting->event_code;
+
+		ret = event_perf_opt(event_code, event_repr, sizeof(event_repr));
+		assert(ret == 0);
+
+		// FIXME: handle buf overflow
+		strcat(buf, event_repr);
+
+		tmp_list = g_slist_next(tmp_list);
+	}
+
+	assert(strlen(buf) > 0);
+
+	return strdup(buf);
 }
 
 
@@ -87,6 +166,7 @@ struct project_event_storage *project_event_storage_new(struct ps *ps,
 
 	pes->filepath = g_build_filename(ps->project->project_db_path,
 					 events_repr_str, NULL);
+	pr_debug(ps, "save trace file under %s", pes->filepath);
 
 	g_free(events_repr_str);
 
