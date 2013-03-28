@@ -76,11 +76,11 @@ endif
 
 
 install: all 
-	install $(TARGET) $(DESTDIR)$(BINDIR)
+	install $(MODULES) $(module_dir)
 
 do_clean =						\
 	($(print_rm)				\
-	$(RM) *.o *.so $(TARGET) core* \
+	$(RM) *.o *.so $(MODULES) core* \
 	$(RM) cscope* \
 	$(RM) version.h \
 	$(RM) .*.d)

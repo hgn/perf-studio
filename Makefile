@@ -1,9 +1,12 @@
 include project.mk
 
+MODDIRS = modules/hello-world
+
 SUBDIRS  = gui-toolkit
-SUBDIRS += modules/hello-world
 SUBDIRS += core
 SUBDIRS += data
+
+SUBDIRS += $(MODDIRS)
 
 
 .PHONY: $(SUBDIRS)
@@ -33,12 +36,13 @@ install: all
 	test -d $(prefix)/bin || mkdir --parents $(prefix)/bin
 	test -d $(prefix)/share || mkdir --parents $(prefix)/share
 	test -d $(prefix)/share/perf-studio || mkdir --parents $(prefix)/share/perf-studio
+	test -d $(module_dir) || mkdir --parent $(module_dir)
 
 	$(INSTALL) -m 0755 scripts/perf-studio-ctrl.py $(prefix)/share/perf-studio
 	$(RM) $(prefix)/bin/perf-studio-ctrl
 	ln -s $(prefix)/share/perf-studio/perf-studio-ctrl.py $(prefix)/bin/perf-studio-ctrl
 
-	@for dir in data core; do \
+	@for dir in data core $(MODDIRS); do \
 					(cd $$dir && $(MAKE) install) \
 	done
 
