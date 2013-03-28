@@ -20,12 +20,12 @@ static void unregister_module(struct ps *ps, struct module *module)
 
 static void add_events(struct ps *ps, struct module *module)
 {
-	struct event *e;
+	struct events *e;
 
 	(void) ps;
 
 	e = event_new();
-	module_add_event(module, e);
+	module_add_events(module, e);
 }
 
 
