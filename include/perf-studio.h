@@ -181,6 +181,10 @@ struct gt_pie_chart;
 
 struct screen {
 	GtkWidget *main_window;
+
+	GtkWidget *main_paned;
+	gint main_paned_position;
+
 	GtkWidget *project_load_window;
 	GtkWidget *vbox;
 	struct {

@@ -108,24 +108,23 @@ static GtkWidget *control_module_project_panel_new(struct ps *ps)
 
 static void gui_main_content_pane_init(struct ps *ps)
 {
-	GtkWidget *main_panel;
 	GtkWidget *upper_control_module_project_panel;
 	GtkWidget *lower_module_panel;
 
-	main_panel = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+	ps->s.main_paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
 	upper_control_module_project_panel = control_module_project_panel_new(ps);
 	gtk_widget_show_all(upper_control_module_project_panel);
-	gtk_paned_pack1(GTK_PANED(main_panel), upper_control_module_project_panel, TRUE, TRUE);
+	gtk_paned_pack1(GTK_PANED(ps->s.main_paned), upper_control_module_project_panel, TRUE, TRUE);
 
 	lower_module_panel = gui_amc_new(ps);
-	gtk_paned_pack2(GTK_PANED(main_panel), lower_module_panel, TRUE, TRUE);
+	gtk_paned_pack2(GTK_PANED(ps->s.main_paned), lower_module_panel, TRUE, TRUE);
 
-	gtk_box_pack_start(GTK_BOX(ps->s.vbox), main_panel, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(ps->s.vbox), ps->s.main_paned, TRUE, TRUE, 0);
 
-	gtk_paned_set_position(GTK_PANED(main_panel), 300);
+	gtk_paned_set_position(GTK_PANED(ps->s.main_paned), 300);
 
-	gtk_widget_show_all(main_panel);
+	gtk_widget_show_all(ps->s.main_paned);
 }
 
 
@@ -135,11 +134,38 @@ void accel_f1_pressed(struct ps *ps)
 }
 
 
+void accel_f5_pressed(struct ps *ps)
+{
+	if (ps->s.main_paned_position) {
+		/* content panel is currenly maximixed,
+		 * minimize to old value */
+		gtk_paned_set_position(GTK_PANED(ps->s.main_paned),
+				       ps->s.main_paned_position);
+		ps->s.main_paned_position = 0;
+	} else {
+		/* content panel un-maximized, remember current
+		 * panel position and maximize main panel now */
+		ps->s.main_paned_position = gtk_paned_get_position(GTK_PANED(ps->s.main_paned));
+		gtk_paned_set_position(GTK_PANED(ps->s.main_paned), 0);
+	}
+}
+
+
 static void accelerator_init(struct ps *ps)
 {
-	GClosure *closure = g_cclosure_new_swap((GCallback)accel_f1_pressed, ps, 0);
-	GtkAccelGroup* accel_group = gtk_accel_group_new();
+	GClosure *closure;
+	GtkAccelGroup* accel_group;
+
+	accel_group = gtk_accel_group_new();
+
+	/* help window */
+	closure = g_cclosure_new_swap((GCallback)accel_f1_pressed, ps, 0);
 	gtk_accel_group_connect(accel_group, GDK_KEY_F1, 0, 0, closure);
+
+	/* maximize main panel */
+	closure = g_cclosure_new_swap((GCallback)accel_f5_pressed, ps, 0);
+	gtk_accel_group_connect(accel_group, GDK_KEY_F5, 0, 0, closure);
+
 	gtk_window_add_accel_group(GTK_WINDOW(ps->s.main_window), accel_group);
 }
 
