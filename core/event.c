@@ -25,7 +25,6 @@ void event_print(struct ps *ps, struct event *e)
 }
 
 
-
 struct events *events_new(void)
 {
 	return g_malloc0(sizeof(struct events));
@@ -43,13 +42,22 @@ void events_free(struct events *e)
 }
 
 
-void events_purge_all(struct events *e)
+void events_purge_all(struct events *events)
 {
-	assert(e);
+	GSList *tmp;
+	struct event *event;
 
-	// FIXME iterate over all events and call event_free();
+	assert(events);
 
-	events_free(e);
+	tmp = events->event_list;
+	while (tmp) {
+		event = tmp->data;
+		assert(event);
+		event_free(event);
+		tmp = g_slist_next(tmp);
+	}
+
+	events_free(events);
 }
 
 
