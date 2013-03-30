@@ -1,6 +1,8 @@
 #ifndef MODULE_UTILS_H
 #define MODULE_UTILS_H
 
+#include <assert.h>
+
 
 #include "perf-studio.h"
 
@@ -18,6 +20,14 @@ int module_get_group(struct module *m);
 
 /* event handling */
 int module_add_events(struct module *m, struct events *e);
+
+static inline struct events *module_get_events(struct module *m)
+{
+	assert(m);
+	assert(m->events);
+
+	return m->events;
+}
 
 
 #endif

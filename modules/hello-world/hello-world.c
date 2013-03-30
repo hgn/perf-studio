@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <assert.h>
 
 #include "perf-studio.h"
 #include "module-utils.h"
@@ -10,7 +11,13 @@
 
 static void unregister_module(struct ps *ps, struct module *module)
 {
+	struct events *e;
+
 	(void) ps;
+
+	e = module_get_events(module);
+	assert(e);
+	events_purge_all(e);
 
 	/* this will free module memory as well
 	 * as child elements like events */
@@ -31,14 +38,11 @@ static void add_counting_events(struct events *events)
 }
 
 
-static void add_events(struct ps *ps, struct module *module)
+static void add_events(struct module *module)
 {
 	struct events *e;
 
-	(void) ps;
-
 	e = events_new();
-
 	add_counting_events(e);
 
 	module_add_events(module, e);
@@ -57,7 +61,7 @@ int register_module(struct ps *ps, struct module **module)
 	module_set_description(m, MODULE_DESCRIPTION);
 	module_set_group(m, MODULE_GROUP_COMMON);
 
-	add_events(ps, m);
+	add_events(m);
 
 	m->unregister_module = unregister_module;
 
