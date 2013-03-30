@@ -53,6 +53,8 @@ int register_module(struct ps *ps, struct module **module)
 {
 	struct module *m;
 
+	(void)ps;
+
 	m = module_new();
 	if (!m)
 		return -ENOBUFS;

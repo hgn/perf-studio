@@ -135,6 +135,9 @@ static int register_modules_dir(struct ps *ps, const char *path)
 			continue;
 
 		/* Only load plugins that end in suffix */
+		if (strlen(name) <= strlen(suffix))
+			continue;
+
 		if (!streq(name + (strlen(name) - strlen(suffix)), suffix))
 			continue;
 
