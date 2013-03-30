@@ -54,6 +54,18 @@ void module_set_description(struct module *m, const char *desc)
 }
 
 
+void module_set_group(struct module *m, int group)
+{
+	m->group = group;
+}
+
+
+int module_get_group(struct module *m)
+{
+	return m->group;
+}
+
+
 char *module_get_description(struct module *m)
 {
 	return m->description;

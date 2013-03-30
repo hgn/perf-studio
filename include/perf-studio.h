@@ -324,6 +324,7 @@ struct ps {
 enum {
 	MODULE_GROUP_COMMON = 0,
 	MODULE_GROUP_THREAD_ANALYSE,
+	MODULE_GROUP_STATS,
 };
 #define MODULE_GROUP_DEFAULT MODULE_GROUP_COMMON
 
@@ -354,7 +355,7 @@ struct module {
 	unsigned long version;
 
 	/* must be one of MODULE_GROUP_* */
-	unsigned int module_group;
+	unsigned int group;
 
 	/* list or registered events */
 	struct events *events;

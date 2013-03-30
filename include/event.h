@@ -67,6 +67,7 @@ struct events {
 
 struct events *events_new(void);
 void events_purge_all(struct events *e);
+void events_add_event(struct events *, struct event *);
 
 
 struct project_event_storage {

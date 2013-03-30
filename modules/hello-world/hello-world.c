@@ -18,13 +18,29 @@ static void unregister_module(struct ps *ps, struct module *module)
 }
 
 
+static void add_counting_events(struct events *events)
+{
+	struct event *e;
+
+	e = event_new();
+	e->type = EVENT_TYPE_COUNTING;
+	e->counting.event_code = EVENT_PERF_CYCLES;
+	e->counting.where      = USERKERNELSPACE;
+
+	events_add_event(events, e);
+}
+
+
 static void add_events(struct ps *ps, struct module *module)
 {
 	struct events *e;
 
 	(void) ps;
 
-	e = event_new();
+	e = events_new();
+
+	add_counting_events(e);
+
 	module_add_events(module, e);
 }
 
@@ -39,6 +55,7 @@ int register_module(struct ps *ps, struct module **module)
 
 	module_set_name(m, MODULE_NAME);
 	module_set_description(m, MODULE_DESCRIPTION);
+	module_set_group(m, MODULE_GROUP_COMMON);
 
 	add_events(ps, m);
 
