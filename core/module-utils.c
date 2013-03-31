@@ -8,6 +8,9 @@
 
 const char *module_group_str(int id)
 {
+	/* if failed add missing case branch here */
+	STATIC_ASSERT(MODULE_GROUP_MAX == 3);
+
 	switch (id) {
 	case MODULE_GROUP_CORE_ANALYSIS:
 		return "Core Analysis";
