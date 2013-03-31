@@ -141,6 +141,16 @@
 # define UNUSED_PARAM_RESULT /* n/a */
 #endif
 
+#define ASSERT_CONCAT_(a, b) a##b
+#define ASSERT_CONCAT(a, b) ASSERT_CONCAT_(a, b)
+#ifdef __COUNTER__
+  #define STATIC_ASSERT(e,m) \
+    { enum { ASSERT_CONCAT(static_assert_, __COUNTER__) = 1/(!!(e)) }; }
+#else
+  #define STATIC_ASSERT(e,m) \
+    { enum { ASSERT_CONCAT(assert_line_, __LINE__) = 1/(!!(e)) }; }
+#endif
+
 
 
 enum {
