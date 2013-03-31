@@ -36,9 +36,6 @@ struct module *module_new(void)
 void module_free(struct module *m)
 {
 	assert(m);
-	assert(m->events);
-
-	events_purge_all(m->events);
 	g_free(m);
 }
 
