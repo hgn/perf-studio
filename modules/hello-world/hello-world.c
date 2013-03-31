@@ -61,7 +61,7 @@ int register_module(struct ps *ps, struct module **module)
 
 	module_set_name(m, MODULE_NAME);
 	module_set_description(m, MODULE_DESCRIPTION);
-	module_set_group(m, MODULE_GROUP_COMMON);
+	module_set_group(m, MODULE_GROUP_CORE_ANALYSIS);
 
 	add_events(m);
 

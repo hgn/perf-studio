@@ -98,7 +98,6 @@ static void generate_cl_elements(GtkTreeStore *treestore,
 static GtkTreeModel *create_and_fill_model(struct ps *ps)
 {
 	GtkTreeStore *treestore;
-	GtkTreeIter toplevel;
 	GSList *tmp;
 	GtkTreeIter root_elements[MODULE_GROUP_MAX];
 
@@ -115,21 +114,7 @@ static GtkTreeModel *create_and_fill_model(struct ps *ps)
 		GtkTreeIter *tree_iter;
 		struct module *m = tmp->data;
 
-		switch (m->group) {
-		case MODULE_GROUP_COMMON:
-			tree_iter = &root_elements[MODULE_GROUP_COMMON];
-			break;
-		case MODULE_GROUP_THREAD_ANALYSE:
-			tree_iter = &root_elements[MODULE_GROUP_THREAD_ANALYSE];
-			break;
-		case MODULE_GROUP_STATS:
-			tree_iter = &root_elements[MODULE_GROUP_STATS];
-			break;
-		default:
-			assert(0);
-			break;
-		};
-
+		tree_iter = &root_elements[m->group];
 		generate_cl_elements(treestore, tree_iter, m);
 
 		tmp = g_slist_next(tmp);

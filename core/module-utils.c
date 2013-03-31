@@ -9,14 +9,14 @@
 const char *module_group_str(int id)
 {
 	switch (id) {
-	case MODULE_GROUP_COMMON:
-		return "Common";
+	case MODULE_GROUP_CORE_ANALYSIS:
+		return "Core Analysis";
 		break;
-	case MODULE_GROUP_THREAD_ANALYSE:
-		return "Thread Analyse";
+	case MODULE_GROUP_APPLICATION_LEVEL:
+		return "Application Level Analysis";
 		break;
-	case MODULE_GROUP_STATS:
-		return "Statistics";
+	case MODULE_GROUP_ARCHITECTURE_LEVEL:
+		return "Architecture Level Analysis";
 		break;
 	default:
 		return "UNKNOWN MODULE GROUP";
