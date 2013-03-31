@@ -8,6 +8,7 @@
 #include "gui-apo.h"
 #include "gui-toolkit.h"
 #include "shared.h"
+#include "module-utils.h"
 
 enum {
 	NAME = 0,
@@ -18,21 +19,18 @@ enum {
 };
 
 
-static void row_activated(GtkTreeView *treeview, GtkTreePath *path,
+static void module_selected_cb(GtkTreeView *treeview, GtkTreePath *path,
 		   GtkTreeViewColumn *col, gpointer priv_data)
 {
-#if 0
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 	struct ps *ps;
-	GList *tmp_list;
 
 	assert(priv_data);
-
 	ps = priv_data;
 
-	pr_info(ps, "row activated");
-
+	(void)ps;
+	(void)col;
 
 	model = gtk_tree_view_get_model(treeview);
 
@@ -41,6 +39,7 @@ static void row_activated(GtkTreeView *treeview, GtkTreePath *path,
 		gtk_tree_model_get(model, &iter, NAME, &name, -1);
 
 		fprintf(stderr, "row actived: %s\n", name);
+#if 0
 
 		tmp_list = sc->control_pane_data_list;
 		while (tmp_list != NULL) {
@@ -48,6 +47,7 @@ static void row_activated(GtkTreeView *treeview, GtkTreePath *path,
 
 			cpml = tmp_list->data;
 			fprintf(stderr, "IN %s\n", cpml->name);
+
 
 			if (!strcmp(cpml->name, name)) {
 				GtkWidget *w;
@@ -59,92 +59,82 @@ static void row_activated(GtkTreeView *treeview, GtkTreePath *path,
 
 			tmp_list = g_list_next(tmp_list);
 		}
+#endif
 
 		g_free(name);
 	}
-#endif
 }
+
+static void generate_tl_elements(GtkTreeStore *treestore, GtkTreeIter *root_elements)
+{
+	int i;
+	const char *group_name;
+
+	for (i = 0; i < MODULE_GROUP_MAX; i++) {
+		group_name = module_group_str(i);
+		gtk_tree_store_append(treestore, &root_elements[i], NULL);
+		gtk_tree_store_set(treestore, &root_elements[i], NAME, group_name, -1);
+	}
+}
+
+
+static void generate_cl_elements(GtkTreeStore *treestore,
+				 GtkTreeIter *root, struct module *module)
+{
+	GtkTreeIter child;
+	char *module_name;
+
+	assert(treestore);
+	assert(root);
+	assert(module);
+
+	module_name = module_get_name(module);
+
+	gtk_tree_store_append(treestore, &child, root);
+	gtk_tree_store_set(treestore, &child, NAME, module_name, -1);
+}
+
 
 static GtkTreeModel *create_and_fill_model(struct ps *ps)
 {
 	GtkTreeStore *treestore;
-	GtkTreeIter toplevel, child;
+	GtkTreeIter toplevel;
+	GSList *tmp;
+	GtkTreeIter root_elements[MODULE_GROUP_MAX];
 
-	(void)ps;
+	treestore = gtk_tree_store_new(NUM_COLS,
+				       G_TYPE_STRING,
+				       G_TYPE_STRING,
+				       G_TYPE_STRING,
+				       G_TYPE_STRING);
 
-	treestore = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+	generate_tl_elements(treestore, root_elements);
 
-	gtk_tree_store_append(treestore, &toplevel, NULL);
+	tmp = ps->module_list;
+	while (tmp) {
+		GtkTreeIter *tree_iter;
+		struct module *m = tmp->data;
 
-	gtk_tree_store_set(treestore, &toplevel, NAME, "Core Analysis", -1);
+		switch (m->group) {
+		case MODULE_GROUP_COMMON:
+			tree_iter = &root_elements[MODULE_GROUP_COMMON];
+			break;
+		case MODULE_GROUP_THREAD_ANALYSE:
+			tree_iter = &root_elements[MODULE_GROUP_THREAD_ANALYSE];
+			break;
+		case MODULE_GROUP_STATS:
+			tree_iter = &root_elements[MODULE_GROUP_STATS];
+			break;
+		default:
+			assert(0);
+			break;
+		};
 
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Time",
-			-1);
+		generate_cl_elements(treestore, tree_iter, m);
 
-	gtk_tree_store_append(treestore, &toplevel, NULL);
-	gtk_tree_store_set(treestore, &toplevel, NAME, "Application Level Analysis", UPTODATE, "yes", -1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Lock Contention Analysis",
-			-1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Scheduling Analysis",
-			-1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "CPU Bouncing",
-			-1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Priority Analysis",
-			-1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Wakeup Analysis",
-			-1);
-
-
-
-	gtk_tree_store_append(treestore, &toplevel, NULL);
-	gtk_tree_store_set(treestore, &toplevel, NAME, "Architecture Level Analysis", -1);
-
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Backend and Pipelining Stalls",
-			-1);
-
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "CPI/IPC",
-			-1);
-	gtk_tree_store_append(treestore, &child, &toplevel);
-	gtk_tree_store_set(treestore, &child,
-			NAME, "Cache Behavior",
-			-1);
-
-
-#if 0
-	tmp = sc->control_pane_data_list;
-	while (tmp != NULL) {
-		struct control_pane_data *cpml;
-
-		cpml = tmp->data;
-
-		gtk_tree_store_append(treestore, &child, &toplevel);
-		gtk_tree_store_set(treestore, &child, NAME, cpml->name, -1);
-
-		tmp = g_list_next(tmp);
+		tmp = g_slist_next(tmp);
 	}
-#endif
+
 
 	return GTK_TREE_MODEL(treestore);
 }
@@ -225,7 +215,7 @@ GtkWidget *gui_amn_new(struct ps *ps)
 					    GTK_SHADOW_OUT);
 
 	view = create_view_and_model(ps);
-	g_signal_connect(view, "row-activated", G_CALLBACK(row_activated), ps);
+	g_signal_connect(view, "row-activated", G_CALLBACK(module_selected_cb), ps);
 
 	//selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), view);

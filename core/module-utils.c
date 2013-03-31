@@ -6,6 +6,26 @@
 #include "event.h"
 #include "module-utils.h"
 
+const char *module_group_str(int id)
+{
+	switch (id) {
+	case MODULE_GROUP_COMMON:
+		return "Common";
+		break;
+	case MODULE_GROUP_THREAD_ANALYSE:
+		return "Thread Analyse";
+		break;
+	case MODULE_GROUP_STATS:
+		return "Statistics";
+		break;
+	default:
+		return "UNKNOWN MODULE GROUP";
+		break;
+	};
+
+	return "UNKNOWN MODULE GROUP";
+}
+
 
 struct module *module_new(void)
 {

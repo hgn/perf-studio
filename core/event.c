@@ -31,8 +31,12 @@ struct events *events_new(void)
 	return g_malloc0(sizeof(struct events));
 }
 
+
 void events_add_event(struct events *events, struct event *event)
 {
+	assert(events);
+	assert(event);
+
 	events->event_list = g_slist_append(events->event_list, event);
 }
 
