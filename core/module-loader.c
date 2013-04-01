@@ -172,7 +172,7 @@ int register_available_modules(struct ps *ps)
 	}
 #endif
 
-	envdir = getenv("TRACE_CMD_PLUGIN_DIR");
+	envdir = getenv("PERF_STUDIO_MODULE_DIR");
 	if (envdir) {
 		pr_info(ps, "search modules in: %s", envdir);
 		ret = register_modules_dir(ps, MODULE_DIR);
