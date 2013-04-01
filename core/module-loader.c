@@ -49,6 +49,29 @@ static void register_module_global(struct ps *ps, struct module *module)
 }
 
 
+/* return true if module is
+ * already loaded, false otherwise */
+static int module_path_dup_check(struct ps *ps, const char *path)
+{
+	struct module *m;
+	GSList *tmp;
+
+	tmp = ps->module_list;
+	while (tmp) {
+		m = tmp->data;
+		assert(m);
+
+		if (streq(path, m->path_name)) {
+			pr_info(ps, "path dup: %s - %s",
+				path,  m->path_name);
+			return 1;
+		}
+		tmp = g_slist_next(tmp);
+	}
+
+	return 0;
+}
+
 
 static void register_module(struct ps *ps, const char *path, const char *name)
 {
@@ -63,6 +86,13 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 	strcpy(path_name, path);
 	strcat(path_name, "/");
 	strcat(path_name, name);
+
+	ret = module_path_dup_check(ps, path_name);
+	if (ret) {
+		pr_error(ps, "Failed to load module %s",
+			 path_name);
+		goto err;
+	}
 
 	handle = dlopen(path_name, RTLD_NOW | RTLD_GLOBAL);
 	if (!handle) {
