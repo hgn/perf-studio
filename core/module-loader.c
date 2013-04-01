@@ -292,7 +292,25 @@ int register_available_modules(struct ps *ps)
 }
 
 
-static GtkWidget *close_tab_button(struct ps *ps, const char *name)
+static gboolean close_module_tab_cb(gpointer data)
+{
+	struct ps *ps;
+	struct module *module;
+
+	assert(data);
+	module = data;
+	ps = module->ps;
+	assert(ps);
+
+	module->deactivate(module);
+	gtk_notebook_remove_page(GTK_NOTEBOOK(ps->s.amc_notebook), module->notebook_id);
+	module->activated = 0;
+
+	return TRUE;
+}
+
+
+static GtkWidget *close_tab_button(struct ps *ps, struct module *module)
 {
 	GtkWidget *hbox;
 	GtkWidget *label;
@@ -300,14 +318,15 @@ static GtkWidget *close_tab_button(struct ps *ps, const char *name)
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
-	label = gtk_label_new(name);
+	label = gtk_label_new(module->name);
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
 
 	button = gtk_button_new();
-	gtk_button_set_relief( GTK_BUTTON( button ), GTK_RELIEF_NONE );
-	gtk_button_set_focus_on_click( GTK_BUTTON( button ), FALSE );
-	gtk_button_set_alignment( GTK_BUTTON( button ), 0, 1 );
+	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE );
+	gtk_button_set_alignment(GTK_BUTTON(button ), 0, 1 );
 	gtk_button_set_image(GTK_BUTTON(button), ps_icon(ps, ICON_CLOSE));
+	g_signal_connect_swapped(G_OBJECT(button), "clicked",
+				 G_CALLBACK(close_module_tab_cb), module);
 
 	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
 
@@ -346,8 +365,14 @@ static void module_activate(struct ps *ps, struct module *module)
 	gtk_widget_show_all(scroll_widget);
 
 	/* add tab panel to netebook */
-	label = close_tab_button(ps, module->name);
-	gtk_notebook_append_page(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, label);
+	label = close_tab_button(ps, module);
+	module->notebook_id = gtk_notebook_append_page(GTK_NOTEBOOK(ps->s.amc_notebook),
+						       scroll_widget, label);
+	if (module->notebook_id < 0) {
+		pr_error(ps, "Failed to add page to notebook");
+		return;
+	}
+
 	gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, TRUE);
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(ps->s.amc_notebook), 1);
 

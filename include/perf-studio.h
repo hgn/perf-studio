@@ -393,6 +393,7 @@ struct module {
 
 	/* true if the module is activated (displayed) or not */
 	int activated;
+	gint notebook_id;
 
 	/*
 	 * module private data - must be freed at
