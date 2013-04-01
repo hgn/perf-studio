@@ -99,6 +99,7 @@ static int check_required_mod_callbacks(struct ps *ps, struct module *module)
 	return 1;
 }
 
+
 static void register_module(struct ps *ps, const char *path, const char *name)
 {
 	int ret;
@@ -289,10 +290,44 @@ int register_available_modules(struct ps *ps)
 	return 0;
 }
 
+
 static void module_activate(struct ps *ps, struct module *module)
 {
+        GtkWidget *label;
+	GtkWidget *scroll_widget;
+	GtkWidget *module_widget = NULL;
+
+	if (module->activated) {
+		pr_info(ps, "Module %s already activated!", module->name);
+		return;
+	}
+
 	pr_debug(ps, "Activate module %s", module->name);
-	module->activate(module);
+	module->activate(module, &module_widget);
+
+	if (!module_widget) {
+		pr_error(ps, "Module %s did not create a GtkWidget",
+			 module->name);
+		return;
+	}
+
+	scroll_widget = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll_widget),
+				       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scroll_widget),
+					    GTK_SHADOW_OUT);
+	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), module_widget);
+	gtk_widget_show_all(scroll_widget);
+
+	/* add tab panel to netebook */
+	label = gtk_label_new(module->name);
+	gtk_notebook_append_page(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, label);
+	gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, TRUE);
+	gtk_notebook_set_current_page(GTK_NOTEBOOK(ps->s.amc_notebook), 1);
+
+	pr_debug(ps, "Module \"%s\" activated", module->name);
+
+	module->activated = 1;
 }
 
 

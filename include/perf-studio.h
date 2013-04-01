@@ -196,7 +196,9 @@ struct screen {
 	gint main_paned_position;
 
 	GtkWidget *project_load_window;
+	// FIXME rename vbox
 	GtkWidget *vbox;
+
 	struct {
 		GtkWidget *label;
 	} atitle;
@@ -214,6 +216,9 @@ struct screen {
 		GtkWidget *expander;
 		GtkWidget *darea;
 	} project_info_segment_size;
+
+	/* AMC Section */
+	GtkWidget *amc_notebook;
 };
 
 struct data {
@@ -382,9 +387,12 @@ struct module {
 	 * Activate the gui element and start display.
 	 * If no data is available (update() wasn't called)
 	 * the a black screen MUST be displayed */
-	int (*activate)(struct module *m);
+	int (*activate)(struct module *m, GtkWidget **);
 	int (*deactivate)(struct module *m);
 	void (*unregister_module)(struct ps *, struct module *);
+
+	/* true if the module is activated (displayed) or not */
+	int activated;
 
 	/*
 	 * module private data - must be freed at

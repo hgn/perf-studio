@@ -801,29 +801,28 @@ GtkWidget *gui_amc_new(struct ps *ps)
 {
         GtkWidget *label;
 	GtkWidget *system_frame;
-	GtkWidget *notebook;
 	GtkWidget *scroll_widget;
 
-	notebook = gtk_notebook_new();
-	gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
-	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_BOTTOM);
+	ps->s.amc_notebook = gtk_notebook_new();
+	gtk_notebook_popup_enable(GTK_NOTEBOOK(ps->s.amc_notebook));
+	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(ps->s.amc_notebook), GTK_POS_TOP);
 
 	scroll_widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll_widget),
 				       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scroll_widget),
 					    GTK_SHADOW_OUT);
-	system_frame = system_notebook_tab_new(ps, notebook);
+	system_frame = system_notebook_tab_new(ps, ps->s.amc_notebook);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), system_frame);
 
 	label = gtk_label_new("System");
-	gtk_notebook_append_page(GTK_NOTEBOOK(notebook), scroll_widget, label);
-	gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(notebook), scroll_widget, TRUE);
+	gtk_notebook_append_page(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, label);
+	gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, TRUE);
 
-	gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
-	gtk_widget_set_size_request(notebook, 50, -1);
+	gtk_notebook_set_current_page(GTK_NOTEBOOK(ps->s.amc_notebook), 0);
+	gtk_widget_set_size_request(ps->s.amc_notebook, 50, -1);
 
-	return notebook;
+	return ps->s.amc_notebook;
 }
 
 

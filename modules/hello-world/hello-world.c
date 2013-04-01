@@ -48,13 +48,24 @@ static void add_events(struct module *module)
 	module_add_events(module, e);
 }
 
-static int activate_cb(struct module *module)
+
+static int activate_cb(struct module *module, GtkWidget **root)
 {
+	GtkWidget *frame;
+
 	assert(module);
 	assert(module->ps);
 
+	frame = gtk_frame_new("Counter Based Sampling");
+	gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
+	gtk_widget_set_size_request (frame, 100, 75);
+	gtk_widget_show(frame);
+
+	*root = frame;
+
 	return 0;
 }
+
 
 static int deactivate_cb(struct module *module)
 {
@@ -62,6 +73,7 @@ static int deactivate_cb(struct module *module)
 
 	return 0;
 }
+
 
 static int update_cb(struct module *module, enum update_type update_type, ...)
 {
