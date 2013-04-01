@@ -107,7 +107,7 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 		goto err;
 	}
 
-	pr_info(ps, "registering module: %s", path_name);
+	pr_info(ps, "try to register module: %s", path_name);
 
 	ret = func(ps, &module);
 	if (ret != 0) {
