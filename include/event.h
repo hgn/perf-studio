@@ -68,11 +68,8 @@ struct events {
 struct events *events_new(void);
 void events_purge_all(struct events *e);
 void events_add_event(struct events *, struct event *);
-
-
-struct project_event_storage {
-	gchar *filepath;
-};
+void event_gen_data_for_module(struct ps *ps, struct module *module);
+gchar *events_repr(struct events *events);
 
 
 #endif

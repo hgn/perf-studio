@@ -34,7 +34,7 @@ static void unregister_module(struct ps *ps, struct module *module)
 	struct events *e;
 	struct hello_world_priv *data;
 
-	(void) ps;
+	(void)ps;
 
 	e = module_get_events(module);
 	assert(e);
@@ -81,7 +81,7 @@ static int activate_cb(struct module *module, GtkWidget **root)
 	assert(module);
 	assert(module->ps);
 
-	frame = gtk_frame_new("No data available");
+	frame = gtk_frame_new("No data available or project open");
 	gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
 	gtk_widget_set_size_request (frame, 100, 75);
 	gtk_widget_show(frame);

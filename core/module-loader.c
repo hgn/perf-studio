@@ -18,6 +18,7 @@
 #include "module-loader.h"
 #include "module-utils.h"
 #include "gui-toolkit.h"
+#include "event.h"
 
 static void clean_module_data(struct module *module)
 {
@@ -377,6 +378,17 @@ static void module_activate(struct ps *ps, struct module *module)
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(ps->s.amc_notebook), 1);
 
 	pr_debug(ps, "Module \"%s\" activated", module->name);
+
+	/*
+	 * Generate the requested data if a project
+	 * is already loaded and module has registered
+	 * events */
+	if (ps->project && module->events) {
+		// FIXME: we should check if the data is
+		// already available, if so we should call
+		// instead module->update()
+		event_gen_data_for_module(ps, module);
+	}
 
 	module->activated = 1;
 }
