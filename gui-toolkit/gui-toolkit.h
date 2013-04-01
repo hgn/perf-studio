@@ -50,4 +50,14 @@ void gt_pie_chart_set_offsets(struct gt_pie_chart *gt_pie_chart, int x_offset, i
 void gt_pie_chart_set_radius(struct gt_pie_chart *gt_pie_chart, int inner_radius, int outer_radius);
 void gt_pie_chart_set_fg_color(struct gt_pie_chart *gt_pie_chart, const struct ps_color *);
 
+
+enum {
+	ICON_CLOSE,
+
+	ICON_MAX
+};
+
+
+GtkWidget *ps_icon(struct ps *ps, int icon_id);
+
 #endif

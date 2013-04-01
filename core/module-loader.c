@@ -17,6 +17,7 @@
 #include "shared.h"
 #include "module-loader.h"
 #include "module-utils.h"
+#include "gui-toolkit.h"
 
 static void clean_module_data(struct module *module)
 {
@@ -291,6 +292,31 @@ int register_available_modules(struct ps *ps)
 }
 
 
+static GtkWidget *close_tab_button(struct ps *ps, const char *name)
+{
+	GtkWidget *hbox;
+	GtkWidget *label;
+	GtkWidget *button;
+
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+
+	label = gtk_label_new(name);
+	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
+
+	button = gtk_button_new();
+	gtk_button_set_relief( GTK_BUTTON( button ), GTK_RELIEF_NONE );
+	gtk_button_set_focus_on_click( GTK_BUTTON( button ), FALSE );
+	gtk_button_set_alignment( GTK_BUTTON( button ), 0, 1 );
+	gtk_button_set_image(GTK_BUTTON(button), ps_icon(ps, ICON_CLOSE));
+
+	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+
+	gtk_widget_show_all(hbox);
+
+	return hbox;
+}
+
+
 static void module_activate(struct ps *ps, struct module *module)
 {
         GtkWidget *label;
@@ -320,7 +346,7 @@ static void module_activate(struct ps *ps, struct module *module)
 	gtk_widget_show_all(scroll_widget);
 
 	/* add tab panel to netebook */
-	label = gtk_label_new(module->name);
+	label = close_tab_button(ps, module->name);
 	gtk_notebook_append_page(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, label);
 	gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, TRUE);
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(ps->s.amc_notebook), 1);

@@ -245,19 +245,19 @@ int gui_register_artwork(struct ps *ps)
 
 	switch (ps->args.theme) {
 	case THEME_DARK:
-		ps->si.pixmapdir = g_strdup_printf("%s/%s",
+		ps->si.pixmapdir = g_strdup_printf("%s%s",
 				DATA_DIR, "artwork/pixmaps/dark/");
-		ps->si.buttondir = g_strdup_printf("%s/%s",
-				DATA_DIR, "artwork/pixmaps/buttons/16x16/");
-		ps->si.theme_style_path = g_strdup_printf("%s/%s",
+		ps->si.buttondir = g_strdup_printf("%s%s",
+				DATA_DIR, "artwork/buttons/dark/");
+		ps->si.theme_style_path = g_strdup_printf("%s%s",
 				DATA_DIR, "artwork/theme-style/dark/theme.css");
 		break;
 	case THEME_LIGHT:
-		ps->si.pixmapdir = g_strdup_printf("%s/%s",
-				DATA_DIR, "artwork/pixmaps/dark/");
-		ps->si.buttondir = g_strdup_printf("%s/%s",
-				DATA_DIR, "artwork/pixmaps/buttons/16x16/");
-		ps->si.theme_style_path = g_strdup_printf("%s/%s",
+		ps->si.pixmapdir = g_strdup_printf("%s%s",
+				DATA_DIR, "artwork/pixmaps/light/");
+		ps->si.buttondir = g_strdup_printf("%s%s",
+				DATA_DIR, "artwork/buttons/light/");
+		ps->si.theme_style_path = g_strdup_printf("%s%s",
 				DATA_DIR, "artwork/theme-style/light/theme.css");
 		break;
 	default:
