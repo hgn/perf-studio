@@ -263,3 +263,31 @@ GtkLabel#dialog_window_header {
 	font: Sans thin 20; 
 	padding: 10px;
 }
+
+
+
+GtkButton#dialog_window_button {
+	background: #111111;
+	border-radius: 4px;
+	border-color: #050505;
+	padding: 2px 14px 2px 14px;
+}
+
+GtkButton#dialog_window_button:active {
+	background-color: #ff0000;
+}
+
+GtkButton#dialog_window_button:hover,
+GtkButton#dialog_window_button:prelight {
+	background-color: #222222;
+}
+
+GtkButton#dialog_window_button:hover:active {
+	background-color: #333333;
+	border-color: #000000;
+}
+
+GtkButton#dialog_window_button > GtkLabel {
+	font: Sans thin 10; 
+	color: @darker_font_color;
+}

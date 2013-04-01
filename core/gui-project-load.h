@@ -1,8 +1,8 @@
-#ifndef PROJECT_LOAD_H
-#define PROJECT_LOAD_H
+#ifndef GUI_PROJECT_LOAD_H
+#define GUI_PROJECT_LOAD_H
 
 #include "perf-studio.h"
 
 void gui_amc_load_project(GtkWidget *widget, struct ps *ps);
 
-#endif /* PROJECT_LOAD_H */
+#endif /* GUI_PROJECT_LOAD_H */

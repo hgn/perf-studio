@@ -9,6 +9,8 @@
 #include "event-generator.h"
 #include "shared.h"
 
+#include "gui-event-generator.h"
+
 
 /* return a filename path to save a perf data file
  * for the events specified by the second argument.
@@ -69,6 +71,8 @@ void event_gen_data_for_project(struct ps *ps, struct project *project, struct e
 	(void)ps;
 	(void)project;
 	(void)events;
+
+	gui_event_executer_setup(ps, project);
 }
 
 

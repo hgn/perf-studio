@@ -199,6 +199,9 @@ struct screen {
 	// FIXME rename vbox
 	GtkWidget *vbox;
 
+	/* modale window to execute a command */
+	GtkWidget *event_executer_window;
+
 	struct {
 		GtkWidget *label;
 	} atitle;

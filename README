@@ -115,6 +115,12 @@ Function Name Nomenclature
  */
 whatever_foo_new();
 
+
+/* long there objects. Not returning a object (maybe true or false)
+   but register a object globaly somewhere.
+ */
+whatever_foo_setup();
+
 /*
  * Short therm objects. In difference to the long term object
  * the create family of functions can return any data type:
