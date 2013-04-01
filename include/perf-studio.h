@@ -383,7 +383,7 @@ struct module {
 	 * If no data is available (update() wasn't called)
 	 * the a black screen MUST be displayed */
 	int (*activate)(struct module *m);
-	int (*deactive)(struct module *m);
+	int (*deactivate)(struct module *m);
 	void (*unregister_module)(struct ps *, struct module *);
 
 	/*

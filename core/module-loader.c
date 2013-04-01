@@ -73,6 +73,32 @@ static int module_path_dup_check(struct ps *ps, const char *path)
 }
 
 
+/* return false for failure, true for success */
+static int check_required_mod_callbacks(struct ps *ps, struct module *module)
+{
+	if (!module->update) {
+		pr_error(ps, "Module update() callback not registered");
+		return 0;
+	}
+
+	if (!module->activate) {
+		pr_error(ps, "Module activate() callback not registered");
+		return 0;
+	}
+
+	if (!module->deactivate) {
+		pr_error(ps, "Module deactivate() callback not registered");
+		return 0;
+	}
+
+	if (!module->unregister_module) {
+		pr_error(ps, "Module unregister_module() callback not registered");
+		return 0;
+	}
+
+	return 1;
+}
+
 static void register_module(struct ps *ps, const char *path, const char *name)
 {
 	int ret;
@@ -123,8 +149,16 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 		pr_info(ps, " registred events:");
 	}
 
+	ret = check_required_mod_callbacks(ps, module);
+	if (!ret) {
+		pr_error(ps, "Module %s (%s) not registered",
+			 module_get_name(module), path_name);
+		goto err;
+	}
+
 	module->dl_handle = handle;
 	module->path_name = path_name;
+	module->ps        = ps;
 
 	register_module_global(ps, module);
 
@@ -132,6 +166,7 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 err:
 	g_free(path_name);
 }
+
 
 /*
  * Returns negative error code in the case
@@ -254,4 +289,26 @@ int register_available_modules(struct ps *ps)
 	return 0;
 }
 
+static void module_activate(struct ps *ps, struct module *module)
+{
+	pr_debug(ps, "Activate module %s", module->name);
+	module->activate(module);
+}
 
+
+void module_activated_by_name(struct ps *ps, const char *module_name)
+{
+	GSList *tmp;
+	struct module *module;
+
+	tmp = ps->module_list;
+	while (tmp) {
+		module = tmp->data;
+		if (streq(module->name, module_name)) {
+			pr_info(ps, "activate module by name\"%s\"", module->name);
+			module_activate(ps, module);
+			return;
+		}
+		tmp = g_slist_next(tmp);
+	}
+}

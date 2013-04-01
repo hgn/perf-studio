@@ -9,6 +9,7 @@
 #include "gui-toolkit.h"
 #include "shared.h"
 #include "module-utils.h"
+#include "module-loader.h"
 
 enum {
 	NAME = 0,
@@ -29,7 +30,6 @@ static void module_selected_cb(GtkTreeView *treeview, GtkTreePath *path,
 	assert(priv_data);
 	ps = priv_data;
 
-	(void)ps;
 	(void)col;
 
 	model = gtk_tree_view_get_model(treeview);
@@ -38,32 +38,13 @@ static void module_selected_cb(GtkTreeView *treeview, GtkTreePath *path,
 		gchar *name;
 		gtk_tree_model_get(model, &iter, NAME, &name, -1);
 
-		fprintf(stderr, "row actived: %s\n", name);
-#if 0
-
-		tmp_list = sc->control_pane_data_list;
-		while (tmp_list != NULL) {
-			struct control_pane_data *cpml;
-
-			cpml = tmp_list->data;
-			fprintf(stderr, "IN %s\n", cpml->name);
-
-
-			if (!strcmp(cpml->name, name)) {
-				GtkWidget *w;
-				fprintf(stderr, "select and found: %s\n", name);
-				w = cpml->widget_new(cpml->priv_data);
-				main_notebook_add_widget(sc, cpml, w);
-			}
-
-
-			tmp_list = g_list_next(tmp_list);
-		}
-#endif
+		pr_debug(ps, "module panel row selected: %s", name);
+		module_activated_by_name(ps, name);
 
 		g_free(name);
 	}
 }
+
 
 static void generate_tl_elements(GtkTreeStore *treestore, GtkTreeIter *root_elements)
 {

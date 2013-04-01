@@ -48,6 +48,29 @@ static void add_events(struct module *module)
 	module_add_events(module, e);
 }
 
+static int activate_cb(struct module *module)
+{
+	assert(module);
+	assert(module->ps);
+
+	return 0;
+}
+
+static int deactivate_cb(struct module *module)
+{
+	(void)module;
+
+	return 0;
+}
+
+static int update_cb(struct module *module, enum update_type update_type, ...)
+{
+	(void)module;
+	(void)update_type;
+
+	return 0;
+}
+
 
 int register_module(struct ps *ps, struct module **module)
 {
@@ -65,6 +88,10 @@ int register_module(struct ps *ps, struct module **module)
 
 	add_events(m);
 
+	/* register callbacks */
+	m->update            = update_cb;
+	m->activate          = activate_cb;
+	m->deactivate        = deactivate_cb;
 	m->unregister_module = unregister_module;
 
 	*module = m;

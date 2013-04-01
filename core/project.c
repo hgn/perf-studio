@@ -83,7 +83,6 @@ static void call_registered_deactivate_cb(struct ps *ps)
 static int check_create_refs_path(struct ps *ps, struct project *project)
 {
 	int ret = 0;
-	gchar *path;
 
 	assert(ps);
 	assert(project);
