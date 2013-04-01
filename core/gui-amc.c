@@ -665,9 +665,10 @@ static void draw_interrupt_monitor_charts_bg(struct ps *ps, GtkWidget *widget, c
 
 static gboolean intr_usage_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
-	int x_position;
 	struct ps *ps;
 	struct interrupt_monitor_data *interrupt_monitor_data;
+
+	(void)data;
 
 	ps = g_object_get_data(G_OBJECT(widget), "ps");
 	assert(ps);
@@ -785,12 +786,12 @@ static GtkWidget *system_tab_new(struct ps *ps)
 }
 
 
-static GtkWidget *system_notebook_tab_new(struct ps *ps, GtkWidget *notebook)
+static GtkWidget *system_notebook_tab_new(struct ps *ps)
 {
         GtkWidget *frame;
 
 	frame = system_tab_new(ps);
-	gtk_container_set_border_width(GTK_CONTAINER (frame), 2);
+	gtk_container_set_border_width(GTK_CONTAINER(frame), 2);
 	gtk_widget_show(frame);
 
 	return frame;
@@ -812,7 +813,7 @@ GtkWidget *gui_amc_new(struct ps *ps)
 				       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scroll_widget),
 					    GTK_SHADOW_OUT);
-	system_frame = system_notebook_tab_new(ps, ps->s.amc_notebook);
+	system_frame = system_notebook_tab_new(ps);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), system_frame);
 
 	label = gtk_label_new("System");
