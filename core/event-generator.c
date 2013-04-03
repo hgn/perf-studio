@@ -66,15 +66,5 @@ void project_event_storage_finalize(struct project_event_storage *pes)
 }
 
 
-void event_gen_data_for_project(struct ps *ps, struct project *project, struct events *events)
-{
-	(void)ps;
-	(void)project;
-	(void)events;
-
-	gui_event_executer_setup(ps, project);
-}
-
-
 
 

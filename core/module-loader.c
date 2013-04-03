@@ -19,6 +19,7 @@
 #include "module-utils.h"
 #include "gui-toolkit.h"
 #include "event.h"
+#include "executer.h"
 
 static void clean_module_data(struct module *module)
 {
@@ -292,6 +293,12 @@ int register_available_modules(struct ps *ps)
 	return 0;
 }
 
+static void module_deactivate(struct ps *ps, struct module *module)
+{
+	executer_unregister_module_events(ps, module);
+	module->deactivate(module);
+}
+
 
 static gboolean close_module_tab_cb(gpointer data)
 {
@@ -303,7 +310,7 @@ static gboolean close_module_tab_cb(gpointer data)
 	ps = module->ps;
 	assert(ps);
 
-	module->deactivate(module);
+	module_deactivate(ps, module);
 	gtk_notebook_remove_page(GTK_NOTEBOOK(ps->s.amc_notebook), module->notebook_id);
 	module->activated = 0;
 
@@ -379,16 +386,12 @@ static void module_activate(struct ps *ps, struct module *module)
 
 	pr_debug(ps, "Module \"%s\" activated", module->name);
 
-	/*
-	 * Generate the requested data if a project
-	 * is already loaded and module has registered
-	 * events */
-	if (ps->project && module->events) {
-		// FIXME: we should check if the data is
-		// already available, if so we should call
-		// instead module->update()
-		event_gen_data_for_module(ps, module);
-	}
+	/* Generate the requested data if module has registered events
+	 * TODO: maybe there is a usecase that module do not need necessarly
+	 * require events. E.g. some dump visualization module. Then
+	 * we should conditional executer_register_module_events() */
+	assert(module->events);
+	executer_register_module_events(ps, module);
 
 	module->activated = 1;
 }

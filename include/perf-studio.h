@@ -259,6 +259,10 @@ struct project {
 
 	/* current checksum (MD5, SHA1, ...) of executable */
 	gchar *checksum;
+
+	/* the registered events for this
+	 * prooject. See core/executer.c */
+	GSList *events_list;
 };
 
 /* forward declaration, see cpu-fueatures.{c,h) */

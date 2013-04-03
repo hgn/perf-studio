@@ -154,16 +154,4 @@ gchar *events_repr(struct events *events)
 
 
 
-void event_gen_data_for_module(struct ps *ps, struct module *module)
-{
-	struct events *events;
-	struct project *project;
-
-	events = module->events;
-	project = ps->project;
-
-	pr_info(ps, "Generate event data for module %s", module->name);
-
-	event_gen_data_for_project(ps, project, events);
-}
 

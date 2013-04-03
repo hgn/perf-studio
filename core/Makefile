@@ -6,6 +6,7 @@ FILES += event-generator.c
 FILES += conf-file.c
 FILES += cpu-features.c
 FILES += project.c
+FILES += executer.c
 
 FILES += module-loader.c
 FILES += module-utils.c
