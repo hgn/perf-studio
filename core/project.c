@@ -43,7 +43,6 @@ void project_register_activate_cb(struct ps *ps, void (*cb)(struct ps *ps))
 	assert(ps);
 	assert(cb);
 
-	pr_debug(ps, "Register project activate callback");
 	ps->project_activate_cb_list = g_slist_append(ps->project_activate_cb_list, cb);
 }
 
@@ -58,7 +57,6 @@ void project_register_deactivate_cb(struct ps *ps,  void (*cb)(struct ps *ps))
 	assert(ps);
 	assert(cb);
 
-	pr_debug(ps, "Register project deactivate callback");
 	ps->project_deactivate_cb_list = g_slist_append(ps->project_deactivate_cb_list, cb);
 }
 

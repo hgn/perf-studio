@@ -386,13 +386,6 @@ static void module_activate(struct ps *ps, struct module *module)
 
 	pr_debug(ps, "Module \"%s\" activated", module->name);
 
-	/* Generate the requested data if module has registered events
-	 * TODO: maybe there is a usecase that module do not need necessarly
-	 * require events. E.g. some dump visualization module. Then
-	 * we should conditional executer_register_module_events() */
-	assert(module->events);
-	executer_register_module_events(ps, module);
-
 	module->activated = 1;
 }
 

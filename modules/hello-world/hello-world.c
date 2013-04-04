@@ -74,19 +74,38 @@ static struct events *events_hello_world_new(void)
 }
 
 
+static gboolean exec_analysis(gpointer data)
+{
+	struct module *module;
+
+	assert(data);
+	module = data;
+
+	executer_register_module_events(module->ps, module);
+}
+
+
 static int activate_cb(struct module *module, GtkWidget **root)
 {
-	GtkWidget *frame;
+	GtkWidget *vbox;
+	GtkWidget *control_hbox;
+	GtkWidget *exec_button;
 
 	assert(module);
 	assert(module->ps);
 
-	frame = gtk_frame_new("No data available or project open");
-	gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
-	gtk_widget_set_size_request (frame, 100, 75);
-	gtk_widget_show(frame);
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
-	*root = frame;
+	control_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	exec_button = gtk_button_new_with_label("Start Analysis");
+	g_signal_connect_swapped(G_OBJECT(exec_button), "clicked",
+				 G_CALLBACK(exec_analysis), module);
+	gtk_box_pack_end(GTK_BOX(control_hbox), exec_button, FALSE, FALSE, 0);
+
+	gtk_box_pack_start(GTK_BOX(vbox), control_hbox, FALSE, FALSE, 0);
+	gtk_widget_show_all(vbox);
+
+	*root = vbox;
 
 	return 0;
 }
