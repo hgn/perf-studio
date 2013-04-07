@@ -94,7 +94,11 @@ void executer_unregister_module_events(struct ps *ps, struct module *module)
 
 	assert(ps);
 	assert(module);
-	assert(ps->project);
+
+	if (!ps->project) {
+		pr_info(ps, "Unregister module - no project active");
+		return;
+	}
 
 	/* We assume that project is active. If we extend
 	 * perf-studio to load a new project or de-activate
