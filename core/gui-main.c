@@ -181,7 +181,6 @@ int gui_init(struct ps *ps, int ac, char **av)
 
 	gtk_window_set_title(GTK_WINDOW(ps->s.main_window), "perf-studio");
 
-
 	/* gtk_main_quit() simple leave the main loop */
 	g_signal_connect(ps->s.main_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 	g_signal_connect(ps->s.main_window, "delete_event", G_CALLBACK(gtk_main_quit), NULL);

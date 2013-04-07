@@ -459,3 +459,12 @@ int project_load_by_id(struct ps *ps, const char *id)
 	return -EINVAL;
 }
 
+
+void project_unload_current(struct ps *ps)
+{
+	assert(ps);
+	assert(ps->project);
+
+	project_deactivate(ps);
+}
+

@@ -147,3 +147,17 @@ void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 	gtk_widget_grab_focus(GTK_WIDGET(ps->s.project_load_window));
 }
 
+
+void gui_amc_unload_project(GtkWidget *widget, struct ps *ps)
+{
+	GtkWidget *vbox;
+
+	(void)widget;
+
+	if (!ps->project) {
+		pr_info(ps, "No project loaded, cannot unload");
+		return;
+	}
+
+	project_unload_current(ps);
+}
