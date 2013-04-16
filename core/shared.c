@@ -112,3 +112,18 @@ void get_random_bytes(char *data, size_t len)
 	for (i = 0; i < len; i++)
 		data[i] = (char) random();
 }
+
+
+size_t strlcpy(char *dest, const char *src, size_t size)
+{
+	size_t ret = strlen(src);
+
+	if (size) {
+		size_t len = (ret >= size) ? size - 1 : ret;
+		memcpy(dest, src, len);
+		dest[len] = '\0';
+	}
+
+	return ret;
+}
+

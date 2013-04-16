@@ -87,5 +87,6 @@ void x_err_sys(struct ps *ps, const char *file, int line_no, const char *, ...);
 int xatoi(const char *, int *);
 void msg(struct ps *ps, int level, const char *, ...);
 void get_random_bytes(char *, size_t);
+size_t strlcpy(char *dest, const char *src, size_t size);
 
 #endif /* SHARED_H */
