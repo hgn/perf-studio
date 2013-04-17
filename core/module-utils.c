@@ -6,6 +6,7 @@
 #include "event.h"
 #include "module-utils.h"
 #include "shared.h"
+#include "executer.h"
 
 const char *module_group_str(int id)
 {
@@ -117,3 +118,7 @@ void module_request_event_data(struct module *module)
 }
 
 
+void module_register_module_events(struct ps *ps, struct module *module)
+{
+	executer_register_module_events(ps, module);
+}

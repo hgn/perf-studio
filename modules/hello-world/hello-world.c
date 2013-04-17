@@ -81,7 +81,9 @@ static gboolean exec_analysis(gpointer data)
 	assert(data);
 	module = data;
 
-	executer_register_module_events(module->ps, module);
+	module_register_module_events(module->ps, module);
+
+	return TRUE;
 }
 
 

@@ -19,6 +19,7 @@ void module_set_group(struct module *m, int group);
 int module_get_group(struct module *m);
 const char *module_group_str(int id);
 void module_request_event_data(struct module *);
+void module_register_module_events(struct ps *, struct module *);
 
 /* event handling */
 int module_add_events(struct module *m, struct events *e);
