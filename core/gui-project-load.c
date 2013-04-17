@@ -150,8 +150,6 @@ void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 
 void gui_amc_unload_project(GtkWidget *widget, struct ps *ps)
 {
-	GtkWidget *vbox;
-
 	(void)widget;
 
 	if (!ps->project) {
