@@ -47,6 +47,7 @@ EXTLIBS += $(shell pkg-config --libs dbus-1)
 EXTLIBS += -lpthread
 EXTLIBS += -lm
 EXTLIBS += -ldl
+EXTLIBS += -lrt
 EXTLIBS += ../gui-toolkit/gui-toolkit.a
 
 WARNINGS = -Wall \
