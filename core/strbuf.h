@@ -109,14 +109,6 @@ static inline void strbuf_addbuf(struct strbuf *sb, const struct strbuf *sb2) {
 }
 extern void strbuf_adddup(struct strbuf *sb, size_t pos, size_t len);
 
-typedef size_t (*expand_fn_t) (struct strbuf *sb, const char *placeholder, void *context);
-extern void strbuf_expand(struct strbuf *sb, const char *format, expand_fn_t fn, void *context);
-struct strbuf_expand_dict_entry {
-	const char *placeholder;
-	const char *value;
-};
-extern size_t strbuf_expand_dict_cb(struct strbuf *sb, const char *placeholder, void *context);
-
 __attribute__((format(printf,2,3)))
 extern int strbuf_addf(struct strbuf *sb, const char *fmt, ...);
 
