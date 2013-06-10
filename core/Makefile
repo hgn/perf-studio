@@ -16,6 +16,7 @@ FILES += random.c
 FILES += ringbuffer.c
 FILES += str-parser.c
 FILES += kv-list.c
+FILES += strbuf.c
 
 FILES += gui-main.c
 FILES += gui-amc.c
