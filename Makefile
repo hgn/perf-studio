@@ -51,5 +51,10 @@ cscope:
 	find . -name '*.[ch]' > cscope.files
 	cscope -b -q
 
+
+help:
+	@echo "Examples:"
+	@echo "    make prefix=/tmp install"
+
 memcheck: all
 	G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=full --leak-resolution=high core/perf-studio
