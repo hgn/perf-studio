@@ -94,8 +94,7 @@
 #mainmenu {
   background-color: darker(@bg_color);
 	border: 0px;
-	color: blue;
-	font-weight:thin;
+	color: red;
 }
 
 #systembox {
@@ -137,7 +136,8 @@ GtkFrame > GtkLabel {
 
 
 GtkLabel {
-	color: #bbbbbb;
+	color: @standard_font_color;
+	background-color: @bg_color_darker;
 }
 
 GtkNotebook {
