@@ -54,7 +54,8 @@ cscope:
 
 help:
 	@echo "Examples:"
-	@echo "    make prefix=/tmp install"
+	@echo "    Compile program, output verbose and install to /tmp"
+	@echo "    make prefix=/tmp V=1 install"
 
 memcheck: all
 	G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=full --leak-resolution=high core/perf-studio
