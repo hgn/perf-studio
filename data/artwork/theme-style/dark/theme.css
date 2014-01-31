@@ -1,9 +1,3 @@
-
-@import url("../reset.css");
-@import url("../shared.css");
-
-
-
 @define-color base_color #ffffff;
 
 @define-color standard_font_color #cccccc;
@@ -40,6 +34,10 @@
 @define-color dark_fg_color #dfdbd2;
 @define-color transparent rgba (0, 0, 0, 0);
 
+@import url("../reset.css");
+@import url("../shared.css");
+
+
 
 * {
 	engine: none;
@@ -49,18 +47,17 @@
 	border-width: 2px;
 	border-color: #111111;
 
-	-GtkScrolledWindow-scrollbar-spacing: 0;
+	-GtkScrolledWindow-scrollbar-spacing: 1;
 	-GtkScrolledWindow-scrollbars-within-bevel: 1;
 
 	/* for tabs in notbooks specify the padding */
 	-GtkNotebook-initial-gap: 10;
 	-GtkNotebook-tab-overlap: 2
 
-    padding: 0;
 
     background-clip: padding-box;
 
-    -GtkToolButton-icon-spacing: 4;
+    -GtkToolButton-icon-spacing: 0px;
 
     -GtkTextView-error-underline-color: @error_color;
 
@@ -128,6 +125,7 @@ GtkMenuItem {
 	font: Sans thin 13; 
 }
 
+/* Font for whole Menu */
 GtkMenuItem > GtkLabel {
 	font: Sans 10; 
 }

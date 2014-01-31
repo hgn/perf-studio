@@ -16,27 +16,30 @@ GtkNotebook GtkButton {
 	background-color: #ff0000;
 }
 
+/* Inactive notebook tab (background) */
 GtkNotebook tab {
 	padding: 0px;
-	color: #ff0000;
-	background-color: #ff0000;
+	background-color: #222222;
+	border-style:solid;
 }
 
 GtkNotebook tab:active {
-	padding: 0px;
-	color: #ff0000;
-	background-color: #ff0000;
+	background-color: #333333;
 }
+
+GtkNotebook tab:hover {
+	background-color: #444444;
+}
+
+
 
 GtkNotebook tab GtkLabel {
 	padding: 3px 20px 3px 20px;
 	color: @standard_font_color;
-	background-color: #ff0000;
-	border-width: 0px;
-	border-radius: 0px;
+	background-color: transparent;
 	font: Sans thin 12;
 }
-
-
-
+GtkNotebook tab:active:hover GtkLabel {
+	background-color: #ff0000;
+}
 
