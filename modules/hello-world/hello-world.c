@@ -6,8 +6,8 @@
 #include "event.h"
 
 
-#define MODULE_NAME "fooo"
-#define MODULE_DESCRIPTION "print foo"
+#define MODULE_NAME "Hello World"
+#define MODULE_DESCRIPTION "print hello world"
 
 struct hello_world_priv {
 	GSList *data_list;
