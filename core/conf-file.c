@@ -68,7 +68,7 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
 
 	cmd = g_key_file_get_string(keyfile, "common", "cmd", NULL);
 	if (!cmd) {
-		pr_error(ps, "Project has not command!");
+		pr_error(ps, "Project has no command for execution specified!");
 		return NULL;
 	}
 
