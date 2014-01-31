@@ -1,4 +1,8 @@
+
+@import url("../reset.css");
 @import url("../shared.css");
+
+
 
 @define-color base_color #ffffff;
 
@@ -47,6 +51,10 @@
 
 	-GtkScrolledWindow-scrollbar-spacing: 0;
 	-GtkScrolledWindow-scrollbars-within-bevel: 1;
+
+	/* for tabs in notbooks specify the padding */
+	-GtkNotebook-initial-gap: 10;
+	-GtkNotebook-tab-overlap: 2
 
     padding: 0;
 
@@ -140,24 +148,6 @@ GtkLabel {
 	background-color: @bg_color_darker;
 }
 
-GtkNotebook {
-	background-color: @bg_color_darker;
-	-GtkWidget-focus-line-width: 0;
-  color: @standard_font_color;
-	border-width: 2px;
-	border-radius: 8px;
-	border-color: #111111;
-	font: Sans thin 8;
-}
-
-GtkNotebook tab GtkLabel {
-	padding: 3px 20px 3px 20px;
-	color: @standard_font_color;
-	font: Sans thin 10;
-}
-
-
-
 
 
 /*
@@ -208,7 +198,6 @@ GtkNotebook tab GtkLabel {
 
 .entry:selected {
   background-color: mix (@selected_bg_color, @base_color, 0.4);
-  -Clearlooks-focus-color: shade (0.65, @selected_bg_color)
 }
 
 #window-name .button,
@@ -218,15 +207,6 @@ GtkWindow#window-name GtkButton.button {
 
 */
 
-/* 
- * Enabled via gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(list), TRUE);
- * see http://stackoverflow.com/questions/8946016/gtktreeview-with-css-in-gtk3
- */
-GtkTreeView {
-	-GtkWidget-even-row-color: green;
-	color: white;
-}
-
 GtkEventBox#header {
 	background-image: url("../../pixmaps/dark/header.png");
 }
@@ -234,6 +214,7 @@ GtkEventBox#header {
 
 @import url("scroolbar.css");
 @import url("tree.css");
+@import url("notebook.css");
 
 
 

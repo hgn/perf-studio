@@ -1,6 +1,12 @@
+
+/* 
+ * Enabled via gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(list), TRUE);
+ * see http://stackoverflow.com/questions/8946016/gtktreeview-with-css-in-gtk3
+ */
 .view,
 GtkTreeView {
     background-color: @bg_color_darker;
+		-GtkWidget-even-row-color: green;
     color: @darker_font_color;
 		font: Sans thin 9;
 }

@@ -1,0 +1,42 @@
+
+
+GtkNotebook {
+	background-color: @bg_color_darker;
+  color: @standard_font_color;
+	border-width: 2px;
+	border-radius: 0px;
+	border-color: #111111;
+	font: Sans thin 8;
+
+}
+
+GtkNotebook GtkButton {
+	padding: 0px;
+	color: #ff0000;
+	background-color: #ff0000;
+}
+
+GtkNotebook tab {
+	padding: 0px;
+	color: #ff0000;
+	background-color: #ff0000;
+}
+
+GtkNotebook tab:active {
+	padding: 0px;
+	color: #ff0000;
+	background-color: #ff0000;
+}
+
+GtkNotebook tab GtkLabel {
+	padding: 3px 20px 3px 20px;
+	color: @standard_font_color;
+	background-color: #ff0000;
+	border-width: 0px;
+	border-radius: 0px;
+	font: Sans thin 12;
+}
+
+
+
+

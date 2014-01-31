@@ -1,0 +1,18 @@
+*, *:active, *:prelight,*:hover, *:insensitive, *:selected, *:focused, *:inconsistent{
+    background: transparent;
+    /*background-color: rgba(0,0,0,0);*/
+    background-image:none;
+    box-shadow: none;
+    padding:0px;
+    margin:0px;
+    border-style:none;
+    border-width:0px;
+    border-radius:0px;
+    border-image:none;
+    -GtkWidget-focus-line-width: 0;
+        -GtkWidget-focus-padding:0;
+        -GtkWidget-interior-focus:false;
+    text-shadow:none;
+}
+
+
