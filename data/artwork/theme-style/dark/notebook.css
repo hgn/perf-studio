@@ -21,14 +21,19 @@ GtkNotebook tab {
 	padding: 0px;
 	background-color: #222222;
 	border-style:solid;
+	border-width: 1px;
 }
 
 GtkNotebook tab:active {
 	background-color: #333333;
+	border-style:solid;
+	border-width: 1px;
 }
 
 GtkNotebook tab:hover {
 	background-color: #444444;
+	border-style:solid;
+	border-width: 1px;
 }
 
 
@@ -41,5 +46,6 @@ GtkNotebook tab GtkLabel {
 }
 GtkNotebook tab:active:hover GtkLabel {
 	background-color: #ff0000;
+	border-color: #111111;
 }
 
