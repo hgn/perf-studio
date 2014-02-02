@@ -296,10 +296,10 @@ void project_deactivate(struct ps *ps)
 	call_registered_deactivate_cb(ps);
 
         /*
+	 * FIXME:
          * we free/deactive all values which we previously
          * generated at active state
          */
-        if (project->checksum) g_free(project->checksum);
 
         ps->project = NULL;
 }
