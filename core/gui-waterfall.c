@@ -12,7 +12,7 @@
  * 400 entries and each enrty consume sizeof(GTKColor)
  * bytes (4 byte). Resulting in 1600 bytes
  */
-#define CIRC_BUFFER_MAX_STEPS 50
+#define CIRC_BUFFER_MAX_STEPS 100
 
 struct cpu_waterfall *cpu_waterfall_new(struct ps *ps)
 {
