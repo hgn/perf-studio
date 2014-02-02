@@ -10,10 +10,10 @@ GtkNotebook {
 
 }
 
-GtkNotebook GtkButton {
+GtkNotebook {
 	padding: 0px;
-	color: #ff0000;
-	background-color: #ff0000;
+	color: #ffff00;
+	background-color: #ffff00;
 }
 
 /* Inactive notebook tab (background) */
