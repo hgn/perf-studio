@@ -1,4 +1,7 @@
-/* area module navigation */
+/*
+ * Area Module Navigation
+ * Upper Left Area of Window
+ */
 
 #include <string.h>
 #include <assert.h>
