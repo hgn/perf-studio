@@ -20,18 +20,17 @@ static void project_activated(struct ps *ps)
 	assert(ps->s.atitle.label);
 
 	project = ps->project;
-	snprintf(buf, sizeof(buf), "<span size=\"x-large\" font_weight=\"thin\""
-			   "foreground=\"#666\">Project: %s  </span>", project->id);
+	snprintf(buf, sizeof(buf), "Project: %s  ", project->id);
+	buf[sizeof(buf) - 1] = '\0';
 
-	gtk_label_set_markup(GTK_LABEL(ps->s.atitle.label), buf);
+	gtk_label_set_text(GTK_LABEL(ps->s.atitle.label), buf);
 }
 
 
 static void project_deactivated(struct ps *ps)
 {
-	gtk_label_set_markup(GTK_LABEL(ps->s.atitle.label),
-			"<span size=\"x-large\" font_weight=\"thin\" "
-			"foreground=\"#666\">Project: None  </span>");
+	gtk_label_set_text(GTK_LABEL(ps->s.atitle.label), "Project: None");
+	gtk_widget_set_name(GTK_WIDGET(ps->s.atitle.label), "project-title-label");
 }
 
 

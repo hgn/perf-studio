@@ -146,6 +146,12 @@ GtkLabel {
 	background-color: @bg_color_darker;
 }
 
+GtkLabel#project-title-label {
+	color: @darker_font_color;
+	background-color: transparent;
+	font: Sans thin 14;
+}
+
 
 
 /*
