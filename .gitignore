@@ -17,3 +17,4 @@ ncscope.*
 *.orig
 *~
 \#*#
+core.*
