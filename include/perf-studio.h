@@ -263,6 +263,10 @@ struct project {
 	/* the registered events for this
 	 * prooject. See core/executer.c */
 	GSList *events_list;
+
+	/* timestamp where the project was last loaded.
+	 * Or 0 if it was never loaded */
+	guint64 last_used_timestamp;
 };
 
 /* forward declaration, see cpu-fueatures.{c,h) */

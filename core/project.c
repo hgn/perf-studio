@@ -432,6 +432,8 @@ void project_show(struct ps *ps, struct project *p)
 	pr_info(ps, " scheduler policy:    ");
 	pr_info(ps, " IO scheduler:        ");
 	pr_info(ps, " project path:      %s", p->project_path);
+	pr_info(ps, " last-used:         %" G_GUINT64_FORMAT, p->last_used_timestamp);
+
 }
 
 

@@ -93,6 +93,9 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
 	/* optional arguments */
 	project->description = g_key_file_get_string(keyfile, "common", "description", NULL);
 
+	/* optional argument */
+	project->last_used_timestamp = g_key_file_get_string(keyfile, "stats", "last-used", NULL);
+
 	project_show(ps, project);
 
 	return project;
