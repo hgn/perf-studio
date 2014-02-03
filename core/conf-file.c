@@ -96,7 +96,11 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
 
 	/* optional argument */
 	last_used_tmp = g_key_file_get_string(keyfile, "stats", "last-used", NULL);
-	project->last_used_timestamp = g_ascii_strtoull(last_used_tmp, NULL, 10);
+	if (last_used_tmp != NULL) {
+		project->last_used_timestamp = g_ascii_strtoull(last_used_tmp, NULL, 10);
+	} else {
+		project->last_used_timestamp = 0;
+	}
 	g_free(last_used_tmp);
 
 	project_show(ps, project);
@@ -111,7 +115,7 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
  * now save a new file with the exaclty same context - except the
  * timestamp. And finally we call rename to do it atomically
  */
-void project_conf_file_update_last_used(struct ps *ps, gchar *project_path)
+void project_conf_file_update_last_used(struct ps *ps, struct project *project)
 {
 	int fd;
 	gsize length;
@@ -122,8 +126,12 @@ void project_conf_file_update_last_used(struct ps *ps, gchar *project_path)
 	GKeyFileFlags flags;
 	guint64 current_time;
 	char buf[32];
+	gchar *project_path;
 
-	assert(project_path);
+	assert(project);
+	assert(project->project_path);
+
+	project_path = project->project_path;
 
 	full_path = g_build_filename(project_path,
 				     PERF_STUDIO_USER_GLOBAL_CONF_NAME,
@@ -146,6 +154,7 @@ void project_conf_file_update_last_used(struct ps *ps, gchar *project_path)
 
 	current_time = g_get_real_time();
 	snprintf(buf, sizeof(buf) - 1, "%" G_GUINT64_FORMAT, current_time);
+	project->last_used_timestamp = current_time;
 
 	g_key_file_set_string(keyfile, "stats", "last-used", buf);
 

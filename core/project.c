@@ -406,7 +406,7 @@ void project_activate(struct ps *ps, struct project *project)
 	project->status = PROJECT_STATUS_OK;
 
 	/* we open the project, thus we update the last-used time */
-	project_conf_file_update_last_used(ps, project->project_path);
+	project_conf_file_update_last_used(ps, project);
 
 	call_registered_activate_cb(ps);
 }
