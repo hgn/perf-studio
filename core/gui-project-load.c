@@ -45,6 +45,40 @@ out:
 }
 
 
+static void last_used_human_delta(gchar *buf, gsize bufmax, guint64 current_time, guint64 last_used)
+{
+	guint64 delta;
+
+	if (last_used == 0) {
+		snprintf(buf, bufmax - 1, "unknown");
+		buf[bufmax - 1] = '\0';
+		return;
+	}
+
+	if (current_time <= last_used) {
+		snprintf(buf, bufmax - 1, "unknown");
+		buf[bufmax - 1] = '\0';
+		return;
+	}
+
+	delta = (current_time - last_used) / 1000000;
+	if (delta < 60) {
+		snprintf(buf, bufmax - 1, "%" G_GUINT64_FORMAT " seconds", delta);
+	} else if (delta < 60 * 60) {
+		float d = (float)delta  / 60;
+		snprintf(buf, bufmax - 1, "%.1f minutes", d);
+	} else if (delta < 60 * 60 * 24) {
+		float d = (float)delta  / (60 * 24);
+		snprintf(buf, bufmax - 1, "%.1f hours", d);
+	} else if (delta < 60 * 60 * 24 * 7) {
+		float d = (float)delta  / (60 * 24 * 7);
+		snprintf(buf, bufmax - 1, "%.1f days", d);
+	}
+
+	return;
+}
+
+
 static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *container)
 {
 	GtkListStore *lista1;
@@ -53,6 +87,8 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
 	GtkTreeViewColumn *column;
 	GtkTreeIter iter;
 	GSList *list_tmp;
+	gchar delta[64];
+	guint64 current_real_time;
 
 
 	lista1 = gtk_list_store_new(4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
@@ -71,15 +107,20 @@ static void project_load_widget_add_project_list(struct ps *ps, GtkWidget *conta
 	column = gtk_tree_view_column_new_with_attributes("  Last used  ", renderer, "text", 3, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree1), column);
 
+	current_real_time = g_get_real_time();
+
 	list_tmp = ps->project_list;
 	while (list_tmp) {
 		struct project *project;
 		project = list_tmp->data;
+
+		last_used_human_delta(delta, sizeof(delta), current_real_time, project->last_used_timestamp);
+
 		gtk_list_store_append(lista1, &iter);
 		gtk_list_store_set(lista1, &iter, 0, project->id,
 						  1, project->cmd,
 						  2, project->description,
-						  3, "3 days ago",
+						  3, delta,
 						  -1);
 
 		list_tmp = g_slist_next(list_tmp);

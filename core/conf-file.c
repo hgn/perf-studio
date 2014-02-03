@@ -69,6 +69,7 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
 {
 	gchar *cmd;
 	struct project *project;
+	gchar *last_used_tmp;
 
 	assert(project_id);
 
@@ -94,7 +95,9 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
 	project->description = g_key_file_get_string(keyfile, "common", "description", NULL);
 
 	/* optional argument */
-	project->last_used_timestamp = g_key_file_get_string(keyfile, "stats", "last-used", NULL);
+	last_used_tmp = g_key_file_get_string(keyfile, "stats", "last-used", NULL);
+	project->last_used_timestamp = g_ascii_strtoull(last_used_tmp, NULL, 10);
+	g_free(last_used_tmp);
 
 	project_show(ps, project);
 
