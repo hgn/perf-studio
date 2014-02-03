@@ -376,6 +376,7 @@ void project_activate(struct ps *ps, struct project *project)
 
 	project->checksum = build_checksum(G_CHECKSUM_MD5, project->cmd);
 	assert(project->checksum);
+	pr_info(ps, "md5 checksum for %s: %s", project->cmd, project->checksum);
 
 	ret = check_create_db_parent_dir(ps, project);
 	if (ret < 0) {
@@ -403,6 +404,9 @@ void project_activate(struct ps *ps, struct project *project)
 	}
 
 	project->status = PROJECT_STATUS_OK;
+
+	/* we open the project, thus we update the last-used time */
+	project_conf_file_update_last_used(ps, project->project_path);
 
 	call_registered_activate_cb(ps);
 }

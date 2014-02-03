@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include <glib.h>
+#include <glib/gstdio.h>
 
 #include "perf-studio.h"
 #include "shared.h"
@@ -93,9 +99,69 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
 }
 
 
+/*
+ * Change the last-used timestamp data.
+ * We already have all data from the keyfile. We
+ * now save a new file with the exaclty same context - except the
+ * timestamp. And finally we call rename to do it atomically
+ */
+void project_conf_file_update_last_used(struct ps *ps, gchar *project_path)
+{
+	int fd;
+	gsize length;
+	gchar *key_file_content;
+	gchar *tmp_name;
+	gchar *full_path;
+	GKeyFile *keyfile;
+	GKeyFileFlags flags;
+	guint64 current_time;
+	char buf[32];
+
+	assert(project_path);
+
+	full_path = g_build_filename(project_path,
+				     PERF_STUDIO_USER_GLOBAL_CONF_NAME,
+				     NULL);
+	keyfile = g_key_file_new();
+	flags = G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS;
+
+	if (!g_key_file_load_from_file(keyfile, full_path, flags, NULL)) {
+		pr_info(ps, "failed to open user configuration file [%s]", full_path);
+		goto err;
+	}
+
+	tmp_name = g_strdup_printf("%s.XXXXXX", "perf-studio-project-conf");
+
+	fd = g_mkstemp_full(tmp_name, O_RDWR, 0666);
+	if (fd < 0) {
+		pr_warn(ps, "Could not update last-used timestamp");
+		goto err2;
+	}
+
+	current_time = g_get_real_time();
+	snprintf(buf, sizeof(buf) - 1, "%" G_GUINT64_FORMAT, current_time);
+
+	g_key_file_set_string(keyfile, "stats", "last-used", buf);
+
+	key_file_content = g_key_file_to_data(keyfile, &length, NULL);
+	write(fd, key_file_content, length);
+	close(fd);
+
+	g_rename(tmp_name, full_path);
+
+err2:
+	g_free(full_path);
+	g_free(tmp_name);
+	g_free(key_file_content);
+	g_key_file_free(keyfile);
+err:
+	return;
+}
+
+
 #define EXAMPLE_ID "0001"
 
-static void load_check_conf(struct ps *ps,  const char *file_name, gchar *project_path)
+static void load_check_conf(struct ps *ps, const char *file_name, gchar *project_path)
 {
 	GFile *file;
 	gchar *project_path_name;
@@ -113,15 +179,21 @@ static void load_check_conf(struct ps *ps,  const char *file_name, gchar *projec
 
 	project_path_name = g_build_filename(project_path, PERF_STUDIO_USER_GLOBAL_CONF_NAME, NULL);
 	file = g_file_new_for_path(project_path);
-	file_info = g_file_query_info(file, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, 0, NULL, NULL);
+	file_info = g_file_query_info(file, G_FILE_ATTRIBUTE_ACCESS_CAN_READ ","
+				      G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, 0, NULL, NULL);
 	bret = g_file_info_get_attribute_boolean(file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ);
 	if (!bret) {
 		pr_warn(ps, "Configuraion file not readable: %s", project_path_name);
 		goto out;
 	}
 
-	pr_info(ps, "Try to read configuration file: %s", project_path_name);
+	bret = g_file_info_get_attribute_boolean(file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE);
+	if (!bret) {
+		pr_warn(ps, "Configuraion file not writeable: %s", project_path_name);
+		goto out;
+	}
 
+	pr_info(ps, "Try to read configuration file: %s", project_path_name);
 
 	keyfile = g_key_file_new();
 	flags = G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS;

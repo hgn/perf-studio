@@ -15,7 +15,7 @@ inner: padding
 outer: margin
 #endif
 
-#define CPU_USAGE_REFRESH 200
+#define CPU_USAGE_REFRESH 500
 
 #define CPU_USAGE_CHART_WIDTH 30
 #define CPU_USAGE_CHART_HEIGHT 250
