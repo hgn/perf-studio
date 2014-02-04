@@ -499,7 +499,7 @@ GtkWidget *gui_apo_new(struct ps *ps)
 					    GTK_SHADOW_OUT);
 
 	main_widget = apo_main_widget_new(ps);
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), main_widget);
+	gtk_container_add(GTK_CONTAINER(scroll_widget), main_widget);
 
 	/* register callback called if a project is
 	 * successful loaded */

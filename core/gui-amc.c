@@ -814,7 +814,7 @@ GtkWidget *gui_amc_new(struct ps *ps)
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scroll_widget),
 					    GTK_SHADOW_OUT);
 	system_frame = system_notebook_tab_new(ps);
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), system_frame);
+	gtk_container_add(GTK_CONTAINER(scroll_widget), system_frame);
 
 	label = gtk_label_new("System");
 	gtk_notebook_append_page(GTK_NOTEBOOK(ps->s.amc_notebook), scroll_widget, label);

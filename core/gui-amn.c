@@ -187,7 +187,7 @@ GtkWidget *gui_amn_new(struct ps *ps)
 	g_signal_connect(view, "row-activated", G_CALLBACK(module_selected_cb), ps);
 
 	//selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), view);
+	gtk_container_add(GTK_CONTAINER(scroll_widget), view);
 
 	return scroll_widget;
 }
