@@ -2,39 +2,32 @@
 
 GtkNotebook {
 	background-color: @bg_color_darker;
-  color: @standard_font_color;
-	border-width: 2px;
-	border-radius: 0px;
 	border-color: #111111;
-	font: Sans thin 8;
-	margin: 2px;
-
+	padding: 1px; /* small padding to draw fine line around all */
+	border-style:solid;
+	border-width: 1px;
 }
 
 /* Inactive notebook tab (background) */
 GtkNotebook tab {
-	padding: 0px;
-	background-color: #222222;
+	background-color: @bg_color;
 	border-style:solid;
 	border-width: 1px;
+	border-radius: 3px;
 }
 
+/* Active notebook tab (foreground) */
 GtkNotebook tab:active {
-	background-color: #333333;
+	background-color: @bg_color_darker;
 	border-style:solid;
 	border-width: 1px;
-}
-
-GtkNotebook tab:hover {
-	background-color: #444444;
-	border-style:solid;
-	border-width: 1px;
+	border-radius: 3px;
 }
 
 /* Formatting of the standard Label within a notebook */
 GtkNotebook tab GtkLabel {
-	padding: 3px 20px 3px 20px;
+	padding: 3px 20px 0px 20px;
 	color: @standard_font_color;
 	background-color: transparent;
-	font: Sans thin 12;
+	font: Sans thin 11;
 }
