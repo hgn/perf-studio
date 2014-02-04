@@ -9,6 +9,7 @@
 #include <glib/gstdio.h>
 
 #include "project.h"
+#include "conf-file.h"
 
 
 static void call_registered_activate_cb(struct ps *ps)
@@ -406,7 +407,7 @@ void project_activate(struct ps *ps, struct project *project)
 	project->status = PROJECT_STATUS_OK;
 
 	/* we open the project, thus we update the last-used time */
-	project_conf_file_update_last_used(ps, project);
+	conf_file_update_project_last_used(ps, project);
 
 	call_registered_activate_cb(ps);
 }

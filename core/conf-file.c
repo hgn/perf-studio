@@ -115,7 +115,7 @@ static struct project *load_new_project(struct ps *ps, GKeyFile *keyfile,
  * now save a new file with the exaclty same context - except the
  * timestamp. And finally we call rename to do it atomically
  */
-void project_conf_file_update_last_used(struct ps *ps, struct project *project)
+void conf_file_update_project_last_used(struct ps *ps, struct project *project)
 {
 	int fd;
 	gsize length;

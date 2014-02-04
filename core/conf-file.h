@@ -5,6 +5,6 @@
 
 int load_user_conf_file(struct ps *);
 int load_projects_from_cache(struct ps *);
-void project_conf_file_update_last_used(struct ps *ps, struct project *);
+void conf_file_update_project_last_used(struct ps *ps, struct project *project);
 
 #endif
