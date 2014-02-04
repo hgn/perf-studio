@@ -321,19 +321,15 @@ static gboolean deactivate_module_tab_cb(GtkWidget *button, gpointer data)
 {
 	struct ps *ps;
 	struct module *module;
-	GtkLabel *label;
 
 	assert(data);
 	module = data;
 	ps = module->ps;
 	assert(ps);
 
-	label = gtk_button_get_label(GTK_BUTTON(button));
-
 	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
 		gtk_button_set_label(GTK_BUTTON(button), "Activate Module");
 	} else {
-		pr_debug(ps, "project activated");
 		gtk_button_set_label(GTK_BUTTON(button), "Deactivate Module");
 	}
 
