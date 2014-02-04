@@ -369,7 +369,7 @@ static void module_activate(struct ps *ps, struct module *module)
 				       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scroll_widget),
 					    GTK_SHADOW_OUT);
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll_widget), module_widget);
+	gtk_container_add (GTK_CONTAINER(scroll_widget), module_widget);
 	gtk_widget_show_all(scroll_widget);
 
 	/* add tab panel to netebook */
