@@ -7,13 +7,8 @@ GtkNotebook {
 	border-radius: 0px;
 	border-color: #111111;
 	font: Sans thin 8;
+	margin: 2px;
 
-}
-
-GtkNotebook {
-	padding: 0px;
-	color: #ffff00;
-	background-color: #ffff00;
 }
 
 /* Inactive notebook tab (background) */
@@ -36,16 +31,10 @@ GtkNotebook tab:hover {
 	border-width: 1px;
 }
 
-
-
+/* Formatting of the standard Label within a notebook */
 GtkNotebook tab GtkLabel {
 	padding: 3px 20px 3px 20px;
 	color: @standard_font_color;
 	background-color: transparent;
 	font: Sans thin 12;
 }
-GtkNotebook tab:active:hover GtkLabel {
-	background-color: #ff0000;
-	border-color: #111111;
-}
-
