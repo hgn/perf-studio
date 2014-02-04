@@ -99,7 +99,7 @@ static int activate_cb(struct module *module, GtkWidget **root)
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
 	control_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	exec_button = gtk_button_new_with_label("Start Analysis");
+	exec_button = gtk_button_new_with_label("Start Analyse Module");
 	g_signal_connect_swapped(G_OBJECT(exec_button), "clicked",
 				 G_CALLBACK(exec_analysis), module);
 	gtk_box_pack_end(GTK_BOX(control_hbox), exec_button, FALSE, FALSE, 0);

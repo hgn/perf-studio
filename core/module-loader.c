@@ -344,9 +344,44 @@ static GtkWidget *close_tab_button(struct ps *ps, struct module *module)
 }
 
 
+static GtkWidget *create_module_top_status_bar(struct ps *ps, struct module *module)
+{
+	GtkWidget *hbox;
+	GtkWidget *control_hbox;
+	GtkWidget *button;
+
+	(void) ps;
+
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+
+	button = gtk_button_new_with_label("Close Module");
+	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+	g_signal_connect_swapped(G_OBJECT(button), "clicked",
+				 G_CALLBACK(close_module_tab_cb), module);
+
+	gtk_widget_show_all(hbox);
+
+	return hbox;
+}
+
+
+static GtkWidget *create_module_container(struct ps *ps)
+{
+	GtkWidget *vbox;
+
+	(void) ps;
+
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+	gtk_widget_show_all(vbox);
+
+	return vbox;
+}
+
+
 static void module_activate(struct ps *ps, struct module *module)
 {
-        GtkWidget *label;
+        GtkWidget *label, *h, *v;
 	GtkWidget *scroll_widget;
 	GtkWidget *module_widget = NULL;
 
@@ -369,7 +404,14 @@ static void module_activate(struct ps *ps, struct module *module)
 				       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scroll_widget),
 					    GTK_SHADOW_OUT);
-	gtk_container_add (GTK_CONTAINER(scroll_widget), module_widget);
+
+	v = create_module_container(ps);
+	h = create_module_top_status_bar(ps, module);
+
+	gtk_box_pack_start(GTK_BOX(v), h,  FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(v), module_widget,  TRUE, TRUE, 0);
+
+	gtk_container_add(GTK_CONTAINER(scroll_widget), v);
 	gtk_widget_show_all(scroll_widget);
 
 	/* add tab panel to netebook */
