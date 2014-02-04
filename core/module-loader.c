@@ -329,18 +329,15 @@ static GtkWidget *create_module_top_status_bar(struct ps *ps, struct module *mod
 
 	button = gtk_button_new_with_label("Start Analyse");
 	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
-	g_signal_connect_swapped(G_OBJECT(button), "clicked",
-				 G_CALLBACK(close_module_tab_cb), module);
-
-	button = gtk_button_new_with_label("Deactivate Module");
-	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
-	g_signal_connect_swapped(G_OBJECT(button), "clicked",
-				 G_CALLBACK(close_module_tab_cb), module);
 
 	button = gtk_button_new_with_label("Close Module");
 	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
 	g_signal_connect_swapped(G_OBJECT(button), "clicked",
 				 G_CALLBACK(close_module_tab_cb), module);
+
+	button = gtk_toggle_button_new_with_label("Deactivate Module");
+	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+
 
 
 	gtk_widget_show_all(hbox);
