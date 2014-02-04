@@ -318,46 +318,30 @@ static gboolean close_module_tab_cb(gpointer data)
 }
 
 
-static GtkWidget *close_tab_button(struct ps *ps, struct module *module)
-{
-	GtkWidget *hbox;
-	GtkWidget *label;
-	GtkWidget *button;
-
-	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-
-	label = gtk_label_new(module->name);
-	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
-
-	button = gtk_button_new();
-	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE );
-	gtk_button_set_alignment(GTK_BUTTON(button ), 0, 1 );
-	gtk_button_set_image(GTK_BUTTON(button), ps_icon(ps, ICON_CLOSE));
-	g_signal_connect_swapped(G_OBJECT(button), "clicked",
-				 G_CALLBACK(close_module_tab_cb), module);
-
-	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
-
-	gtk_widget_show_all(hbox);
-
-	return hbox;
-}
-
-
 static GtkWidget *create_module_top_status_bar(struct ps *ps, struct module *module)
 {
 	GtkWidget *hbox;
-	GtkWidget *control_hbox;
 	GtkWidget *button;
 
 	(void) ps;
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
+	button = gtk_button_new_with_label("Start Analyse");
+	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+	g_signal_connect_swapped(G_OBJECT(button), "clicked",
+				 G_CALLBACK(close_module_tab_cb), module);
+
+	button = gtk_button_new_with_label("Deactivate Module");
+	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+	g_signal_connect_swapped(G_OBJECT(button), "clicked",
+				 G_CALLBACK(close_module_tab_cb), module);
+
 	button = gtk_button_new_with_label("Close Module");
 	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
 	g_signal_connect_swapped(G_OBJECT(button), "clicked",
 				 G_CALLBACK(close_module_tab_cb), module);
+
 
 	gtk_widget_show_all(hbox);
 
@@ -414,8 +398,8 @@ static void module_activate(struct ps *ps, struct module *module)
 	gtk_container_add(GTK_CONTAINER(scroll_widget), v);
 	gtk_widget_show_all(scroll_widget);
 
-	/* add tab panel to netebook */
-	label = close_tab_button(ps, module);
+	/* add tab panel to notebook */
+	label = gtk_label_new(module->name);
 	module->notebook_id = gtk_notebook_append_page(GTK_NOTEBOOK(ps->s.amc_notebook),
 						       scroll_widget, label);
 	if (module->notebook_id < 0) {
