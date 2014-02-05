@@ -317,7 +317,7 @@ static gboolean close_module_tab_cb(gpointer data)
 	return TRUE;
 }
 
-static gboolean deactivate_module_tab_cb(GtkWidget *button, gpointer data)
+static gboolean disenable_module_tab_cb(GtkWidget *button, gpointer data)
 {
 	struct ps *ps;
 	struct module *module;
@@ -328,16 +328,16 @@ static gboolean deactivate_module_tab_cb(GtkWidget *button, gpointer data)
 	assert(ps);
 
 	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
-		gtk_button_set_label(GTK_BUTTON(button), "Disable Module");
-		if (module->enable) {
-			module->enable(module);
+		gtk_button_set_label(GTK_BUTTON(button), "Enable Module");
+		if (module->disable) {
+			module->disable(module);
 		} else {
 			pr_warn(ps, "Module implement no enable/disable functionality");
 		}
 	} else {
-		gtk_button_set_label(GTK_BUTTON(button), "Enable Module");
-		if (module->disable) {
-			module->disable(module);
+		gtk_button_set_label(GTK_BUTTON(button), "Disable Module");
+		if (module->enable) {
+			module->enable(module);
 		} else {
 			pr_warn(ps, "Module implement no enable/disable functionality");
 		}
@@ -366,8 +366,9 @@ static GtkWidget *create_module_top_status_bar(struct ps *ps, struct module *mod
 
 	button = gtk_toggle_button_new_with_label("Disable Module");
 	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
-	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON (button), FALSE);
-	g_signal_connect(G_OBJECT(button), "toggled", G_CALLBACK(deactivate_module_tab_cb), module);
+	//gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(button), FALSE);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), FALSE);
+	g_signal_connect(G_OBJECT(button), "toggled", G_CALLBACK(disenable_module_tab_cb), module);
 
 	gtk_widget_show_all(hbox);
 

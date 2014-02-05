@@ -137,6 +137,8 @@ static int enable_cb(struct module *module)
 	priv_data = (struct hello_world_priv *) module->data;
 	assert(priv_data);
 
+	gtk_widget_set_sensitive(priv_data->root, TRUE);
+
 	return 0;
 }
 
@@ -147,6 +149,8 @@ static int disable_cb(struct module *module)
 
 	priv_data = (struct hello_world_priv *) module->data;
 	assert(priv_data);
+
+	gtk_widget_set_sensitive(priv_data->root, FALSE);
 
 	return 0;
 }
