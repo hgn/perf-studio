@@ -402,6 +402,13 @@ struct module {
 	int (*deactivate)(struct module *m);
 	void (*unregister_module)(struct ps *, struct module *);
 
+	/* command send by the GUI to enable the functionality
+	 * for longer/shorter time. Normally the module should
+	 * stop active processing and should do not draw anything
+	 * furthermore the elements should be sensitive disabled */
+	int (*disable)(struct module *m);
+	int (*enable)(struct module *m);
+
 	/* true if the module is activated (displayed) or not */
 	int activated;
 	gint notebook_id;

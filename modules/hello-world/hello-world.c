@@ -121,6 +121,24 @@ static int deactivate_cb(struct module *module)
 }
 
 
+static int enable_cb(struct module *module)
+{
+	(void)module;
+
+	return 0;
+}
+
+
+static int disable_cb(struct module *module)
+{
+	(void)module;
+
+	return 0;
+}
+
+
+
+
 static int update_cb(struct module *module, enum update_type update_type, ...)
 {
 	(void)module;
@@ -153,6 +171,9 @@ int register_module(struct ps *ps, struct module **module)
 	m->activate          = activate_cb;
 	m->deactivate        = deactivate_cb;
 	m->unregister_module = unregister_module;
+
+	m->enable  = enable_cb;
+	m->disable = disable_cb;
 
 	/* module private data */
 	m->data = hello_world_priv_new();
