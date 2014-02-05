@@ -329,8 +329,18 @@ static gboolean deactivate_module_tab_cb(GtkWidget *button, gpointer data)
 
 	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
 		gtk_button_set_label(GTK_BUTTON(button), "Disable Module");
+		if (module->enable) {
+			module->enable(module);
+		} else {
+			pr_warn(ps, "Module implement no enable/disable functionality");
+		}
 	} else {
 		gtk_button_set_label(GTK_BUTTON(button), "Enable Module");
+		if (module->disable) {
+			module->disable(module);
+		} else {
+			pr_warn(ps, "Module implement no enable/disable functionality");
+		}
 	}
 
 	return TRUE;
@@ -358,8 +368,6 @@ static GtkWidget *create_module_top_status_bar(struct ps *ps, struct module *mod
 	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
 	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON (button), FALSE);
 	g_signal_connect(G_OBJECT(button), "toggled", G_CALLBACK(deactivate_module_tab_cb), module);
-
-
 
 	gtk_widget_show_all(hbox);
 

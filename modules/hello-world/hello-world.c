@@ -11,6 +11,7 @@
 
 struct hello_world_priv {
 	GSList *data_list;
+	GtkWidget *root;
 };
 
 
@@ -92,6 +93,7 @@ static int activate_cb(struct module *module, GtkWidget **root)
 	GtkWidget *vbox;
 	GtkWidget *control_hbox;
 	GtkWidget *exec_button;
+	struct hello_world_priv *priv_data;
 
 	assert(module);
 	assert(module->ps);
@@ -108,6 +110,9 @@ static int activate_cb(struct module *module, GtkWidget **root)
 	gtk_widget_show_all(vbox);
 
 	*root = vbox;
+	priv_data = (struct hello_world_priv *)module->data;
+	assert(priv_data);
+	priv_data->root = vbox;
 
 	return 0;
 }
@@ -121,9 +126,16 @@ static int deactivate_cb(struct module *module)
 }
 
 
+/*
+ * this function is called after a disable() is called -
+ * not in the beginning
+ */
 static int enable_cb(struct module *module)
 {
-	(void)module;
+	struct hello_world_priv *priv_data;
+
+	priv_data = (struct hello_world_priv *) module->data;
+	assert(priv_data);
 
 	return 0;
 }
@@ -131,12 +143,13 @@ static int enable_cb(struct module *module)
 
 static int disable_cb(struct module *module)
 {
-	(void)module;
+	struct hello_world_priv *priv_data;
+
+	priv_data = (struct hello_world_priv *) module->data;
+	assert(priv_data);
 
 	return 0;
 }
-
-
 
 
 static int update_cb(struct module *module, enum update_type update_type, ...)
