@@ -149,7 +149,7 @@ const char *module_maturity_str(struct module *module)
 }
 
 
-void module_set_maturiy(struct module *m, int maturity)
+void module_set_maturity(struct module *m, int maturity)
 {
 	m->maturity = maturity;
 }
