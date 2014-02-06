@@ -34,7 +34,18 @@ const char *module_group_str(int id)
 
 struct module *module_new(void)
 {
-	return g_malloc0(sizeof(struct module));
+	struct module *m;
+
+	m = g_malloc0(sizeof(struct module));
+
+	/*
+	 * per default all modules are considered
+	 * as stable, new module must mark them
+	 * as experimantal is wished otherwise
+	 */
+	m->maturity = MODULE_MATURITY_STABLE;
+
+	return m;
 }
 
 
@@ -121,4 +132,18 @@ void module_request_event_data(struct module *module)
 void module_register_module_events(struct ps *ps, struct module *module)
 {
 	executer_register_module_events(ps, module);
+}
+
+
+const char *module_maturity_str(struct module *module)
+{
+	switch (module->maturity) {
+	case MODULE_MATURITY_STABLE:
+		return "stable";
+	case MODULE_MATURITY_EXPERIMENTAL:
+		return "experimental";
+	default:
+		assert(0);
+		return "unknown";
+	};
 }

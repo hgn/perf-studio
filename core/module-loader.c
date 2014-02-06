@@ -149,8 +149,18 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 
 	pr_info(ps, " module name:        \"%s\"", module_get_name(module));
 	pr_info(ps, " module description: \"%s\"", module_get_description(module));
+	pr_info(ps, " module maturity:    \"%s\"", module_maturity_str(module));
 	if (MSG_LEVEL_INFO(ps)) {
 		pr_info(ps, " registred events:");
+	}
+
+	if (module->maturity == MODULE_MATURITY_EXPERIMENTAL) {
+		pr_info(ps, "  EXPERIMENTAL marked module");
+		if (!ps->conf.module_conf.show_experimental_modules) {
+			pr_info(ps, "  do no load module (no whitecard)");
+			goto err;
+		}
+		pr_info(ps, "  load module (user requested)");
 	}
 
 	ret = check_required_mod_callbacks(ps, module);

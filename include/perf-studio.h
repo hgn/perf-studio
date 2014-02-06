@@ -181,6 +181,10 @@ struct conf {
 		gchar *username;
 		gchar **module_paths;
 	} common;
+	/* section module conf in ~/.config/perf-studio/config */
+	struct {
+		gboolean show_experimental_modules;
+	} module_conf;
 	struct {
 		gboolean statusbar_enabled;
 	} ui;
@@ -370,6 +374,13 @@ enum update_type {
 };
 
 
+enum {
+	MODULE_MATURITY_STABLE,
+	MODULE_MATURITY_EXPERIMENTAL,
+};
+#define MODULE_MATURITY_DEFAULT MODULE_MATURITY_STABLE
+
+
 
 /* forward decl, see events.h */
 struct events;
@@ -380,6 +391,12 @@ struct module {
 	char name[MODULE_DESC_MAX];
 	char description[MODULE_DESC_MAX];
 	unsigned long version;
+
+	/* One of MODULE_MATURITY_*, by default
+	 * onle stable modules are loaded and can
+	 * be used. This can be overwritten by
+	 * an entry to module-conf */
+	unsigned int maturity;
 
 	/* must be one of MODULE_GROUP_* */
 	unsigned int group;

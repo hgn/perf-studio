@@ -22,7 +22,7 @@ int load_user_conf_file(struct ps *ps)
 	GKeyFile *keyfile;
 	GKeyFileFlags flags;
 	gsize length;
-	gchar *full_path;
+	gchar *full_path, *tmp;
 	gchar **iter;
 
 	full_path = g_build_filename(g_get_user_config_dir(),
@@ -50,6 +50,11 @@ int load_user_conf_file(struct ps *ps)
 		pr_info(ps, "module-paths: %s", *iter);
 		iter++;
 	}
+
+	ps->conf.module_conf.show_experimental_modules = FALSE;
+	tmp = g_key_file_get_string(keyfile, "module-conf", "show-experimental-modules", NULL);
+	if (tmp && streq(tmp, "yes"))
+		ps->conf.module_conf.show_experimental_modules = TRUE;
 
 	/* FIXME: needs parsing */
 	ps->conf.ui.statusbar_enabled = FALSE;
