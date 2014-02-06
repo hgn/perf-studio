@@ -17,6 +17,18 @@
 #define PERF_STUDIO_USER_PROJECT_DIR_NAME "projects"
 
 
+static gboolean question_true(gchar *tmp)
+{
+	if (!tmp)
+		return FALSE;
+
+	if (strcaseeq(tmp, "yes") || strcaseeq(tmp, "true"))
+		return TRUE;
+
+	return FALSE;
+}
+
+
 int load_user_conf_file(struct ps *ps)
 {
 	GKeyFile *keyfile;
@@ -51,10 +63,15 @@ int load_user_conf_file(struct ps *ps)
 		iter++;
 	}
 
-	ps->conf.module_conf.show_experimental_modules = FALSE;
 	tmp = g_key_file_get_string(keyfile, "module-conf", "show-experimental-modules", NULL);
-	if (tmp && streq(tmp, "yes"))
+	if (question_true(tmp)) {
+		pr_info(ps, "experimental modules: ACTIVATED");
 		ps->conf.module_conf.show_experimental_modules = TRUE;
+	} else {
+		pr_info(ps, "experimental modules: BANNED");
+		ps->conf.module_conf.show_experimental_modules = FALSE;
+	}
+	g_free(tmp);
 
 	/* FIXME: needs parsing */
 	ps->conf.ui.statusbar_enabled = FALSE;
