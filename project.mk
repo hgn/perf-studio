@@ -93,7 +93,7 @@ endif
 
 do_fpic_compile =					\
 	($(print_fpic_compile)				\
-	$(CC) -c $(CFLAGS) $(EXT) -fPIC $< -o $@)
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(EXT) -fPIC $< -o $@)
 
 do_app_build =						\
 	($(print_app_build)				\
@@ -105,11 +105,11 @@ do_compile_shared_library =			\
 
 do_compile_module_obj =				\
 	($(print_module_obj_compile)		\
-	$(CC) -c $(CFLAGS) $(BASIC_CFLAGS) -fPIC -o $@ $<)
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) -fPIC -o $@ $<)
 
 do_module_build =				\
 	($(print_module_build)			\
-	$(CC) $(CFLAGS) $(EXTLIBS) $(LDFLAGS) -shared -nostartfiles -o $@ $<)
+	$(CC) $(EXTLIBS) $(LDFLAGS) -shared -nostartfiles -o $@ $<)
 
 do_build_static_lib =				\
 	($(print_static_lib_build)		\
