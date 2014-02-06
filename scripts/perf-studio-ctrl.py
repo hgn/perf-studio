@@ -296,6 +296,7 @@ class ConfigCmd(Command):
         root['common']['username'] = self.get_username()
         root['projects'] = collections.OrderedDict()
         root['projects']['max-perf-data-per-project'] = '1GiB'
+        root['module-conf'] = collections.OrderedDict()
         root['module-conf']['show-experimental-modules'] = 'true'
         return root
 
