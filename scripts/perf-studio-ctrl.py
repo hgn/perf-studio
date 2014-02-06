@@ -115,6 +115,9 @@ class ProjectCmd(Command):
         config['common']['cmd-args'] = ''
         config['common']['description'] = 'Unnamed'
 
+        config['stats'] = {}
+        config['stats']['created'] = int(time.time() * 1000000)
+
 
     def create_project_conf(self, project_path):
         conf_path = os.path.join(project_path, "config")
