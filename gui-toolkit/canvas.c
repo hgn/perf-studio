@@ -31,4 +31,3 @@ void gui_err_dialog(struct ps *ps, const gchar *format, ...)
 	g_free(str);
 	gtk_widget_destroy(dialog);
 }
-

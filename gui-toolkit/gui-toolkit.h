@@ -12,6 +12,7 @@ PangoLayout *create_pango_layout(cairo_t *cr, const char *font_desc);
 
 /* canvas.c */
 void gui_err_dialog(struct ps *ps, const gchar *format, ...);
+void gui_msg_dialog(struct ps *ps, const gchar *format, ...);
 
 
 /* pie-chart.h */

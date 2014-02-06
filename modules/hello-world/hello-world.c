@@ -30,6 +30,33 @@ static void hello_world_priv_free(struct hello_world_priv *data)
 }
 
 
+static void gui_msg_dialog(struct ps *ps, const gchar *format, ...)
+{
+	va_list  args;
+	gchar *str;
+	GtkWidget *dialog;
+	GtkWidget *label, *content_area;
+
+	va_start(args, format);
+	str = g_strdup_vprintf (format, args);
+	va_end(args);
+
+	dialog = gtk_dialog_new_with_buttons("Message", GTK_WINDOW(ps->s.main_window),
+					     GTK_DIALOG_DESTROY_WITH_PARENT, "OK",
+					     GTK_RESPONSE_NONE, NULL);
+	content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+	label = gtk_label_new(str);
+
+	g_signal_connect_swapped(dialog, "response",
+				 G_CALLBACK(gtk_widget_destroy), dialog);
+
+	gtk_container_add(GTK_CONTAINER(content_area), label);
+	gtk_widget_show_all(dialog);
+
+	g_free(str);
+}
+
+
 static void unregister_module(struct ps *ps, struct module *module)
 {
 	struct events *e;
@@ -77,12 +104,17 @@ static struct events *events_hello_world_new(void)
 
 static gboolean exec_analysis(gpointer data)
 {
+	struct ps *ps;
 	struct module *module;
 
 	assert(data);
 	module = data;
+	ps = module->ps;
+	assert(ps);
 
-	module_register_module_events(module->ps, module);
+	gui_msg_dialog(ps, "Exec not implemented yet");
+
+	//module_register_module_events(module->ps, module);
 
 	return TRUE;
 }
