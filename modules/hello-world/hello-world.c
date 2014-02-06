@@ -179,6 +179,7 @@ int register_module(struct ps *ps, struct module **module)
 	module_set_name(m, MODULE_NAME);
 	module_set_description(m, MODULE_DESCRIPTION);
 	module_set_group(m, MODULE_GROUP_CORE_ANALYSIS);
+	module_set_maturiy(m, MODULE_MATURITY_EXPERIMENTAL);
 
 	/* register module events */
 	module_add_events(m, events_hello_world_new());
