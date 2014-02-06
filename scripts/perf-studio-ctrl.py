@@ -294,7 +294,8 @@ class ConfigCmd(Command):
         root['common']['perf-path'] = 'perf'
         root['common']['username'] = self.get_username()
         root['projects'] = collections.OrderedDict()
-        root['projects']['max-perf-data-per_project'] = '1GiB'
+        root['projects']['max-perf-data-per-project'] = '1GiB'
+        root['module-conf']['show-experimental-modules'] = 'true'
         return root
 
 
