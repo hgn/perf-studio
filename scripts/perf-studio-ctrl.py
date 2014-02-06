@@ -271,17 +271,18 @@ class ConfigCmd(Command):
         self.parser = argparse.ArgumentParser(description='Process some integers.')
         self.parser.add_argument('-c', '--create', help='Create configuration', action="store_true")
         self.parser.add_argument('-l', '--list', help='List current configuration', action="store_true")
-        self.parser.add_argument('-a', '--add', help='Add configuration value (common.username=fooo)', action="store_true")
+        self.parser.add_argument('-s', '--set', help='set configuration value (common.username "John Doo")', action="store_true")
         self.parser.add_argument('-e', '--edit', help='Edit user configuration', action="store_true")
         self.parser.add_argument('-v', '--verbose', help='verbose output', action="store_true")
         self.parser.add_argument('args', nargs=argparse.REMAINDER)
         self.args = self.parser.parse_args(sys.argv[2:])
         self.logger.setLevel(logging.DEBUG) if self.args.verbose else None
-        if not self.args.list and not self.args.create and not self.args.add and not self.args.edit:
+        if not self.args.list and not self.args.create and not self.args.set and not self.args.edit:
             self.parser.print_help()
             self.logger.error("")
             self.logger.error("create/list/set/edit option missing")
             sys.exit(1)
+
 
     def get_username(self):
         s = pwd.getpwuid(os.getuid())[4]
@@ -429,12 +430,43 @@ class ConfigCmd(Command):
         subprocess.call([editor, CONFIG_CONF])
 
 
+    def set_user_conf(self):
+        if not os.path.exists(CONFIG_CONF):
+            self.logger.error("Configuration file {0} do not exist ({1})!".format(CONFIG_CONF))
+            sys.exit(1)
+        if len(self.args.args) != 2:
+            self.logger.error("Error: expect key value string! common.username \"John Doo\"")
+            sys.exit(1)
+        (group_key, value) = self.args.args
+        self.logger.info("Key:   {} ".format(group_key))
+        self.logger.info("Value: {} ".format(value))
+
+        try:
+            (group, key) = group_key.split('.')
+        except ValueError:
+            self.logger.error("Error: expect key value string! common.username \"John Doo\"")
+            sys.exit(1)
+
+        self.logger.warn("Set \"{}\" to \"{}\"".format(group_key, value))
+
+        config_parser = configparser.ConfigParser()
+        config_parser.read(CONFIG_CONF)
+        config_parser.set(group, key, value)
+
+        conf_fd = open(CONFIG_CONF,'w')
+        config_parser.write(conf_fd)
+        conf_fd.close()
+
+
     def run(self):
         if self.args.create:
             self.create_configuration()
             return
         if self.args.edit:
             self.edit_user_conf()
+            return
+        if self.args.set:
+            self.set_user_conf()
             return
 
 
