@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 
 #define streq(a, b) (!strcmp((a),(b)))
+#define strcaseeq(a, b) (!strcasecmp((a),(b)))
 # if !defined likely && !defined unlikely
 #  define likely(x)   __builtin_expect(!!(x), 1)
 #  define unlikely(x) __builtin_expect(!!(x), 0)
