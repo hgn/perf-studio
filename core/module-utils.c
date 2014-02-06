@@ -147,3 +147,9 @@ const char *module_maturity_str(struct module *module)
 		return "unknown";
 	};
 }
+
+
+void module_set_maturiy(struct module *m, int maturity)
+{
+	m->maturity = maturity;
+}
