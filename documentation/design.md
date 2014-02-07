@@ -18,12 +18,14 @@
   diese werden standadisiert zur verf=FCgung gestellt
 
 
+
     enum {
-        CLASS=5FEXEC=5FRAW,
-        CLASS=5FEXEC=5FRAW=5FSTDOUT=5FSTDERR=5FCAPTURE,
-        CLASS=5FEXEC=5FTIME=5FMEASUREMENT,
-        CLASS=5FEXEC=5FPERF=5FRECORD
+    CLASS=5FEXEC=5FRAW,
+    CLASS=5FEXEC=5FRAW=5FSTDOUT=5FSTDERR=5FCAPTURE,
+    CLASS=5FEXEC=5FTIME=5FMEASUREMENT,
+    CLASS=5FEXEC=5FPERF=5FRECORD
     };
+
 
 Ein Module kann sich an mehr als einen "event" registieren, ein update()
 liefert also mehr als ein ergebniss, Ein Module darf aber sich aber nicht mehr
