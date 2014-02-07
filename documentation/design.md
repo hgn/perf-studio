@@ -18,13 +18,14 @@
   diese werden standadisiert zur verf=FCgung gestellt
 
 
-
+```
     enum {
     CLASS_EXEC_RAW,
     CLASS_EXEC_RAW_STDOUT_STDERR_CAPTURE,
     CLASS_EXEC_TIME_MEASUREMENT,
     CLASS_EXEC_PERF_RECORD
     };
+```
 
 
 Ein Module kann sich an mehr als einen "event" registieren, ein update()
