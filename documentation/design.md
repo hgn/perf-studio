@@ -17,6 +17,7 @@
 - kein third party programm wird gestartet aber daten werden gesammelt,=20
   diese werden standadisiert zur verf=FCgung gestellt
 
+
     enum {
         CLASS=5FEXEC=5FRAW,
         CLASS=5FEXEC=5FRAW=5FSTDOUT=5FSTDERR=5FCAPTURE,
