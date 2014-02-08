@@ -309,3 +309,7 @@ GtkButton:active {
 GtkButton > GtkLabel {
 	font: Sans thin 10;
 }
+
+GtkButton > GtkLabel:hover {
+	text-shadow: 1px 1px 1px alpha(white, 0.6);
+}
