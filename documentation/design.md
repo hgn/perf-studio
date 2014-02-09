@@ -22,12 +22,12 @@ Perf-Studio core API is flexible enough to handle different kind of measurements
 The following code illustrate all currently supported measurement classes:
 
 ```
-    enum {
+enum {
     CLASS_EXEC_RAW,
     CLASS_EXEC_RAW_STDOUT_STDERR_CAPTURE,
     CLASS_EXEC_TIME_MEASUREMENT,
     CLASS_EXEC_PERF_RECORD
-    };
+};
 ```
 
 Each module register there required data and some measurement classes requires
@@ -83,6 +83,8 @@ same Measurement Classes. For example if two modules required cache line miss
 data then the project will run one measurement for both modules.  Another
 advantage is that the project know when data is outdated (md5 missmatch of
 executable)
+
+![Module and Project Interaction](https://dl.dropboxusercontent.com/s/d0ghb805klc4quk/project-module-register.png)
 
 If modules are deactivated (insensitive) then Measurement Classes are
 deregistered at the project. If later the Module is reenabled the Measurement
