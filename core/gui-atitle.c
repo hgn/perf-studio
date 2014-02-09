@@ -29,21 +29,9 @@ static void project_activated(struct ps *ps)
 
 static void project_deactivated(struct ps *ps)
 {
-	gtk_label_set_text(GTK_LABEL(ps->s.atitle.label), "Project: None");
+	gtk_label_set_text(GTK_LABEL(ps->s.atitle.label), "Project: None ");
 	gtk_widget_set_name(GTK_WIDGET(ps->s.atitle.label), "project-title-label");
 }
-
-
-void gui_atitle_set_title(struct ps *ps, const gchar *title)
-{
-	(void) title;
-
-	// FIXME: get rid of markup and put in css file
-	gtk_label_set_markup(GTK_LABEL(ps->s.atitle.label),
-			"<span size=\"x-large\" font_weight=\"thin\" "
-			"foreground=\"#666\">Project: None  </span>");
-}
-
 
 
 void gui_atitle_init(struct ps *ps)
