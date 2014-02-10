@@ -186,12 +186,12 @@ void conf_file_update_project_last_used(struct ps *ps, struct project *project)
 
 	g_rename(tmp_name, full_path);
 
+	g_free(key_file_content);
 err2:
 	g_free(full_path);
 	g_free(tmp_name);
-	g_free(key_file_content);
-	g_key_file_free(keyfile);
 err:
+	g_key_file_free(keyfile);
 	return;
 }
 
