@@ -8,3 +8,6 @@ compiler:
 install:
   - sudo apt-get -qq update
   - sudo apt-get -qq install libwebkitgtk-dev libwebkitgtk-3.0-dev libgtk-3-dev libdbus-1-dev
+
+script:
+  make
