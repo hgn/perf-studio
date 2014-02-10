@@ -10,6 +10,7 @@ modules/*.so
 *.a
 *.so
 !.gitignore
+!.travis.yml
 
 cscope.*
 ncscope.*
