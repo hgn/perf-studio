@@ -4,10 +4,6 @@ compiler:
   - gcc
   - clang
 
-env:
-  - TARGETS=arm-softmmu,arm-linux-user
-  - TARGETS=i386-softmmu,x86_64-softmmu
-
 matrix:
   include:
     - env: TARGETS=i386-softmmu,x86_64-softmmu
