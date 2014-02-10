@@ -5,12 +5,12 @@ data, but it can be other data as well (oprofile(1), time(1)). Modules do not
 directly start measurement applications like perf(1) itself, rather they
 register the required data set at the perf-studio core. Perf-studio core will
 inform each activated module if new measurement data is available
-(```module->update()``` is called).
+(`module->update()` is called).
 
 Perf-Studio core API is flexible enough to handle different kind of measurements:
 
 - measurement program executed by fork/exec. Output is recorded and provided for the module.
-  E.g. ```/usr/bin/time df 1>/dev/null```
+  E.g. `/usr/bin/time df 1>/dev/null`
 - measurement program executed by fork/exec and nothing is recorded. The module
 	knows how to find the output (e.g module parse tracefile from oprofile directly)
 - measurement program is executed and a path to the output file is returned. This is the
@@ -23,10 +23,10 @@ The following code illustrate all currently supported measurement classes:
 
 ```
 enum {
-    CLASS_EXEC_RAW,
-    CLASS_EXEC_RAW_STDOUT_STDERR_CAPTURE,
-    CLASS_EXEC_TIME_MEASUREMENT,
-    CLASS_EXEC_PERF_RECORD
+    MEASUREMENT_CLASS_RAW,
+    MEASUREMENT_CLASS_RAW_STDOUT_STDERR_CAPTURE,
+    MEASUREMENT_CLASS_TIME_MEASUREMENT,
+    MEASUREMENT_CLASS_PERF_RECORD,
 };
 ```
 
