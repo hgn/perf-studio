@@ -5,19 +5,19 @@ compiler:
   - clang
 
 env:
-  - TARGETS=alpha-softmmu,alpha-linux-user
   - TARGETS=arm-softmmu,arm-linux-user
   - TARGETS=i386-softmmu,x86_64-softmmu
-  - TARGETS=mips-softmmu,mips64-softmmu,mips64el-softmmu,mipsel-softmmu
-  - TARGETS=ppc-softmmu,ppc64-softmmu,ppcemb-softmmu
-  - TARGETS=sparc-softmmu,sparc64-softmmu
 
 matrix:
   include:
     - env: TARGETS=i386-softmmu,x86_64-softmmu
       compiler: gcc
-    - env: TARGETS=i386-softmmu,x86_64-softmmu
+    - env: TARGETS=arm-softmmu,arm-linux-user
       compiler: gcc
+    - env: TARGETS=i386-softmmu,x86_64-softmmu
+      compiler: clang
+    - env: TARGETS=arm-softmmu,arm-linux-user
+      compiler: clang
 
 install:
   - sudo apt-get -qq update
