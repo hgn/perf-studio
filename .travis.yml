@@ -4,17 +4,6 @@ compiler:
   - gcc
   - clang
 
-matrix:
-  include:
-    - env: TARGETS=i386-softmmu,x86_64-softmmu
-      compiler: gcc
-    - env: TARGETS=arm-softmmu,arm-linux-user
-      compiler: gcc
-    - env: TARGETS=i386-softmmu,x86_64-softmmu
-      compiler: clang
-    - env: TARGETS=arm-softmmu,arm-linux-user
-      compiler: clang
-
 install:
   - sudo apt-get -qq update
   - sudo apt-get -qq install libwebkitgtk-dev libwebkitgtk-3.0-dev libgtk-3-dev libdbus-1-dev
