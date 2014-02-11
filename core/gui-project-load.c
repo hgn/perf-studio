@@ -45,9 +45,14 @@ out:
 }
 
 
+#define SECOND_PER_MINUTE (60)
+#define SECOND_PER_HOUR   (SECOND_PER_MINUTE * 60)
+#define SECOND_PER_DAY    (SECOND_PER_HOUR * 24)
+#define SECOND_PER_WEEK   (SECOND_PER_DAY * 7)
+
 static void last_used_human_delta(gchar *buf, gsize bufmax, guint64 current_time, guint64 last_used)
 {
-	guint64 delta;
+	guint64 delta_sec;
 
 	if (last_used == 0) {
 		snprintf(buf, bufmax - 1, "unknown");
@@ -61,18 +66,22 @@ static void last_used_human_delta(gchar *buf, gsize bufmax, guint64 current_time
 		return;
 	}
 
-	delta = (current_time - last_used) / 1000000;
-	if (delta < 60) {
-		snprintf(buf, bufmax - 1, "%" G_GUINT64_FORMAT " seconds", delta);
-	} else if (delta < 60 * 60) {
-		float d = (float)delta  / 60;
+	delta_sec = (current_time - last_used) / 1000000;
+	if (delta_sec < SECOND_PER_MINUTE) {
+		snprintf(buf, bufmax - 1, "%" G_GUINT64_FORMAT " seconds", delta_sec);
+	} else if (delta_sec < SECOND_PER_HOUR) {
+		float d = (float)delta_sec / SECOND_PER_MINUTE;
 		snprintf(buf, bufmax - 1, "%.1f minutes", d);
-	} else if (delta < 60 * 60 * 24) {
-		float d = (float)delta  / (60 * 24);
+	} else if (delta_sec < SECOND_PER_DAY) {
+		float d = (float)delta_sec / (SECOND_PER_HOUR);
 		snprintf(buf, bufmax - 1, "%.1f hours", d);
-	} else if (delta < 60 * 60 * 24 * 7) {
-		float d = (float)delta  / (60 * 24 * 7);
+	} else if (delta_sec < SECOND_PER_WEEK * 10) {
+		float d = (float)delta_sec / (SECOND_PER_DAY);
 		snprintf(buf, bufmax - 1, "%.1f days", d);
+	} else {
+		/* display in weeks after 10 weeks */
+		float d = (float)delta_sec / (SECOND_PER_WEEK);
+		snprintf(buf, bufmax - 1, "%.2f weeks", d);
 	}
 
 	return;
