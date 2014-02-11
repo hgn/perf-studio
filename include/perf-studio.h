@@ -243,6 +243,9 @@ enum {
 	PROJECT_STATUS_SOMEHOW_INVALID,
 };
 
+/* forward declaration, see measurement-class.h */
+struct mc_store;
+
 struct project {
 	/* values from .perf-studio/config */
 	gchar *id;
@@ -272,6 +275,11 @@ struct project {
 	/* timestamp where the project was last loaded.
 	 * Or 0 if it was never loaded */
 	guint64 last_used_timestamp;
+
+	/* if the project has activated measurement registered */
+	struct mc_store *mc_store;
+
+	struct ps *ps;
 };
 
 /* forward declaration, see cpu-fueatures.{c,h) */

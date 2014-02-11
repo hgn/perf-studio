@@ -33,6 +33,7 @@ FILES += gui-event-generator.c
 
 FILES += disect-core.c
 FILES += disect-perf.c
+FILES += measurement-class.c
 
 FILES += gui-help.c
 
