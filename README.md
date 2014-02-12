@@ -1,20 +1,29 @@
-Mini Howto
-==========
+# Mini Howto
 
+
+````
 # everything happends temporary (/tmp)
 export D=/tmp
 cd $D
+````
 
+````
 # clone perf-studio master
 git clone https://github.com/hgn/perf-studio
+````
 
+````
 # install dependencies (Debian based distribution)
 sudo apt-get install libwebkitgtk-3.0-dev libgtk-3-dev libdbus-1-dev
+````
 
+````
 # compile and install perf-studio (to /tmp)
 cd perf-studio
 make prefix=$D install
+````
 
+````
 # generate test file
 cat > test.c << EOT
 #include <stdio.h>
@@ -25,13 +34,19 @@ int main(){
         }
 }
 EOT
+````
 
+````
 # compile program
 gcc -g -o test test.c
+````
 
+````
 # generate perf-studio project configuration file
 $D/bin/perf-studio-ctrl project --create
+````
 
+````
 # a new project with an ID is created, the first project
 # ID is 0001 and is incremented each time a new project is created
 # (we assume 0001 for the example now)
@@ -39,17 +54,17 @@ $D/bin/perf-studio-ctrl project --create
 #
 # Now configure the project to analyze our small program:
 $D/bin/perf-studio-ctrl project --set common.cmd "/tmp/test"
+````
 
+````
 # finally start perf-studio
 $D/bin/perf-studio
+````
 
 
+# Configuration
 
-Configuration
-=============
-
-Perf-studio Configuration
--------------------------
+### Perf-studio Configuration
 
 The user specific configuration is located under
 
@@ -63,8 +78,7 @@ You can edit configuration values via the --add argument:
 perf-studio-ctrtl config --add common.username="John Doe" common.perf-path=/usr/src/linux/tools/perf
 
 
-Project Configuration
----------------------
+### Project Configuration
 
 Each perf-project is saved in $HOME/.cache/perf-studio/projects/. The unique ID
 of the project is a increasing number. Removed project directories are recycled
@@ -93,8 +107,7 @@ Example project configuration:
 
 
 
-Project Structure
-=================
+# Project Structure
 
 
 $HOME/.cache/perf-studio/projects/
@@ -136,8 +149,7 @@ info:
 
 
 
-Coding Style
-============
+# Coding Style
 
 Return Values:
 
@@ -151,8 +163,7 @@ They are generally three kinds of function classes:
    never fail.
 
 
-Function Name Nomenclature
-==========================
+# Function Name Nomenclature
 
 
 
