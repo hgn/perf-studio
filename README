@@ -19,10 +19,10 @@ make prefix=$D install
 cat > test.c << EOT
 #include <stdio.h>
 int main(){
-	    int i = 1000;
-      while (i--) {
-	        printf("Foo Bar\n");
-			}
+        int i = 1000;
+        while (i--) {
+                printf("Foo Bar\n");
+        }
 }
 EOT
 
