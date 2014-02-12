@@ -116,7 +116,7 @@ class ProjectCmd(Command):
         config['common']['description'] = 'Unnamed'
 
         config['stats'] = {}
-        config['stats']['created'] = int(time.time() * 1000000)
+        config['stats']['created'] = str(int(time.time() * 1000000))
 
 
     def create_project_conf(self, project_path):
