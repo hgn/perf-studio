@@ -13,7 +13,7 @@
 #include <log.h>
 
 
-static const char const *log_tags[2][5] =
+static const char *log_tags[2][5] =
 {
 	{
 		"[CRITICAL] ",
