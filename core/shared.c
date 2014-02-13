@@ -34,6 +34,7 @@ void msg(struct ps *ps, int level, const char *format, ...)
 }
 
 
+__attribute__((__format__ (__printf__, 5, 0)))
 static void err_doit(struct ps *ps, int sys_error, const char *file, const int line_no,
 		const char *fmt, va_list ap)
 {
