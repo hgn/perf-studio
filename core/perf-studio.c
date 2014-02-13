@@ -251,7 +251,7 @@ out2:
 	project_purge_all(ps);
 out:
 	rand_free(ps);
-	ps_free(ps);
 	pr_info(ps, "exiting");
+	ps_free(ps);
 	return ret;
 }
