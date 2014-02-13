@@ -9,7 +9,7 @@
 
 
 struct str_parser {
-	const char const *start_ptr;
+	const char *start_ptr;
 	const char *curr_ptr;
 };
 
