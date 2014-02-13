@@ -52,6 +52,9 @@ struct mc_store {
 
 	/* mc_stores belong to an module. To get
 	 * the back reference modules must set itself.
+	 * The owner is used - among other things - to
+	 * know the owner when the mc_store is deregistered
+	 * at a active project
 	 */
 	struct module *owner;
 };
