@@ -10,3 +10,17 @@ install:
 
 script:
   make
+
+env:
+  global:
+   - secure: "B50adh8hzwnEroUwM9q1aJh69+lXncMQnadAmioxJyQ/e6pbOxbcTXSLhQgVawLXQbcjtxsE9GzWa9FSPuRFIE77cGZuqHI56jWQf6wE+uFnqPPgyzy4DECQ0191XvR5kEmlx5Q/zeVi5Gaw3b6QBd5wMYATtIbICGuGfxc0B20="
+
+addons:
+  coverity_scan:
+    project:
+      name: "hgn/perf-studio"
+      description: "Perf Studio"
+    notification_email: hagen@jauu.net
+    build_command_prepend:
+    build_command: "make"
+    branch_pattern: master
