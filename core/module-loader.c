@@ -134,7 +134,7 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 	if (!func) {
 		pr_warn(ps, "could not find func '%s' in plugin '%s'\n%s\n",
 			PERF_STUDIO_MODULE_REGISTER_FUNC, path_name, dlerror());
-		goto err;
+		goto err2;
 	}
 
 	pr_info(ps, "try to register module: %s", path_name);
@@ -143,7 +143,7 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 	if (ret != 0) {
 		pr_warn(ps, "failed to register module %s", path_name);
 		dlclose(handle);
-		goto err;
+		goto err2;
 	}
 
 
@@ -158,7 +158,7 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 		pr_info(ps, "  EXPERIMENTAL marked module");
 		if (!ps->conf.module_conf.show_experimental_modules) {
 			pr_info(ps, "  do no load module (no whitecard)");
-			goto err;
+			goto err2;
 		}
 		pr_info(ps, "  load module (user requested)");
 	}
@@ -167,7 +167,7 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 	if (!ret) {
 		pr_error(ps, "Module %s (%s) not registered",
 			 module_get_name(module), path_name);
-		goto err;
+		goto err2;
 	}
 
 	module->dl_handle = handle;
@@ -177,6 +177,8 @@ static void register_module(struct ps *ps, const char *path, const char *name)
 	register_module_global(ps, module);
 
 	return;
+err2:
+	dlclose(handle);
 err:
 	g_free(path_name);
 }
