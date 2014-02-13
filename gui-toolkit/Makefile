@@ -26,7 +26,6 @@ WARNINGS = -Wall \
 					 -Wformat-y2k \
 					 -Winit-self \
 					 -Wredundant-decls \
-					 -Wstrict-aliasing=3 \
 					 -Wswitch-default \
 					 -Wswitch-enum \
 					 -Wno-system-headers \
@@ -37,6 +36,11 @@ WARNINGS = -Wall \
 					 -Wwrite-strings \
 					 -Wold-style-definition \
 					 -Wdeclaration-after-statement
+
+# LLVM did not understand everything
+ifeq ($(CC),gcc)
+				WARNINGS += -Wstrict-aliasing=3
+endif
 
 # use 64 bit off_t etc. even on 32 bit systems
 override CFLAGS += -D_FILE_OFFSET_BITS=64
