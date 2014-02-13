@@ -16,10 +16,10 @@ static void project_activated(struct ps *ps)
 	const struct project *project;
 	char buf[128];
 
-	assert(ps->project);
+	assert(ps->active_project);
 	assert(ps->s.atitle.label);
 
-	project = ps->project;
+	project = ps->active_project;
 	snprintf(buf, sizeof(buf), "Project: %s  ", project->id);
 	buf[sizeof(buf) - 1] = '\0';
 

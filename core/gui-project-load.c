@@ -202,7 +202,7 @@ void gui_amc_unload_project(GtkWidget *widget, struct ps *ps)
 {
 	(void)widget;
 
-	if (!ps->project) {
+	if (!ps->active_project) {
 		pr_info(ps, "No project loaded, cannot unload");
 		return;
 	}

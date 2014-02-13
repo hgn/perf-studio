@@ -70,12 +70,12 @@ void executer_register_module_events(struct ps *ps, struct module *module)
 	assert(module);
 	assert(module->events);
 
-	if (!ps->project) {
+	if (!ps->active_project) {
 		pr_info(ps, "No project open, so we do not register here");
 		return;
 	}
 
-	ret = register_events_at_project(ps, ps->project, module);
+	ret = register_events_at_project(ps, ps->active_project, module);
 	if (ret < 0) {
 		pr_error(ps, "Failed to register events for project");
 		return;
@@ -83,7 +83,7 @@ void executer_register_module_events(struct ps *ps, struct module *module)
 
 
 
-	gui_event_executer_setup(ps, ps->project);
+	gui_event_executer_setup(ps, ps->active_project);
 }
 
 
@@ -95,7 +95,7 @@ void executer_unregister_module_events(struct ps *ps, struct module *module)
 	assert(ps);
 	assert(module);
 
-	if (!ps->project) {
+	if (!ps->active_project) {
 		pr_info(ps, "Unregister module - no project active");
 		return;
 	}
@@ -108,7 +108,7 @@ void executer_unregister_module_events(struct ps *ps, struct module *module)
 	 * The previous assert should crash the program if in
 	 * future this unload feature is implemented.
 	 */
-	project = ps->project;
+	project = ps->active_project;
 
 	tmp = project->events_list;
 	while (tmp) {

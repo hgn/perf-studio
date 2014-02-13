@@ -48,7 +48,7 @@ static void project_load_widget_add_command_data(struct ps *ps, GtkWidget *conta
 	GtkWidget *label;
 	struct project *project;
 
-	project = ps->project;
+	project = ps->active_project;
 	assert(project);
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);

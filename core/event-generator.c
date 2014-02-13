@@ -31,14 +31,14 @@ struct project_event_storage *project_event_storage_new(struct ps *ps,
 	struct project_event_storage *pes;
 
 	assert(ps);
-	assert(ps->project);
-	assert(ps->project->project_db_path);
+	assert(ps->active_project);
+	assert(ps->active_project->project_db_path);
 
 	pes = g_malloc0(sizeof(*pes));
 
 	events_repr_str = events_repr(events);
 
-	pes->filepath = g_build_filename(ps->project->project_db_path,
+	pes->filepath = g_build_filename(ps->active_project->project_db_path,
 					 events_repr_str, NULL);
 	pr_debug(ps, "save trace file under %s", pes->filepath);
 

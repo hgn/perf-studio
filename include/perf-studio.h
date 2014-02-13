@@ -341,7 +341,7 @@ struct ps {
 	 * current loaded/active project, one
 	 * of project_list
 	 */
-	struct project *project;
+	struct project *active_project;
 	GSList *project_activate_cb_list;
 	GSList *project_deactivate_cb_list;
 	/* list of all available projects */

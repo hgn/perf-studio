@@ -214,19 +214,19 @@ static GtkWidget *project_info_widget_new(struct ps *ps)
 static void gui_apc_update_overview_panel(struct ps *ps)
 {
 	assert(ps);
-	assert(ps->project);
-	assert(ps->project->id);
-	assert(ps->project->cmd);
+	assert(ps->active_project);
+	assert(ps->active_project->id);
+	assert(ps->active_project->cmd);
 
 	/* required data */
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.id), ps->project->id);
-	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_path), ps->project->cmd);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.id), ps->active_project->id);
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_path), ps->active_project->cmd);
 
 #define COND_LABEL_SET(x, y) if (x) gtk_label_set_text(GTK_LABEL(y), x);
 
 	/* optional, thus conditional */
-	COND_LABEL_SET(ps->project->description, ps->s.project_info.description)
-	COND_LABEL_SET(ps->project->cmd_args_full, ps->s.project_info.cmd_args)
+	COND_LABEL_SET(ps->active_project->description, ps->s.project_info.description)
+	COND_LABEL_SET(ps->active_project->cmd_args_full, ps->s.project_info.cmd_args)
 
 #undef COND_LABEL_SET
 }
@@ -448,9 +448,9 @@ static void gui_apc_update_segment_size(struct ps *ps)
 	struct gt_pie_chart *gt_pie_chart;
 
         assert(ps);
-        assert(ps->project);
+        assert(ps->active_project);
 
-        kv_list = cmd_segment_size_create(ps, ps->project->cmd);
+        kv_list = cmd_segment_size_create(ps, ps->active_project->cmd);
         if (!kv_list) {
                 pr_error(ps, "Cannot get segment size");
                 return;
@@ -472,12 +472,12 @@ static void gui_apc_update_segment_size(struct ps *ps)
 
 
 /*
- * ps->project is new (or replaced), update
+ * ps->active_project is new (or replaced), update
  * all views and related fields now
  */
 static void gui_apo_new_project_loaded(struct ps *ps)
 {
-	assert(ps->project);
+	assert(ps->active_project);
         /* update project summary fields */
 	gui_apc_update_overview_panel(ps);
 

@@ -288,9 +288,9 @@ void project_deactivate(struct ps *ps)
 	struct project *project;
 
         assert(ps);
-        assert(ps->project);
+        assert(ps->active_project);
 
-	project = ps->project;
+	project = ps->active_project;
 
         pr_info(ps, "deactivate project %s", project->id);
 
@@ -302,7 +302,7 @@ void project_deactivate(struct ps *ps)
          * generated at active state
          */
 
-        ps->project = NULL;
+        ps->active_project = NULL;
 }
 
 #define BUF_SIZE 4096
@@ -356,9 +356,9 @@ void project_activate(struct ps *ps, struct project *project)
 
 	assert(ps);
 	assert(project);
-	assert(ps->project == NULL);
+	assert(ps->active_project == NULL);
 
-	ps->project = project;
+	ps->active_project = project;
 	project->status = PROJECT_STATUS_SOMEHOW_INVALID;
 
 	pr_info(ps, "activate project %s", project->id);
@@ -447,7 +447,7 @@ int project_load_by_id(struct ps *ps, const char *id)
 {
 	GSList *list_tmp;
 
-        if (ps->project)
+        if (ps->active_project)
                 project_deactivate(ps);
 
 	list_tmp = ps->project_list;
@@ -470,7 +470,7 @@ int project_load_by_id(struct ps *ps, const char *id)
 void project_unload_current(struct ps *ps)
 {
 	assert(ps);
-	assert(ps->project);
+	assert(ps->active_project);
 
 	project_deactivate(ps);
 }
