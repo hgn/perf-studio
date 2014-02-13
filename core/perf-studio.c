@@ -149,7 +149,7 @@ static void sigquit_handler(int signal_no)
 
 static void sighup_handler(int signal_no)
 {
-	assert(signal == SIGHUP);
+	assert(signal_no == SIGHUP);
 
 	fprintf(stderr, "signal (SIGHUP) enforced exit\n");
 	gtk_main_quit();

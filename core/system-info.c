@@ -50,7 +50,7 @@ void system_cpu_update(struct ps *ps, struct system_cpu *system_cpu)
 	FILE *fp;
 	char *line = NULL;
 	size_t len = 0;
-	ssize_t read;
+	ssize_t read_bytes;
 	long unsigned it, kt, ut;
 	long int cpu;
 	long unsigned int user, system, idle;
@@ -67,10 +67,10 @@ void system_cpu_update(struct ps *ps, struct system_cpu *system_cpu)
 
 
 	tmp = system_cpu->cpu_data_list;
-	while ((read = getline(&line, &len, fp)) != -1) {
-		line[read - 1] = '\0';
+	while ((read_bytes = getline(&line, &len, fp)) != -1) {
+		line[read_bytes - 1] = '\0';
 
-		if (read < 5)
+		if (read_bytes < 5)
 			continue;
 
 		if (strncmp(line, "cpu", 3))
@@ -167,7 +167,7 @@ void interrupt_monitor_ctrl_update(struct ps *ps, struct interrupt_monitor_data 
 	unsigned i, j;
 	char *line = NULL;
 	size_t size = 0;
-	ssize_t read;
+	ssize_t read_bytes;
 	gboolean initial_phase = FALSE;
 
 	assert(imd);
@@ -180,8 +180,8 @@ void interrupt_monitor_ctrl_update(struct ps *ps, struct interrupt_monitor_data 
 	}
 
 	/* skip cpu line */
-	read = getline(&line, &size, imd->proc_interrupts_fh);
-	if (read == -1) {
+	read_bytes = getline(&line, &size, imd->proc_interrupts_fh);
+	if (read_bytes == -1) {
 		free(line); line = NULL;
 		return;
 	}
@@ -193,13 +193,13 @@ void interrupt_monitor_ctrl_update(struct ps *ps, struct interrupt_monitor_data 
 		char buffer[8];
 		long retval;
 
-		read = getline(&line, &size, imd->proc_interrupts_fh);
-		if (read == -1) {
+		read_bytes = getline(&line, &size, imd->proc_interrupts_fh);
+		if (read_bytes == -1) {
 			free(line); line = NULL;
 			return;
 		}
 
-		line[read - 1] = '\0';
+		line[read_bytes - 1] = '\0';
 		str_parser_init(&str_parser, line);
 
 		str_parser_next_alphanum(&str_parser, buffer, 8);
