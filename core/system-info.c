@@ -53,7 +53,7 @@ void system_cpu_update(struct ps *ps, struct system_cpu *system_cpu)
 	ssize_t read_bytes;
 	long unsigned it, kt, ut;
 	long int cpu;
-	long unsigned int user, system, idle;
+	long unsigned int user_time, sys_time, idle_time;
 	GSList *tmp;
 
 	/* FIXME: do not open the file every time,
@@ -79,7 +79,7 @@ void system_cpu_update(struct ps *ps, struct system_cpu *system_cpu)
 		if (!isdigit(line[3]))
 			continue;
 
-		if (sscanf(line, "cpu%lu %lu %*d %lu %lu", &cpu, &user, &system, &idle) == 4) {
+		if (sscanf(line, "cpu%lu %lu %*d %lu %lu", &cpu, &user_time, &sys_time, &idle_time) == 4) {
 			struct cpu_data *cpu_data;
 			assert(tmp && tmp->data);
 			cpu_data = tmp->data;
@@ -106,17 +106,17 @@ void system_cpu_update(struct ps *ps, struct system_cpu *system_cpu)
 
 			cpu_data->cpu_no = cpu;
 
-			it = (idle - cpu_data->idle_time_last);
-			kt = (system - cpu_data->system_time_last);
-			ut = (user - cpu_data->user_time_last);
+			it = (idle_time - cpu_data->idle_time_last);
+			kt = (sys_time - cpu_data->system_time_last);
+			ut = (user_time - cpu_data->user_time_last);
 
 			cpu_data->idle_time_percent   = min(max(0.0f, (float)it), 100.0f);
 			cpu_data->system_time_percent = min(max(0.0f, (float)kt), 100.0f);
 			cpu_data->user_time_percent   = min(max(0.0f, (float)ut), 100.0f);
 
-			cpu_data->idle_time_last   = idle;
-			cpu_data->system_time_last = system;
-			cpu_data->user_time_last   = user;
+			cpu_data->idle_time_last   = idle_time;
+			cpu_data->system_time_last = sys_time;
+			cpu_data->user_time_last   = user_time;
 		}
 
 		tmp = g_slist_next(tmp);
