@@ -21,8 +21,6 @@ static const char *icon_name(int i)
 		return "overlay-closedowntransp9.png";
 		break;
 	}
-
-	return "overlay-closedowntransp9.png";
 }
 
 

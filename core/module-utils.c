@@ -27,8 +27,6 @@ const char *module_group_str(int id)
 		return "UNKNOWN MODULE GROUP";
 		break;
 	};
-
-	return "UNKNOWN MODULE GROUP";
 }
 
 
