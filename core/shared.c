@@ -55,6 +55,7 @@ static void err_doit(struct ps *ps, int sys_error, const char *file, const int l
 }
 
 
+__attribute__((__format__ (__printf__, 4, 0)))
 void x_err_ret(struct ps *ps, const char *file, int line_no, const char *fmt, ...)
 {
 	va_list ap;
@@ -67,6 +68,7 @@ void x_err_ret(struct ps *ps, const char *file, int line_no, const char *fmt, ..
 }
 
 
+__attribute__((__format__ (__printf__, 4, 0)))
 void x_err_sys(struct ps *ps, const char *file, int line_no, const char *fmt, ...)
 {
 	va_list ap;
