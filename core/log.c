@@ -63,7 +63,8 @@ int log_get_mode(void)
 }
 
 
-void _print_log(int loglevel, const char *file, const char *func, const char *clock, int line, const char *msg, ...)
+void _print_log(int loglevel, const char *file, const char *func,
+		const char *clock_time, int line, const char *msg, ...)
 {
 	char *to_print;
 	va_list args;
@@ -106,7 +107,7 @@ void _print_log(int loglevel, const char *file, const char *func, const char *cl
 		if (logging_file)
 			fprintf(logging_file,
 					"%s() (%s:%d) at %s |\t",
-					func, file, line, clock);
+					func, file, line, clock_time);
 	}
 
 	to_print = strtok(buffer, "\n");
