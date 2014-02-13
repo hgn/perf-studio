@@ -117,4 +117,6 @@ void _print_log(int loglevel, const char *file, const char *func, const char *cl
 		if (logging_file)
 			fprintf(logging_file, "%s\n", to_print);
 	}
+
+	va_end(args);
 }
