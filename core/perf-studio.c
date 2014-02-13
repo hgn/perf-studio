@@ -120,9 +120,9 @@ static void ps_free(struct ps *ps)
 }
 
 
-static void sigterm_handler(int signal)
+static void sigterm_handler(int signal_no)
 {
-	assert(signal == SIGTERM);
+	assert(signal_no == SIGTERM);
 
 	fprintf(stderr, " signal (SIGTERM) enforced exit\n");
 	gtk_main_quit();
