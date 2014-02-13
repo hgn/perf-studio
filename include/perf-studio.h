@@ -342,8 +342,19 @@ struct ps {
 	 * of project_list
 	 */
 	struct project *active_project;
+
+	/*
+	 * Every component can register itself to get informed
+    	 * if a projects come active (or deactive). ps->project
+    	 * is guaranteed to be a valid pointer. This function
+    	 * can be used to change project title in a statusbar, etc
+    	 * pp. Module on the other hand MUST not use this function,
+    	 * the activation/deactivation for modules is triggered by the
+    	 * project - modules are directly informed by the project
+    	 */
 	GSList *project_activate_cb_list;
 	GSList *project_deactivate_cb_list;
+
 	/* list of all available projects */
 	GSList *project_list;
 
