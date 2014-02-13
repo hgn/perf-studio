@@ -16,6 +16,7 @@
 #define MAXERRMSG 1024
 
 
+__attribute__((format(printf, 3, 4)))
 void msg(struct ps *ps, int level, const char *format, ...)
 {
 	va_list ap;
