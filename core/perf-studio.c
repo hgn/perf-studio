@@ -129,25 +129,25 @@ static void sigterm_handler(int signal_no)
 }
 
 
-static void sigint_handler(int signal)
+static void sigint_handler(int signal_no)
 {
-	assert(signal == SIGINT);
+	assert(signal_no == SIGINT);
 
 	fprintf(stderr, " signal (SIGINT) enforced exit\n");
 	gtk_main_quit();
 }
 
 
-static void sigquit_handler(int signal)
+static void sigquit_handler(int signal_no)
 {
-	assert(signal == SIGQUIT);
+	assert(signal_no == SIGQUIT);
 
 	fprintf(stderr, "signal (SIGQUIT) enforced exit\n");
 	gtk_main_quit();
 }
 
 
-static void sighup_handler(int signal)
+static void sighup_handler(int signal_no)
 {
 	assert(signal == SIGHUP);
 
