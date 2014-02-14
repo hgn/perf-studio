@@ -5,13 +5,14 @@
 #include "module-utils.h"
 #include "event.h"
 #include "log.h"
+#include "measurement-class.h"
 
 
 #define MODULE_NAME "Hello World"
 #define MODULE_DESCRIPTION "print hello world"
 
 struct hello_world_priv {
-	GSList *data_list;
+	struct mc_store *mc_store;
 	GtkWidget *root;
 };
 
@@ -25,9 +26,8 @@ static struct hello_world_priv *hello_world_priv_new(void)
 static void hello_world_priv_free(struct hello_world_priv *data)
 {
 	assert(data);
-
-	g_slist_free(data->data_list);
 	g_free(data);
+	data = NULL;
 }
 
 
@@ -100,6 +100,22 @@ static struct events *events_hello_world_new(void)
 	add_counting_events(e);
 
 	return e;
+}
+
+static struct mc_store *hello_mc_store_create(struct module *module, struct hello_world_priv *hwp)
+{
+	struct mc_store *mc_store;
+
+	mc_store = mc_store_alloc();
+	mc_store_set_owner(mc_store, module);
+}
+
+void hello_mc_store_free_recursive(struct mc_store *mc_store)
+{
+	assert(mc_store);
+
+	mc_store_free(mc_store);
+
 }
 
 
@@ -208,6 +224,7 @@ static int update_cb(struct module *module, enum update_type update_type, ...)
 
 int register_module(struct ps *ps, struct module **module)
 {
+	struct hello_world_priv *hello_world_priv;
 	struct module *m;
 
 	(void)ps;
@@ -235,7 +252,14 @@ int register_module(struct ps *ps, struct module **module)
 	m->disable = disable_cb;
 
 	/* module private data */
-	m->data = hello_world_priv_new();
+	hello_world_priv = hello_world_priv_new();
+
+	/* we also generate mc_store, the data structure describing
+	 * all of our perf/traced data */
+	hello_mc_store_create(m, hello_world_priv);
+
+	/* we register our private data at the module user data pointer */
+	m->data = hello_world_priv;
 
 	*module = m;
 

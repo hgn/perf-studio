@@ -60,6 +60,17 @@ struct mc_store {
 };
 
 
+static inline void mc_store_set_owner(struct mc_store *s, struct module *m)
+{
+	assert(s);
+	assert(m);
+
+	s->owner = m;
+}
+
+
+struct mc_store *mc_store_alloc(void);
+void mc_store_free(struct mc_store *);
 
 
 #endif /* MEASUREMENT_CLASS_H */
