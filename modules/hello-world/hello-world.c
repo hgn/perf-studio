@@ -187,7 +187,7 @@ static int disable_cb(struct module *module)
 	assert(module);
 	assert(module->data);
 
-	log_print(LOG_INFO, "module %s disabled", module_get_name(module));
+	log_print(LOG_INFO, "module \"%s\" disabled", module_get_name(module));
 
 	priv_data = (struct hello_world_priv *) module->data;
 
