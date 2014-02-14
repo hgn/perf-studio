@@ -381,7 +381,7 @@ static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 	(void)ps;
 	(void)widget;
 
-	draw_cpu_auxiliary_lines = 0;
+	draw_cpu_auxiliary_lines = 1;
 
 	cairo_set_antialias(cr, CAIRO_ANTIALIAS_DEFAULT);
 
@@ -441,7 +441,7 @@ static int draw_cpu_waterfall_chart(struct ps *ps, GtkWidget *widget,
 
 			y_pos = 40 + (j * 30);
 
-			cairo_set_source_rgba(cr, .1, .1, .1, 1.);
+			cairo_set_source_rgba(cr, .1, .1, .1, 5.);
 			cairo_move_to(cr, x_start, y_pos);
 			cairo_line_to(cr, x_end, y_pos);
 			cairo_stroke(cr);

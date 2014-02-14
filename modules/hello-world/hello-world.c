@@ -4,6 +4,7 @@
 #include "perf-studio.h"
 #include "module-utils.h"
 #include "event.h"
+#include "log.h"
 
 
 #define MODULE_NAME "Hello World"
@@ -166,8 +167,12 @@ static int enable_cb(struct module *module)
 {
 	struct hello_world_priv *priv_data;
 
+	assert(module);
+	assert(module->data);
+
+	log_print(LOG_INFO, "module %s enabled", module_get_name(module));
+
 	priv_data = (struct hello_world_priv *) module->data;
-	assert(priv_data);
 
 	gtk_widget_set_sensitive(priv_data->root, TRUE);
 
@@ -179,8 +184,12 @@ static int disable_cb(struct module *module)
 {
 	struct hello_world_priv *priv_data;
 
+	assert(module);
+	assert(module->data);
+
+	log_print(LOG_INFO, "module %s disabled", module_get_name(module));
+
 	priv_data = (struct hello_world_priv *) module->data;
-	assert(priv_data);
 
 	gtk_widget_set_sensitive(priv_data->root, FALSE);
 
