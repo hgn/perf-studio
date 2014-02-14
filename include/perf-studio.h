@@ -432,9 +432,17 @@ struct module {
 	int (*update)(struct module *m, enum update_type update_type, ...);
 
 	/*
-	 * Activate the gui element and start display.
-	 * If no data is available (update() wasn't called)
-	 * the a black screen MUST be displayed */
+	 * Used by the module to allocate, initialize all
+	 * required data structures and start the GUI widgets.
+	 * If no (perf) data is available (update() wasn't called)
+	 * the a black screen MUST be displayed.
+	 *
+	 * The module must return the module main widget. Which is added
+	 * to the panel.
+	 *
+	 * Activate is usually called once. Only if the module
+	 * is closed the deactive function is called.
+	 * */
 	int (*activate)(struct module *m, GtkWidget **);
 	int (*deactivate)(struct module *m);
 	void (*unregister_module)(struct ps *, struct module *);
