@@ -40,7 +40,7 @@ static const char *log_tags[2][5] =
 
 static FILE *logging_file;
 static int current_log_mode = 1;
-static int  _log_current_mode;
+static int  _log_current_mode = 1;
 
 void log_set_logfile(char *filename)
 {
@@ -103,6 +103,10 @@ void _print_log(int loglevel, const char *file, const char *func,
 	if (logging_file)
 		fprintf(logging_file, "%s", log_tags[_log_current_mode][loglevel]);
 	printf(COLOR_END);
+
+	fprintf(logging_file, "%s:%s(): %s\n", file, func, buffer);
+
+	return;
 
 	if (_log_current_mode == LOG_VERBOSE) {
 		if (logging_file)
