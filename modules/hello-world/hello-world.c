@@ -102,15 +102,21 @@ static struct events *events_hello_world_new(void)
 	return e;
 }
 
-static struct mc_store *hello_mc_store_create(struct module *module,
-					      struct hello_world_priv *hwp)
+static void hello_mc_store_create(struct module *module,
+			          struct hello_world_priv *hwp)
 {
 	struct mc_store *mc_store;
+
+	assert(module);
+	assert(hwp);
 
 	mc_store = mc_store_alloc();
 	mc_store_set_owner(mc_store, module);
 
-	return mc_store;
+	/* remember a pointer to our mc_store. This
+	 * is used later when module callbacks are
+	 * called via module->data->mc_store */
+	hwp->mc_store = mc_store;
 }
 
 void hello_mc_store_free_recursive(struct mc_store *mc_store)
