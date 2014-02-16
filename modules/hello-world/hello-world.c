@@ -231,6 +231,20 @@ static int update_cb(struct module *module, enum update_type update_type, ...)
 }
 
 
+static void project_activated_cb(struct module *module, struct project *project)
+{
+	assert(module);
+	assert(project);
+}
+
+
+static void project_unloading_cb(struct module *module, struct project *project)
+{
+	assert(module);
+	assert(project);
+}
+
+
 int register_module(struct ps *ps, struct module **module)
 {
 	struct hello_world_priv *hello_world_priv;
@@ -266,8 +280,8 @@ int register_module(struct ps *ps, struct module **module)
 	m->unregister_module = unregister_module;
 
 	/* called whenn a project is activated or deactivated */
-	m->project_activation = project_activated;
-	m->project_unloading  = project_unloading;
+	m->project_activated  = project_activated_cb;
+	m->project_unloading  = project_unloading_cb;
 
 	m->enable  = enable_cb;
 	m->disable = disable_cb;

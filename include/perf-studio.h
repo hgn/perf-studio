@@ -447,6 +447,13 @@ struct module {
 	int (*deactivate)(struct module *m);
 	void (*unregister_module)(struct ps *, struct module *);
 
+	/*
+	 * Next two functions are required module functions and are
+	 * called when a project is loaded/unloded
+	 */
+	void (*project_activated)(struct module *, struct project *);
+	void (*project_unloading)(struct module *, struct project *);
+
 	/* command send by the GUI to enable the functionality
 	 * for longer/shorter time. Normally the module should
 	 * stop active processing and should do not draw anything
