@@ -253,9 +253,21 @@ int register_module(struct ps *ps, struct module **module)
 
 	/* register callbacks */
 	m->update            = update_cb;
+
+	/* module should do not draw anything (show standard screen)
+	 * and should do no calculation: as less cpu cycles are used
+	 * the better */
 	m->activate          = activate_cb;
 	m->deactivate        = deactivate_cb;
+
+	/* unregister is the counterpart to this (register)
+	 * module. After this function _all_ ressources must
+	 * be freed */
 	m->unregister_module = unregister_module;
+
+	/* called whenn a project is activated or deactivated */
+	m->project_activation = project_activated;
+	m->project_unloading  = project_unloading;
 
 	m->enable  = enable_cb;
 	m->disable = disable_cb;
