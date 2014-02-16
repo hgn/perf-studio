@@ -99,6 +99,16 @@ static int check_required_mod_callbacks(struct ps *ps, struct module *module)
 		return 0;
 	}
 
+	if (!module->project_activated) {
+		pr_error(ps, "Module proect_activated() callback not registered");
+		return 0;
+	}
+
+	if (!module->project_unloading) {
+		pr_error(ps, "Module proect_unloading() callback not registered");
+		return 0;
+	}
+
 	return 1;
 }
 
