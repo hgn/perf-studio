@@ -235,6 +235,9 @@ static void project_activated_cb(struct module *module, struct project *project)
 {
 	assert(module);
 	assert(project);
+
+	log_print(LOG_INFO, "module %s callback project_activated called",
+		  module_get_name(module));
 }
 
 
@@ -242,6 +245,9 @@ static void project_unloading_cb(struct module *module, struct project *project)
 {
 	assert(module);
 	assert(project);
+
+	log_print(LOG_INFO, "module %s callback project_unloading called",
+		  module_get_name(module));
 }
 
 
