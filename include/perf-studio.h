@@ -445,6 +445,10 @@ struct module {
 	 * */
 	int (*activate)(struct module *m, GtkWidget **);
 	int (*deactivate)(struct module *m);
+
+	/* true if the module is activated (displayed) or not */
+	int activated;
+
 	void (*unregister_module)(struct ps *, struct module *);
 
 	/*
@@ -461,8 +465,6 @@ struct module {
 	int (*disable)(struct module *m);
 	int (*enable)(struct module *m);
 
-	/* true if the module is activated (displayed) or not */
-	int activated;
 	gint notebook_id;
 
 	/*
