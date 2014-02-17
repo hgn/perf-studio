@@ -386,7 +386,7 @@ static void project_activated_broadcast_modules(struct ps *ps)
 		module = tmp->data;
 		if (module->activated) {
 			log_print(LOG_INFO, "module activated, inform that"
-			    " the project becomes inactive");
+				  " the project becomes inactive");
 			module->project_activated(module, ps->active_project);
 		}
 		tmp = g_slist_next(tmp);

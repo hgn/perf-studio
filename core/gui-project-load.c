@@ -7,6 +7,7 @@
 #include "gui-apo.h"
 #include "gui-project-load.h"
 #include "project.h"
+#include "log.h"
 
 
 static void screen_intro_dialog_existing_activated(GtkTreeView *view,
@@ -200,12 +201,15 @@ void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 
 void gui_amc_unload_project(GtkWidget *widget, struct ps *ps)
 {
-	(void)widget;
+	assert(widget);
+	assert(ps);
 
 	if (!ps->active_project) {
 		pr_info(ps, "No project loaded, cannot unload");
 		return;
 	}
+
+	log_print(LOG_INFO, "unload active project");
 
 	project_unload_current(ps);
 }
