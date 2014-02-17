@@ -481,3 +481,5 @@ void module_activated_by_name(struct ps *ps, const char *module_name)
 		tmp = g_slist_next(tmp);
 	}
 }
+
+

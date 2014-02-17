@@ -10,6 +10,7 @@
 
 #include "project.h"
 #include "conf-file.h"
+#include "log.h"
 
 
 static void call_registered_activate_cb(struct ps *ps)
@@ -282,6 +283,29 @@ void project_purge_all(struct ps *ps)
 }
 
 
+/* inform all active modules that the current project is
+ * to be removed
+ */
+static void project_deactivated_broadcast_modules(struct ps *ps)
+{
+	GSList *tmp;
+	struct module *module;
+
+	tmp = ps->module_list;
+
+	while (tmp) {
+		module = tmp->data;
+		/* we inform only loaded/activated modules */
+		if (module->activated) {
+			log_print(LOG_INFO, "module activated, inform that"
+			    " the project becomes inactive");
+			module->project_unloading(module, ps->active_project);
+		}
+		tmp = g_slist_next(tmp);
+	}
+}
+
+
 /* deactivate ps->project */
 void project_deactivate(struct ps *ps)
 {
@@ -293,6 +317,7 @@ void project_deactivate(struct ps *ps)
 	project = ps->active_project;
 
         pr_info(ps, "deactivate project %s", project->id);
+	project_deactivated_broadcast_modules(ps);
 
 	call_registered_deactivate_cb(ps);
 
@@ -346,6 +371,26 @@ static gboolean is_absolute_path(const gchar *cmd)
                 return TRUE;
 
         return FALSE;
+}
+
+/* inform all active modules that a new project is active now
+ */
+static void project_activated_broadcast_modules(struct ps *ps)
+{
+	GSList *tmp;
+	struct module *module;
+
+	tmp = ps->module_list;
+
+	while (tmp) {
+		module = tmp->data;
+		if (module->activated) {
+			log_print(LOG_INFO, "module activated, inform that"
+			    " the project becomes inactive");
+			module->project_activated(module, ps->active_project);
+		}
+		tmp = g_slist_next(tmp);
+	}
 }
 
 /* called when ps->project becomes valid. We check
@@ -410,6 +455,7 @@ void project_activate(struct ps *ps, struct project *project)
 	conf_file_update_project_last_used(ps, project);
 
 	call_registered_activate_cb(ps);
+	project_activated_broadcast_modules(ps);
 }
 
 
