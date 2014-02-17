@@ -199,6 +199,7 @@ void gui_amc_load_project(GtkWidget *widget, struct ps *ps)
 }
 
 
+/* called when unload project menu button is pressed */
 void gui_amc_unload_project(GtkWidget *widget, struct ps *ps)
 {
 	assert(widget);
@@ -211,5 +212,6 @@ void gui_amc_unload_project(GtkWidget *widget, struct ps *ps)
 
 	log_print(LOG_INFO, "unload active project");
 
+	gui_apo_unload_project(ps);
 	project_unload_current(ps);
 }

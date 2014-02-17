@@ -507,3 +507,16 @@ GtkWidget *gui_apo_new(struct ps *ps)
 
 	return scroll_widget;
 }
+
+
+void gui_apo_unload_project(struct ps *ps)
+{
+	assert(ps);
+	assert(ps->active_project);
+
+	/* required data */
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.id), "");
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_path), "");
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.description), "");
+	gtk_label_set_text(GTK_LABEL(ps->s.project_info.cmd_args), "");
+}
