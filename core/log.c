@@ -13,20 +13,22 @@
 #include <log.h>
 
 
-static const char *log_tags[2][5] =
+static const char *log_tags[2][6] =
 {
 	{
 		"[CRITICAL] ",
 		"[ERROR]    ",
 		"[WARNING]  ",
 		"[INFO]     ",
+		"[DEBUG]    ",
 		"[INVALID LOG LEVEL] "
 	},
 	{
 		"[!] ",
 		"[*] ",
-		"[-] ",
 		"[+] ",
+		"[-] ",
+		"[.] ",
 		"[~] "
 	}
 };
@@ -35,6 +37,7 @@ static const char *log_tags[2][5] =
 #define FG_YELLOW	"\033[33m"
 #define FG_BLUE		"\033[34m"
 #define FG_PURPLE	"\033[35m"
+#define FG_GREEN     "\033[32m"
 #define TEXT_BOLD	"\033[1m"
 #define COLOR_END	"\033[0m"
 
@@ -80,7 +83,8 @@ void _print_log(int loglevel, const char *file, const char *func,
 	// also, make sure we don't get an invalid loglevel.
 	buffer = alloca(strlen(msg) + 1024);
 	vsnprintf(buffer, strlen(msg) + 1024, msg, args);
-	if (loglevel < 0 || loglevel > 3) loglevel = LOG_INVALID;
+	if (loglevel < 0 || loglevel > 4)
+		loglevel = LOG_INVALID;
 
 	// set console color for printing the tag
 	switch (loglevel) {
@@ -95,6 +99,9 @@ void _print_log(int loglevel, const char *file, const char *func,
 			break;
 		case LOG_INFO:
 			printf(FG_BLUE);
+			break;
+		case LOG_DEBUG:
+			printf(FG_GREEN);
 			break;
 		case LOG_INVALID:
 			printf(FG_PURPLE);

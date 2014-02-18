@@ -11,7 +11,8 @@
 #define LOG_ERROR    1
 #define LOG_WARNING  2
 #define LOG_INFO     3
-#define LOG_INVALID  4
+#define LOG_DEBUG    4
+#define LOG_INVALID  5
 
 
 #define LOG_VERBOSE 0
