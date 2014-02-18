@@ -10,6 +10,7 @@
 #include "event-generator.h"
 #include "shared.h"
 #include "gui-event-generator.h"
+#include "log.h"
 
 
 struct project_events_data {
@@ -127,6 +128,32 @@ void executer_unregister_module_events(struct ps *ps, struct module *module)
 	}
 
 	pr_error(ps, "Could not find events for project in project list, mmh");
+}
+
+
+/*
+ * This function is called when a module hit the "start analyze"
+ * button. We first check if a project is loaded, if not we simple
+ * return. If a project is loaded we now enforce a new execution.
+ * In future releases we may check if the data is up to date. If so
+ * we can show a "should we really do a new analyze" button. This
+ * may be overwritten by configuration.
+ */
+void execute_module_triggered_analyze(struct module *module)
+{
+	struct ps *ps;
+
+	assert(module);
+	assert(module->ps);
+
+	ps = module->ps;
+
+	if (!ps->active_project) {
+		log_print(LOG_INFO, "No project loaded - cannot do analyzes for project none");
+		return;
+	}
+
+	log_print(LOG_INFO, "Now do analyzed for project!");
 }
 
 

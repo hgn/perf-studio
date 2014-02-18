@@ -20,6 +20,7 @@
 #include "gui-toolkit.h"
 #include "event.h"
 #include "executer.h"
+#include "log.h"
 
 static void clean_module_data(struct module *module)
 {
@@ -319,6 +320,7 @@ static void module_deactivate(struct ps *ps, struct module *module)
 {
 	executer_unregister_module_events(ps, module);
 	module->deactivate(module);
+	module->activated = 0;
 }
 
 
@@ -334,10 +336,28 @@ static gboolean close_module_tab_cb(gpointer data)
 
 	module_deactivate(ps, module);
 	gtk_notebook_remove_page(GTK_NOTEBOOK(ps->s.amc_notebook), module->notebook_id);
-	module->activated = 0;
 
 	return TRUE;
 }
+
+
+static gboolean start_analyze_button_cb(gpointer data)
+{
+	struct ps *ps;
+	struct module *module;
+
+	assert(data);
+	module = data;
+	ps = module->ps;
+	assert(ps);
+
+	log_print(LOG_DEBUG, "module analyze start button pressed");
+
+	execute_module_triggered_analyze(module);
+
+	return TRUE;
+}
+
 
 static gboolean disenable_module_tab_cb(GtkWidget *button, gpointer data)
 {
@@ -380,6 +400,8 @@ static GtkWidget *create_module_top_status_bar(struct ps *ps, struct module *mod
 
 	button = gtk_button_new_with_label("Start Analyse");
 	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+	g_signal_connect_swapped(G_OBJECT(button), "clicked",
+				 G_CALLBACK(start_analyze_button_cb), module);
 
 	button = gtk_button_new_with_label("Close Module");
 	gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
