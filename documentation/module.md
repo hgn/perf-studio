@@ -37,3 +37,21 @@ If a MODULE is already enabled (enabled == TRUE) and a new project is activated
 the MODULE should be informed and should register at the project. The MODULE
 functions are `MODULE->project_loaded()/MODULE->project_unloading()` callbacks
 are called.
+
+
+### Module Configuration
+
+Module configuration is stored in the global perf-config file. The section begins
+with
+
+```
+[module-MODULENAME]
+  value = key
+```
+
+But: projects can have own configuration values. Project specific values
+overwrite the global one.
+
+GUI editied values overwrite configuration values. In the GUI the user can
+select if the global or the project specific value is modified.
+
