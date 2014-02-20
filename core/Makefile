@@ -95,14 +95,17 @@ endif
 # use 64 bit off_t etc. even on 32 bit systems
 override CFLAGS += -D_FILE_OFFSET_BITS=64
 override CFLAGS += -D_GNU_SOURCE
-override CFLAGS += $(WARNINGS)
 override CFLAGS += -I../include
 override CFLAGS += -I../gui-toolkit
+override CFLAGS += -std=gnu99
+override CFLAGS += -fno-common
+override CFLAGS += -fno-strict-aliasing
+override CFLAGS += -ffast-math
+override CFLAGS += -fdiagnostics-show-option
 override CFLAGS += $(BASIC_CFLAGS)
+override CFLAGS += $(WARNINGS)
 override CFLAGS += $(MODULE_DIR)
 override CFLAGS += $(DATA_DIR)
-override CFLAGS += -std=gnu99
-override CFLAGS += -fno-common -fno-strict-aliasing -ffast-math -fdiagnostics-show-option
 
 override CPPFLAGS += -Wp,-D_FORTIFY_SOURCE=2  
 
