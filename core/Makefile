@@ -60,8 +60,6 @@ WARNINGS = -Wall \
 					 -Wshadow \
 					 -Wformat=2 \
 					 -Wundef \
-					 -fno-strict-aliasing \
-					 -fno-common \
 					 -Wformat-security \
 					 -Wformat-y2k \
 					 -Winit-self \
@@ -74,7 +72,20 @@ WARNINGS = -Wall \
 					 -Wbad-function-cast \
 					 -Wwrite-strings \
 					 -Wold-style-definition \
-					 -Wdeclaration-after-statement
+					 -Wdeclaration-after-statement \
+					 -Wno-inline \
+					 -Wlogical-op \
+					 -Wsign-compare \
+					 -Wmissing-include-dirs \
+					 -Wpointer-arith \
+					 -Winit-self \
+					 -Wdeclaration-after-statement \
+					 -Wfloat-equal \
+					 -Wredundant-decls \
+					 -Wmissing-declarations \
+					 -Wmissing-noreturn \
+					 -Wendif-labels \
+					 -Werror=overflow
 
 # LLVM did not understand everything
 ifeq ($(CC),gcc)
@@ -91,6 +102,9 @@ override CFLAGS += $(BASIC_CFLAGS)
 override CFLAGS += $(MODULE_DIR)
 override CFLAGS += $(DATA_DIR)
 override CFLAGS += -std=gnu99
+override CFLAGS += -fno-common -fno-strict-aliasing -ffast-math -fdiagnostics-show-option
+
+override CPPFLAGS += -Wp,-D_FORTIFY_SOURCE=2  
 
 COBJECTS=$(subst .c,.o,$(FILES))
 
