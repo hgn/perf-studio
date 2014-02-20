@@ -68,7 +68,7 @@ void events_purge_all(struct events *events)
 }
 
 
-int event_perf_opt(int type, char *opt, size_t opt_max)
+static int event_perf_opt(int type, char *opt, size_t opt_max)
 {
 	if (opt_max < 1)
 		return -ENOBUFS;

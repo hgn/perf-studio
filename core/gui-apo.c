@@ -390,7 +390,7 @@ static GtkWidget *apo_main_widget_new(struct ps *ps)
 }
 
 
-struct kv_list *cmd_segment_size_create(struct ps *ps, const char *exec_path)
+static struct kv_list *cmd_segment_size_create(struct ps *ps, const char *exec_path)
 {
         int ret;
 	unsigned int i;
@@ -436,7 +436,7 @@ err:
 }
 
 
-void cmd_segment_size_free(struct kv_list *kv_list)
+USED static void cmd_segment_size_free(struct kv_list *kv_list)
 {
 	(void)kv_list;
 }

@@ -66,6 +66,7 @@ struct events {
 };
 
 struct events *events_new(void);
+void events_free(struct events *e);
 void events_purge_all(struct events *e);
 void events_add_event(struct events *, struct event *);
 gchar *events_repr(struct events *events);

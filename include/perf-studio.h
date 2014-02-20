@@ -124,6 +124,16 @@
 #define NORETURN __attribute__ ((__noreturn__))
 #define PACKED __attribute__ ((__packed__))
 #define ALIGNED(m) __attribute__ ((__aligned__(m)))
+#define USED __attribute__ ((__used__))
+#define UNUSED __attribute__ ((__unused__))
+#define ALIAS(x) __attribute__((alias(x)))
+# if defined(__i386__) || defined(__x86_64__)
+/* __builtin_prefetch(x) generates prefetchnt0 on x86 */
+#  define PREFETCH(x) __asm__("prefetchnta (%0)" : : "r" (x))
+# else
+#  define PREFETCH(x) __builtin_prefetch(x)
+# endif
+
 
 #if __GNUC_PREREQ(3,0) && !defined(__NO_INLINE__)
 # define ALWAYS_INLINE __attribute__ ((always_inline)) inline

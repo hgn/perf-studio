@@ -11,6 +11,7 @@
 #include "perf-studio.h"
 #include "shared.h"
 #include "project.h"
+#include "conf-file.h"
 
 #define PERF_STUDIO_USER_CONF_DIR "perf-studio"
 #define PERF_STUDIO_USER_GLOBAL_CONF_NAME "config"

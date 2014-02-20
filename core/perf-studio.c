@@ -27,7 +27,7 @@ static void print_usage(void)
 }
 
 
-int parse_cli_options(struct ps *ps, int ac, char **av)
+static int parse_cli_options(struct ps *ps, int ac, char **av)
 {
 	int c;
 

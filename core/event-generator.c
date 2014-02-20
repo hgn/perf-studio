@@ -24,7 +24,7 @@
  * the conf file is probably empty or even not available.
  * This
  */
-struct project_event_storage *project_event_storage_new(struct ps *ps,
+static struct project_event_storage *project_event_storage_new(struct ps *ps,
 							struct events *events)
 {
 	gchar *events_repr_str;
@@ -48,7 +48,7 @@ struct project_event_storage *project_event_storage_new(struct ps *ps,
 }
 
 
-void project_event_storage_free(struct project_event_storage *pes)
+USED void project_event_storage_free(struct project_event_storage *pes)
 {
 	assert(pes);
 
@@ -60,7 +60,7 @@ void project_event_storage_free(struct project_event_storage *pes)
 
 
 /* write new file into conf file to reflect new data */
-void project_event_storage_finalize(struct project_event_storage *pes)
+USED void project_event_storage_finalize(struct project_event_storage *pes)
 {
 	assert(pes);
 }
