@@ -10,7 +10,7 @@
 #include <glib.h>
 
 
-enum {
+enum mc_type {
 	MEASUREMENT_CLASS_RAW,
 	MEASUREMENT_CLASS_RAW_STDOUT_STDERR_CAPTURE,
 	MEASUREMENT_CLASS_TIME_MEASUREMENT,
@@ -35,8 +35,6 @@ struct mc_perf_record_data {
 	/* -g, --call-graph */
 	gboolean call_graph;
 };
-
-
 
 
 
@@ -72,6 +70,8 @@ static inline void mc_store_set_owner(struct mc_store *s, struct module *m)
 struct mc_store *mc_store_alloc(void);
 void mc_store_free(struct mc_store *);
 void mc_store_free_recursive(struct mc_store *mc_store);
+int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data);
+
 
 struct mc_element *mc_element_alloc(void);
 void mc_element_free_recursive(struct mc_element *l);
@@ -79,6 +79,7 @@ void mc_element_free(struct mc_element *l);
 
 struct mc_perf_record_event *mc_perf_record_event_alloc(void);
 void mc_perf_record_event_free(struct mc_perf_record_event *mc_perf_record_event);
+
 struct mc_perf_record_data *mc_perf_record_data_alloc(void);
 void mc_perf_record_data_free(struct mc_perf_record_data *mc_perf_record_data);
 void mc_perf_record_data_free_recursive(struct mc_perf_record_data *mc_perf_record_data);

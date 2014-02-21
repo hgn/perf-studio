@@ -51,6 +51,16 @@ void mc_perf_record_data_free_recursive(struct mc_perf_record_data *mc_perf_reco
 	mc_perf_record_data_free(mc_perf_record_data);
 }
 
+
+static int mc_perf_record_data_check(struct mc_perf_record_data *mc_perf_record_data)
+{
+	assert(mc_perf_record_data);
+
+	return 0;
+}
+
+
+
 struct mc_element *mc_element_alloc(void)
 {
 	return g_malloc0(sizeof(struct mc_element));
@@ -118,6 +128,59 @@ void mc_store_free_recursive(struct mc_store *mc_store)
 	return;
 }
 
+
+int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data)
+{
+	int ret;
+	struct mc_element *mc_element;
+
+	if (!mc_store) {
+		log_print(LOG_ERROR, "Cannot add element to non-existing mc store");
+		return -EINVAL;
+	}
+
+	if (mc_type >= MEASUREMENT_CLASS_MAX) {
+		log_print(LOG_ERROR, "Cannot add element because type is unknown (out of range)");
+		return -EINVAL;
+	}
+
+	if (!mc_data) {
+		log_print(LOG_ERROR, "Cannot add non-existing data to mc store");
+		return -EINVAL;
+	}
+
+	/* first data checks are fine, now do specific data checks */
+	switch (mc_type) {
+	case MEASUREMENT_CLASS_PERF_RECORD:
+		ret = mc_perf_record_data_check((struct mc_perf_record_data *)mc_data);
+		break;
+	default:
+		log_print(LOG_ERROR, "mc type has no check implmented, ...");
+		ret = 0;
+		break;
+	}
+
+	if (ret != 0) {
+		log_print(LOG_ERROR, "mc data check failed, data invalid!");
+		return -EINVAL;
+	}
+
+	mc_element = mc_element_alloc();
+	if (!mc_element) {
+		log_print(LOG_ERROR, "No memory");
+		return -ENOMEM;
+	}
+
+	mc_element->measurement_class = mc_type;
+	mc_element->mc_element_data   = mc_data;
+
+	/* add to list */
+	mc_store->mc_element_list = g_slist_append(mc_store->mc_element_list, mc_element);
+
+	return 0;
+}
+
+
 static gboolean mc_perf_record_data_sanity_check(struct mc_perf_record_data *data)
 {
 	if (!data)
@@ -146,7 +209,7 @@ static gboolean check_mc_element_sanity(struct project *project, struct mc_eleme
 		 * bad code here? This makes no sense.
 		 */
 		log_print(LOG_ERROR, "unknown measurement class: %d",
-				mc_element->measurement_class);
+			  mc_element->measurement_class);
 		return FALSE;
 	}
 
