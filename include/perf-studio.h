@@ -127,6 +127,7 @@
 #define USED __attribute__ ((__used__))
 #define UNUSED __attribute__ ((__unused__))
 #define ALIAS(x) __attribute__((alias(x)))
+#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 # if defined(__i386__) || defined(__x86_64__)
 /* __builtin_prefetch(x) generates prefetchnt0 on x86 */
 #  define PREFETCH(x) __asm__("prefetchnta (%0)" : : "r" (x))
