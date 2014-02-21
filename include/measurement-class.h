@@ -70,7 +70,7 @@ static inline void mc_store_set_owner(struct mc_store *s, struct module *m)
 struct mc_store *mc_store_alloc(void);
 void mc_store_free(struct mc_store *);
 void mc_store_free_recursive(struct mc_store *mc_store);
-int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data);
+int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data) WARN_UNUSED_RESULT;
 
 
 struct mc_element *mc_element_alloc(void);
