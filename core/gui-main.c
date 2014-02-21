@@ -128,7 +128,7 @@ static void gui_main_content_pane_init(struct ps *ps)
 }
 
 
-void accel_f1_pressed(struct ps *ps)
+static void accel_f1_pressed_cb(struct ps *ps)
 {
 	gui_help_overview_window(NULL, ps);
 }
@@ -159,7 +159,7 @@ static void accelerator_init(struct ps *ps)
 	accel_group = gtk_accel_group_new();
 
 	/* help window */
-	closure = g_cclosure_new_swap((GCallback)accel_f1_pressed, ps, 0);
+	closure = g_cclosure_new_swap((GCallback)accel_f1_pressed_cb, ps, 0);
 	gtk_accel_group_connect(accel_group, GDK_KEY_F1, 0, 0, closure);
 
 	/* maximize main panel */
