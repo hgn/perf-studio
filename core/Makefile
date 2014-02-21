@@ -63,7 +63,7 @@ WARNINGS = -Wall \
 					 -Wformat-y2k \
 					 -Winit-self \
 					 -Wredundant-decls \
-					 -Wswitch-enum \
+					 -Wswitch \
 					 -Wno-system-headers \
 					 -Wundef \
 					 -Wvolatile-register-var \
