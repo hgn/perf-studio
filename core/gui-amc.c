@@ -717,7 +717,7 @@ static GtkWidget *intr_usage_widget_new(struct ps *ps)
 }
 
 
-void header_status_widget_set_title(GtkWidget *widget, const char *title)
+static void header_status_widget_set_title(GtkWidget *widget, const char *title)
 {
 	char buf[128];
 

@@ -134,7 +134,7 @@ static void accel_f1_pressed_cb(struct ps *ps)
 }
 
 
-void accel_f5_pressed(struct ps *ps)
+static void accel_f5_pressed_cb(struct ps *ps)
 {
 	if (ps->s.main_paned_position) {
 		/* content panel is currenly maximixed,
@@ -163,7 +163,7 @@ static void accelerator_init(struct ps *ps)
 	gtk_accel_group_connect(accel_group, GDK_KEY_F1, 0, 0, closure);
 
 	/* maximize main panel */
-	closure = g_cclosure_new_swap((GCallback)accel_f5_pressed, ps, 0);
+	closure = g_cclosure_new_swap((GCallback)accel_f5_pressed_cb, ps, 0);
 	gtk_accel_group_connect(accel_group, GDK_KEY_F5, 0, 0, closure);
 
 	gtk_window_add_accel_group(GTK_WINDOW(ps->s.main_window), accel_group);
