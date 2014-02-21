@@ -6,7 +6,6 @@
 #include "module-utils.h"
 #include "shared.h"
 #include "event.h"
-#include "event-generator.h"
 #include "shared.h"
 
 
