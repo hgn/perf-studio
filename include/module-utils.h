@@ -18,21 +18,28 @@ char *module_get_description(struct module *m);
 void module_set_group(struct module *m, int group);
 int module_get_group(struct module *m);
 const char *module_group_str(int id);
-void module_request_event_data(struct module *);
-void module_register_module_events(struct ps *, struct module *);
-const char *module_maturity_str(struct module *);
-void module_set_maturity(struct module *m, int);
 
-/* event handling */
-int module_add_events(struct module *m, struct events *e);
+/**
+ * module_set_maturity - set maturity level for module
+ * @module: the affected module
+ * @level: the level
+ *
+ * During development a module is often not in a bug free condition
+ * and things may change rapidly or the code is not stable enough.
+ * To provide a way to distribute bleeding age module too a module
+ * can specify itself as experimental (MODULE_MATURITY_EXPERIMENTAL).
+ * Users will only see experimental marked modules if the configuration
+ * is enabled.
+ */
+void module_set_maturity(struct module *module, int level);
 
-static inline struct events *module_get_events(struct module *m)
-{
-	assert(m);
-	assert(m->events);
 
-	return m->events;
-}
-
+/**
+ * module_maturity_str - return a user readable string of the maturity level
+ * @module: the referenced module
+ *
+ * Return a string representative of the maturity level form module.
+ */
+const char *module_maturity_str(struct module *module);
 
 #endif

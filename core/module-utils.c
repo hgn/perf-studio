@@ -103,36 +103,6 @@ char *module_get_description(struct module *m)
 }
 
 
-int module_add_events(struct module *m, struct events *e)
-{
-	if (!m || !e)
-		return -EINVAL;
-
-	m->events = e;
-
-	return 0;
-}
-
-
-/* module_request_event_data() is called by a module
- * that data is requested. Normally a module is
- * signaled by perf-studio if new data is available
- * to display. But this can also be triggered by
- * the module. If new data is available perf-studio
- * will call module->update() to inform the module.
- */
-void module_request_event_data(struct module *module)
-{
-	pr_info(module->ps, "Module %s request data", module->name);
-}
-
-
-void module_register_module_events(struct ps *ps, struct module *module)
-{
-	executer_register_module_events(ps, module);
-}
-
-
 const char *module_maturity_str(struct module *module)
 {
 	switch (module->maturity) {

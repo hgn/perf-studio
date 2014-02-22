@@ -60,14 +60,9 @@ static void gui_msg_dialog(struct ps *ps, const gchar *format, ...)
 
 static void unregister_module(struct ps *ps, struct module *module)
 {
-	struct events *e;
 	struct hello_world_priv *data;
 
 	(void)ps;
-
-	e = module_get_events(module);
-	assert(e);
-	events_purge_all(e);
 
 	data = module->data;
 	assert(data);
@@ -76,30 +71,6 @@ static void unregister_module(struct ps *ps, struct module *module)
 	/* this will free module memory as well
 	 * as child elements like events */
 	module_free(module);
-}
-
-
-static void add_counting_events(struct events *events)
-{
-	struct event *e;
-
-	e = event_new();
-	e->type = EVENT_TYPE_COUNTING;
-	e->counting.event_code = EVENT_PERF_CYCLES;
-	e->counting.where      = USERKERNELSPACE;
-
-	events_add_event(events, e);
-}
-
-
-static struct events *events_hello_world_new(void)
-{
-	struct events *e;
-
-	e = events_new();
-	add_counting_events(e);
-
-	return e;
 }
 
 
@@ -166,8 +137,6 @@ static gboolean exec_analysis(gpointer data)
 	assert(ps);
 
 	gui_msg_dialog(ps, "Exec not implemented yet");
-
-	//module_register_module_events(module->ps, module);
 
 	return TRUE;
 }
@@ -294,9 +263,6 @@ int register_module(struct ps *ps, struct module **module)
 	module_set_description(m, MODULE_DESCRIPTION);
 	module_set_group(m, MODULE_GROUP_CORE_ANALYSIS);
 	module_set_maturity(m, MODULE_MATURITY_EXPERIMENTAL);
-
-	/* register module events */
-	module_add_events(m, events_hello_world_new());
 
 	/* register callbacks */
 	m->update            = update_cb;
