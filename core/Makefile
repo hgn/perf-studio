@@ -30,7 +30,7 @@ FILES += gui-project-load.c
 FILES += gui-menu.c
 FILES += gui-event-generator.c
 
-FILES += measurement-class.c
+FILES += mc.c
 FILES += mc-perf-record.c
 
 FILES += gui-help.c

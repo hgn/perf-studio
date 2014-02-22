@@ -1,13 +1,11 @@
-#ifndef MEASUREMENT_CLASS_H
-#define MEASUREMENT_CLASS_H
+#ifndef MC_H
+#define MC_H
 
 #include <stdio.h>
 #include <assert.h>
-
+#include <glib.h>
 
 #include "perf-studio.h"
-
-#include <glib.h>
 
 
 enum mc_type {
@@ -18,7 +16,6 @@ enum mc_type {
 
 	MEASUREMENT_CLASS_MAX
 };
-
 
 
 struct mc_element {
@@ -75,4 +72,4 @@ void mc_perf_record_data_callgraph_disable(struct mc_perf_record_data *mc_perf_r
 void mc_perf_record_data_system_wide_enable(struct mc_perf_record_data *mc_perf_record_data);
 void mc_perf_record_data_system_wide_disable(struct mc_perf_record_data *mc_perf_record_data);
 
-#endif /* MEASUREMENT_CLASS_H */
+#endif /* MC_H */

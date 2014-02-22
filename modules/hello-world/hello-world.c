@@ -4,7 +4,7 @@
 #include "perf-studio.h"
 #include "module-utils.h"
 #include "log.h"
-#include "measurement-class.h"
+#include "mc.h"
 
 
 #define MODULE_NAME "Hello World"

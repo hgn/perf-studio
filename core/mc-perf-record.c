@@ -1,7 +1,7 @@
 #include <errno.h>
 
 #include "perf-studio.h"
-#include "measurement-class.h"
+#include "mc.h"
 #include "log.h"
 #include "strbuf.h"
 
