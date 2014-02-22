@@ -68,7 +68,7 @@ struct mc_store *project_unregister_mc_store(struct project *project);
 struct mc_perf_record_data *mc_perf_record_data_create(void);
 void mc_perf_record_data_free(struct mc_perf_record_data *mc_perf_record_data);
 void mc_perf_record_data_free_recursive(struct mc_perf_record_data *mc_perf_record_data);
-gboolean mc_perf_record_data_check(struct mc_perf_record_data *data);
+int mc_perf_record_data_check(struct mc_perf_record_data *data);
 int mc_perf_record_data_add_raw(struct mc_perf_record_data *mc_perf_record_data, const char *event);
 void mc_perf_record_data_callgraph_enable(struct mc_perf_record_data *mc_perf_record_data);
 void mc_perf_record_data_callgraph_disable(struct mc_perf_record_data *mc_perf_record_data);

@@ -121,6 +121,8 @@ int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data)
 	/* add to list */
 	mc_store->mc_element_list = g_slist_append(mc_store->mc_element_list, mc_element);
 
+	log_print(LOG_DEBUG, "successful added element to measurement store");
+
 	return 0;
 }
 

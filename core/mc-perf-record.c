@@ -108,11 +108,11 @@ void mc_perf_record_data_system_wide_disable(struct mc_perf_record_data *mc_perf
 }
 
 
-gboolean mc_perf_record_data_check(struct mc_perf_record_data *data)
+int mc_perf_record_data_check(struct mc_perf_record_data *data)
 {
 	if (!data)
-		return FALSE;
+		return -EINVAL;
 
-	return TRUE;
+	return 0;
 }
 

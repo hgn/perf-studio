@@ -102,16 +102,44 @@ static struct events *events_hello_world_new(void)
 	return e;
 }
 
+
+static struct mc_perf_record_data *hello_mc_create_perf_record_data(void)
+{
+	struct mc_perf_record_data *mc_perf_record_data;
+
+	mc_perf_record_data = mc_perf_record_data_create();
+	if (!mc_perf_record_data)
+		return NULL;
+
+	mc_perf_record_data_add_raw(mc_perf_record_data, "instructions");
+
+	return mc_perf_record_data;
+}
+
 static void hello_mc_store_create(struct module *module,
 			          struct hello_world_priv *hwp)
 {
+	int ret;
 	struct mc_store *mc_store;
+	struct mc_perf_record_data *mc_perf_record_data;
 
 	assert(module);
 	assert(hwp);
 
 	mc_store = mc_store_alloc();
 	mc_store_set_owner(mc_store, module);
+
+	mc_perf_record_data = hello_mc_create_perf_record_data();
+	ret = mc_store_add(mc_store, MEASUREMENT_CLASS_PERF_RECORD, mc_perf_record_data);
+	if (ret != 0) {
+		/* FIXME: proper error handling required, here
+		 * return error code, free memory and check alone
+		 * the part that the module cannot be used. In other
+		 * words a clean error handling
+		 */
+		log_print(LOG_ERROR, "Cannot register perf record data");
+		return;
+	}
 
 	/* remember a pointer to our mc_store. This
 	 * is used later when module callbacks are
@@ -123,8 +151,7 @@ void hello_mc_store_free_recursive(struct mc_store *mc_store)
 {
 	assert(mc_store);
 
-	mc_store_free(mc_store);
-
+	mc_store_free_recursive(mc_store);
 }
 
 
