@@ -18,7 +18,6 @@
 #include "module-loader.h"
 #include "module-utils.h"
 #include "gui-toolkit.h"
-#include "event.h"
 #include "executer.h"
 #include "log.h"
 
@@ -316,9 +315,9 @@ int register_available_modules(struct ps *ps)
 	return 0;
 }
 
-static void module_deactivate(struct ps *ps, struct module *module)
+
+static void module_deactivate(UNUSED struct ps *ps, struct module *module)
 {
-	executer_unregister_module_events(ps, module);
 	module->deactivate(module);
 	module->activated = 0;
 }

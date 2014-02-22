@@ -30,8 +30,6 @@ FILES += gui-project-load.c
 FILES += gui-menu.c
 FILES += gui-event-generator.c
 
-FILES += disect-core.c
-FILES += disect-perf.c
 FILES += measurement-class.c
 FILES += mc-perf-record.c
 

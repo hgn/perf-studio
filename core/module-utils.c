@@ -3,7 +3,6 @@
 #include <assert.h>
 
 #include "perf-studio.h"
-#include "event.h"
 #include "module-utils.h"
 #include "shared.h"
 #include "executer.h"
