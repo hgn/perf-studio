@@ -19,23 +19,6 @@ enum mc_type {
 	MEASUREMENT_CLASS_MAX
 };
 
-struct mc_perf_record_event {
-	int trash;
-};
-
-
-
-struct mc_perf_record_data {
-	/* list of perf events, e.g. -e, --event */
-	GSList *mc_perf_record_event_list;
-
-	/* -a, --all-cpus */
-	gboolean system_wide;
-
-	/* -g, --call-graph */
-	gboolean call_graph;
-};
-
 
 
 struct mc_element {
@@ -77,15 +60,19 @@ struct mc_element *mc_element_alloc(void);
 void mc_element_free_recursive(struct mc_element *l);
 void mc_element_free(struct mc_element *l);
 
-struct mc_perf_record_event *mc_perf_record_event_alloc(void);
-void mc_perf_record_event_free(struct mc_perf_record_event *mc_perf_record_event);
-
-struct mc_perf_record_data *mc_perf_record_data_alloc(void);
-void mc_perf_record_data_free(struct mc_perf_record_data *mc_perf_record_data);
-void mc_perf_record_data_free_recursive(struct mc_perf_record_data *mc_perf_record_data);
 
 int project_register_mc_store(struct project *project, struct mc_store *mc_store);
 struct mc_store *project_unregister_mc_store(struct project *project);
 
+/* mc-perf-record.c */
+struct mc_perf_record_data *mc_perf_record_data_create(void);
+void mc_perf_record_data_free(struct mc_perf_record_data *mc_perf_record_data);
+void mc_perf_record_data_free_recursive(struct mc_perf_record_data *mc_perf_record_data);
+gboolean mc_perf_record_data_check(struct mc_perf_record_data *data);
+int mc_perf_record_data_add_raw(struct mc_perf_record_data *mc_perf_record_data, const char *event);
+void mc_perf_record_data_callgraph_enable(struct mc_perf_record_data *mc_perf_record_data);
+void mc_perf_record_data_callgraph_disable(struct mc_perf_record_data *mc_perf_record_data);
+void mc_perf_record_data_system_wide_enable(struct mc_perf_record_data *mc_perf_record_data);
+void mc_perf_record_data_system_wide_disable(struct mc_perf_record_data *mc_perf_record_data);
 
 #endif /* MEASUREMENT_CLASS_H */

@@ -4,62 +4,6 @@
 #include "measurement-class.h"
 #include "log.h"
 
-struct mc_perf_record_event *mc_perf_record_event_alloc(void)
-{
-	return g_malloc0(sizeof(struct mc_perf_record_event));
-}
-
-
-void mc_perf_record_event_free(struct mc_perf_record_event *mc_perf_record_event)
-{
-	assert(mc_perf_record_event);
-	g_free(mc_perf_record_event);
-	mc_perf_record_event = NULL;
-}
-
-
-struct mc_perf_record_data *mc_perf_record_data_alloc(void)
-{
-	return g_malloc0(sizeof(struct mc_perf_record_data));
-}
-
-
-void mc_perf_record_data_free(struct mc_perf_record_data *mc_perf_record_data)
-{
-	assert(mc_perf_record_data);
-
-	g_free(mc_perf_record_data);
-	mc_perf_record_data = NULL;
-}
-
-
-void mc_perf_record_data_free_recursive(struct mc_perf_record_data *mc_perf_record_data)
-{
-	GSList *tmp;
-	struct mc_perf_record_event *mc_perf_record_event;
-
-	tmp = mc_perf_record_data->mc_perf_record_event_list;
-	while (tmp) {
-		mc_perf_record_event = tmp->data;
-		assert(mc_perf_record_event);
-
-		mc_perf_record_event_free(mc_perf_record_event);
-
-		tmp = g_slist_next(tmp);
-	}
-
-	mc_perf_record_data_free(mc_perf_record_data);
-}
-
-
-static int mc_perf_record_data_check(struct mc_perf_record_data *mc_perf_record_data)
-{
-	assert(mc_perf_record_data);
-
-	return 0;
-}
-
-
 
 struct mc_element *mc_element_alloc(void)
 {
@@ -181,19 +125,6 @@ int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data)
 }
 
 
-static gboolean mc_perf_record_data_sanity_check(struct mc_perf_record_data *data)
-{
-	if (!data)
-		return FALSE;
-
-	if (!data->mc_perf_record_event_list) {
-		log_print(LOG_ERROR, "Registered perf record data specifies no events");
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
 
 static gboolean check_mc_element_sanity(struct project *project, struct mc_element *mc_element)
 {
@@ -215,7 +146,7 @@ static gboolean check_mc_element_sanity(struct project *project, struct mc_eleme
 
 	switch (mc_element->measurement_class) {
 	case MEASUREMENT_CLASS_PERF_RECORD:
-		return mc_perf_record_data_sanity_check((struct mc_perf_record_data *)mc_element->mc_element_data);
+		return mc_perf_record_data_check((struct mc_perf_record_data *)mc_element->mc_element_data);
 		break;
 	default:
 		log_print(LOG_WARNING, "No sanity check implemented");
