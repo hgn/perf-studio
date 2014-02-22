@@ -74,6 +74,10 @@ int mc_perf_record_data_add_raw(struct mc_perf_record_data *mc_perf_record_data,
 {
 	assert(mc_perf_record_data);
 
+	if (!event)
+		return -EINVAL;
+
+	strbuf_addstr(&mc_perf_record_data->event_string, "-e ");
 	strbuf_addstr(&mc_perf_record_data->event_string, event);
 
 	return 0;
