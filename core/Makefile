@@ -1,7 +1,6 @@
 include ../project.mk
 
 FILES  = perf-studio.c
-FILES += event.c
 FILES += conf-file.c
 FILES += cpu-features.c
 FILES += project.c

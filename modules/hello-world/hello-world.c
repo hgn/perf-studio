@@ -228,11 +228,23 @@ static int update_cb(struct module *module, enum update_type update_type, ...)
 
 static void project_activated_cb(struct module *module, struct project *project)
 {
+	int ret;
+	struct hello_world_priv *priv_data;
+
 	assert(module);
 	assert(project);
 
 	log_print(LOG_INFO, "module %s callback project_activated called",
 		  module_get_name(module));
+
+	/* now register mc store at project */
+	priv_data = (struct hello_world_priv *)module->data;
+	assert(priv_data);
+	ret = project_register_mc_store(project, priv_data->mc_store);
+	if (ret != 0) {
+		log_print(LOG_ERROR, "Could not register mc_store at project");
+		return;
+	}
 }
 
 
@@ -243,6 +255,8 @@ static void project_unloading_cb(struct module *module, struct project *project)
 
 	log_print(LOG_INFO, "module %s callback project_unloading called",
 		  module_get_name(module));
+
+	project_unregister_mc_store(project);
 }
 
 

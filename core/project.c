@@ -373,6 +373,7 @@ static gboolean is_absolute_path(const gchar *cmd)
         return FALSE;
 }
 
+
 /* inform all active modules that a new project is active now
  */
 static void project_activated_broadcast_modules(struct ps *ps)
@@ -393,6 +394,7 @@ static void project_activated_broadcast_modules(struct ps *ps)
 	}
 }
 
+
 /* called when ps->project becomes valid. We check
  * some values (sanity) and compute temp values */
 void project_activate(struct ps *ps, struct project *project)
@@ -405,6 +407,7 @@ void project_activate(struct ps *ps, struct project *project)
 
 	ps->active_project = project;
 	project->status = PROJECT_STATUS_SOMEHOW_INVALID;
+	ps->active_project->ps = ps;
 
 	pr_info(ps, "activate project %s", project->id);
 

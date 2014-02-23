@@ -128,11 +128,8 @@ int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data)
 
 
 
-static gboolean check_mc_element_sanity(struct project *project, struct mc_element *mc_element)
+static int check_mc_element_sanity(struct project *project, struct mc_element *mc_element)
 {
-	gboolean ret = TRUE;
-
-
 	(void) project;
 
 	if (mc_element->measurement_class >= MEASUREMENT_CLASS_MAX) {
@@ -143,7 +140,7 @@ static gboolean check_mc_element_sanity(struct project *project, struct mc_eleme
 		 */
 		log_print(LOG_ERROR, "unknown measurement class: %d",
 			  mc_element->measurement_class);
-		return FALSE;
+		return -EINVAL;
 	}
 
 	switch (mc_element->measurement_class) {
@@ -154,15 +151,15 @@ static gboolean check_mc_element_sanity(struct project *project, struct mc_eleme
 		log_print(LOG_WARNING, "No sanity check implemented");
 	};
 
-	return ret;
+	return 0;
 }
 
 
-static gboolean check_mc_store_sanity(struct project *project,
+static int check_mc_store_sanity(struct project *project,
 		struct mc_store *mc_store)
 {
 	GSList *tmp;
-	gboolean gret;
+	int ret;
 	struct mc_element *mc_element;
 
 	tmp = mc_store->mc_element_list;
@@ -171,12 +168,12 @@ static gboolean check_mc_store_sanity(struct project *project,
 
 		if (!mc_element) {
 			log_print(LOG_ERROR, "XXX");
-			return FALSE;
+			return -EINVAL;
 		}
 
-		gret = check_mc_element_sanity(project, mc_element);
-		if (gret == FALSE) {
-			return FALSE;
+		ret = check_mc_element_sanity(project, mc_element);
+		if (ret) {
+			return -EINVAL;
 		}
 
 		/*
@@ -189,11 +186,15 @@ static gboolean check_mc_store_sanity(struct project *project,
 
 		tmp = g_slist_next(tmp);
 	}
-	return TRUE;
+
+	return 0;
 }
 
 
 /* FIXME
+ * mc_store must be list: every activated
+ * module has the right to register their own
+ * mc store.
  * projects should contain a reference to */
 
 /* Called from module when module is activated to register
@@ -202,7 +203,7 @@ static gboolean check_mc_store_sanity(struct project *project,
  */
 int project_register_mc_store(struct project *project, struct mc_store *mc_store)
 {
-	gboolean bret;
+	int ret;
 
 	assert(project);
 	assert(project->ps);
@@ -218,8 +219,8 @@ int project_register_mc_store(struct project *project, struct mc_store *mc_store
 	}
 
 	/* now we iterate over store and check sanity of data */
-	bret = check_mc_store_sanity(project, mc_store);
-	if (bret == FALSE) {
+	ret = check_mc_store_sanity(project, mc_store);
+	if (ret != 0) {
 		log_print(LOG_ERROR, "mc store data currupt");
 		return -EINVAL;
 	}
