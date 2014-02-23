@@ -71,7 +71,6 @@ WARNINGS = -Wall \
 					 -Wold-style-definition \
 					 -Wdeclaration-after-statement \
 					 -Wno-inline \
-					 -Wlogical-op \
 					 -Wsign-compare \
 					 -Wmissing-include-dirs \
 					 -Wpointer-arith \
@@ -86,7 +85,7 @@ WARNINGS = -Wall \
 
 # LLVM did not understand everything
 ifeq ($(CC),gcc)
-				WARNINGS += -Wstrict-aliasing=3
+				WARNINGS += -Wstrict-aliasing=3 -Wlogical-op
 endif
 
 # use 64 bit off_t etc. even on 32 bit systems
