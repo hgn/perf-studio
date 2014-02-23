@@ -4,9 +4,9 @@
 
 #include "perf-studio.h"
 
-void executer_register_module_events(struct ps *ps, struct module *module);
-void executer_unregister_module_events(struct ps *ps, struct module *module);
 void execute_module_triggered_analyze(struct module *module);
+int executer_init(struct ps *ps);
+void executer_fini(struct ps *ps);
 
 
 #endif /* EXECUTER_H */

@@ -16,6 +16,9 @@
 #include "version.h"
 #include "random.h"
 #include "gui-main.h"
+#include "log.h"
+#include "executer.h"
+
 
 static void print_usage(void)
 {
@@ -208,6 +211,13 @@ int main (int ac, char **av)
 		goto out;
 	}
 
+	ret = executer_init(ps);
+	if (ret != 0) {
+		log_print(LOG_CRITICAL, "failed to initialize executer");
+		ret = EXIT_FAILURE;
+		goto out;
+	}
+
 	ret = load_user_conf_file(ps);
 	if (ret != 0) {
 		err_msg(ps, "failed to parse configuration file");
@@ -243,14 +253,14 @@ int main (int ac, char **av)
 
 	gtk_main();
 
-
 	ret = EXIT_SUCCESS;
 out3:
-	unregister_all_modules(ps);
+	executer_fini(ps);
 out2:
 	project_purge_all(ps);
 out:
 	rand_free(ps);
+	unregister_all_modules(ps);
 	pr_info(ps, "exiting");
 	ps_free(ps);
 	return ret;

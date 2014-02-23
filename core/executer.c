@@ -10,6 +10,23 @@
 #include "log.h"
 
 
+int executer_init(struct ps *ps)
+{
+	assert(ps);
+
+	log_print(LOG_INFO, "initialize executer threads");
+
+	return 0;
+}
+
+void executer_fini(struct ps *ps)
+{
+	log_print(LOG_INFO, "shutdown executer threads");
+
+	assert(ps);
+}
+
+
 /*
  * This function is called when a module hit the "start analyze"
  * button. We first check if a project is loaded, if not we simple
