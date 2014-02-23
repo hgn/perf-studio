@@ -113,23 +113,5 @@ void _print_log(int loglevel, const char *file, const char *func,
 
 	fprintf(logging_file, "%s:%s(): %s\n", file, func, buffer);
 
-	return;
-
-	if (_log_current_mode == LOG_VERBOSE) {
-		if (logging_file)
-			fprintf(logging_file,
-					"%s() (%s:%d) at %s |\t",
-					func, file, line, clock_time);
-	}
-
-	to_print = strtok(buffer, "\n");
-	if (logging_file)
-		fprintf(logging_file, "%s\n", to_print);
-
-	while ((to_print = strtok(NULL, "\n"))) {
-		if (logging_file)
-			fprintf(logging_file, "%s\n", to_print);
-	}
-
 	va_end(args);
 }
