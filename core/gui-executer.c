@@ -46,7 +46,6 @@ static void gui_add_analyser_content(GtkWidget *vbox)
 	GtkWidget *hbox;
 	GtkWidget *entry;
 	GtkWidget *progress_bar;
-	GtkWidget *spinner;
 
 	hbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
@@ -59,11 +58,6 @@ static void gui_add_analyser_content(GtkWidget *vbox)
 	//gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_bar), 50);
 	//gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0.5);
 	gtk_box_pack_start(GTK_BOX(hbox), progress_bar, TRUE, FALSE, 0);
-
-	spinner = gtk_spinner_new();
-	gtk_spinner_start(GTK_SPINNER(spinner));
-	gtk_box_pack_start(GTK_BOX(hbox), spinner, TRUE, FALSE, 0);
-
 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 	gtk_widget_show_all(vbox);
