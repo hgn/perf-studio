@@ -164,8 +164,12 @@ gboolean timeout_function(gpointer user_data)
 	thread_data = g_async_queue_try_pop(executer_queue);
 	if (!thread_data) {
 		log_print(LOG_INFO, "no data received");
+		return TRUE;
 	}
+
 	log_print(LOG_INFO, "data received");
+
+	//executer_gui_finish();
 
 	return TRUE;
 }
@@ -229,6 +233,6 @@ void execute_module_triggered_analyze(struct module *module)
 	g_thread_pool_push(executer_pool, GUINT_TO_POINTER (1000), NULL);
 
 	/* now executer a timer to check if the thread is finished */
-	timeout_id = g_timeout_add(1000, timeout_function, ps);
+	timeout_id = g_timeout_add(5000, timeout_function, ps);
 }
 
