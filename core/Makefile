@@ -28,6 +28,7 @@ FILES += gui-waterfall.c
 FILES += gui-project-load.c
 FILES += gui-menu.c
 FILES += gui-event-generator.c
+FILES += gui-executer.c
 
 FILES += mc.c
 FILES += mc-perf-record.c

@@ -17,6 +17,8 @@
 static GAsyncQueue *executer_queue;
 static GThreadPool *executer_pool;
 
+struct executer_gui_ctx *executer_gui_ctx;
+
 
 static int execute_raw(const char *program, const char **options)
 {
@@ -142,6 +144,16 @@ void executer_fini(struct ps *ps)
 }
 
 
+static void executer_gui_finish(void)
+{
+	assert(executer_gui_ctx);
+
+	executer_gui_free(executer_gui_ctx);
+	g_free(executer_gui_ctx);
+	executer_gui_ctx = NULL;
+}
+
+
 guint timeout_id;
 
 gboolean timeout_function(gpointer user_data)
@@ -156,6 +168,24 @@ gboolean timeout_function(gpointer user_data)
 	log_print(LOG_INFO, "data received");
 
 	return TRUE;
+}
+
+int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
+		 struct executer_gui_reply *executer_gui_reply)
+{
+	assert(executer_gui_ctx);
+	assert(executer_gui_reply);
+
+	switch (executer_gui_reply->type) {
+	case EXECUTER_GUI_REPLY_USER_CANCEL:
+		log_print(LOG_DEBUG, "user cancled GUI executer");
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	return 0;
 }
 
 
@@ -182,28 +212,23 @@ void execute_module_triggered_analyze(struct module *module)
 		return;
 	}
 
+	if (executer_gui_ctx) {
+		log_print(LOG_ERROR, "Execution already running - cannot start two");
+		return;
+	}
+
 	log_print(LOG_INFO, "Now do analyzed for project!");
+
+	/* we now start the GUI */
+	executer_gui_ctx = g_malloc0(sizeof(*executer_gui_ctx));
+	executer_gui_ctx->ps = module->ps;
+	executer_gui_ctx->reply_cb = gui_reply_cb;
+	executer_gui_init(executer_gui_ctx);
 
 	/* push data to run */
 	g_thread_pool_push(executer_pool, GUINT_TO_POINTER (1000), NULL);
 
 	/* now executer a timer to check if the thread is finished */
 	timeout_id = g_timeout_add(1000, timeout_function, ps);
-
 }
 
-
-#if 0
-/* iterate over all registered modules,
- * check if the particular events are registerd
- * and if so then the module is informed via update()
- */
-static events_multiplexer(struct *ps)
-{
-}
-
-/* called when executer ends and data was produced
- * then this function is called which in turn calls events multiplexer
- */
-static events_update()
-#endif
