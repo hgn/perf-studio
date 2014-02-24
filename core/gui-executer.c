@@ -13,11 +13,78 @@ struct executer_gui_priv_data {
 };
 
 
+static void gui_add_title(GtkWidget *vbox)
+{
+	GtkWidget *hbox;
+	GtkWidget *label;
+
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	label = gtk_label_new("Analyze Program");
+	gtk_widget_set_name(label, "dialog_window_header");
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+	gtk_widget_show_all(hbox);
+}
+
+
+static void gui_add_artwork(GtkWidget *vbox)
+{
+        GtkWidget *event_box;
+
+        event_box = gtk_event_box_new();
+	gtk_widget_set_name(event_box, "header");
+	gtk_widget_set_size_request(event_box, -1, 10);
+
+        gtk_box_pack_start(GTK_BOX(vbox), event_box, FALSE, TRUE, 0);
+        gtk_widget_show_all(event_box);
+}
+
+
+static void gui_add_analyser_content(GtkWidget *vbox)
+{
+	GtkWidget *entry;
+
+	entry = gtk_entry_new();
+	gtk_entry_set_text(GTK_ENTRY(entry), "Fooo");
+
+	gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, TRUE, 0);
+	gtk_widget_show_all(entry);
+}
+
+
+static void gui_add_button_bar(GtkWidget *vbox)
+{
+	GtkWidget *hbox;
+	GtkWidget *cancel_button;
+	GtkWidget *general_button;
+
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+
+	/* cancel button */
+	cancel_button = gtk_button_new_with_label("Cancel");
+	gtk_box_pack_start(GTK_BOX(hbox), cancel_button, TRUE, FALSE, 0);
+
+	/* next button (start with start, next, et cetera) */
+	general_button = gtk_button_new_with_label("Analyze Program");
+	gtk_box_pack_end(GTK_BOX(hbox), general_button, TRUE, FALSE, 0);
+
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+	gtk_widget_show_all(hbox);
+}
+
+
 static GtkWidget *executer_main_content(struct executer_gui_ctx *executer_gui_ctx)
 {
 	GtkWidget *vbox;
 
+	assert(executer_gui_ctx);
+
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	gui_add_title(vbox);
+	gui_add_artwork(vbox);
+	gui_add_analyser_content(vbox);
+	gui_add_button_bar(vbox);
 
 	return vbox;
 }
@@ -53,6 +120,8 @@ int executer_gui_init(struct executer_gui_ctx *executer_gui_ctx)
 		log_print(LOG_ERROR, "Cannot init content");
 		goto err;
 	}
+	gtk_container_add(GTK_CONTAINER(priv_data->main_window), main_content);
+	gtk_widget_show(main_content);
 
 	/* show everything */
 	gtk_widget_show((GtkWidget *)priv_data->main_window);
