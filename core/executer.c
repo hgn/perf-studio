@@ -103,19 +103,27 @@ out:
 	return ret;
 }
 
+/*
+ * If we wan't to marshal integer we must
+ * make sure the value is a valid pointer - not
+ * a NULL pointer.
+ */
+enum {
+	PROGRAM_FINISHED = 1
+};
 
+
+/*
+ * This function is called if a binary must be analyzed.
+ * This funtion blocks until the execution ends.
+ */
 static void executer_thread(gpointer thread_data, gpointer user_data)
 {
-	int i;
-	struct ps *ps = thread_data;
-
 	log_print(LOG_INFO, "executer thread started");
 
-	for (i = 0; i < 10; i++) {
-		g_usleep(1000000);
-		log_print(LOG_INFO, "calculating");
-		g_async_queue_push(executer_queue, ps);
-	}
+	g_usleep(10000000);
+	log_print(LOG_INFO, "program finished");
+	g_async_queue_push(executer_queue, GINT_TO_POINTER(PROGRAM_FINISHED));
 }
 
 
@@ -136,11 +144,9 @@ int executer_init(struct ps *ps)
 
 void executer_fini(struct ps *ps)
 {
-	log_print(LOG_INFO, "shutdown executer threads");
-
-	g_async_queue_unref(executer_queue);
-
 	assert(ps);
+	log_print(LOG_INFO, "shutdown executer threads");
+	g_async_queue_unref(executer_queue);
 }
 
 
@@ -158,21 +164,44 @@ guint timeout_id;
 
 gboolean timeout_function(gpointer user_data)
 {
+	unsigned int type;
 	gpointer thread_data;
+	struct executer_gui_update_data executer_gui_update_data;
 
+	memset(&executer_gui_update_data, 0, sizeof(executer_gui_update_data));
+
+	/*
+	 * Check if data is available from the executed program,
+	 * if not we simple send a update message to the GUI
+	 * to pulse the progress bar
+	 */
 	log_print(LOG_INFO, "wait for data");
 	thread_data = g_async_queue_try_pop(executer_queue);
 	if (!thread_data) {
 		log_print(LOG_INFO, "no data received");
+		assert(executer_gui_ctx);
+		executer_gui_update_data.type = EXECUTER_GUI_UPDATE_UNKNOWN_PROGRESS;
+		executer_gui_update(executer_gui_ctx, &executer_gui_update_data);
 		return TRUE;
 	}
 
 	log_print(LOG_INFO, "data received");
 
-	//executer_gui_finish();
+	type = GPOINTER_TO_UINT(thread_data);
+	switch (type) {
+	case PROGRAM_FINISHED:
+		log_print(LOG_DEBUG, "received program finished");
+		executer_gui_finish();
+		return FALSE;
+		break;
+	default:
+		log_print(LOG_INFO, "received unknown signal");
+		break;
+	}
 
 	return TRUE;
 }
+
 
 int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
 		 struct executer_gui_reply *executer_gui_reply)
@@ -233,6 +262,6 @@ void execute_module_triggered_analyze(struct module *module)
 	g_thread_pool_push(executer_pool, GUINT_TO_POINTER (1000), NULL);
 
 	/* now executer a timer to check if the thread is finished */
-	timeout_id = g_timeout_add(5000, timeout_function, ps);
+	timeout_id = g_timeout_add(250, timeout_function, ps);
 }
 

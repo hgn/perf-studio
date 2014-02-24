@@ -67,7 +67,8 @@ void executer_gui_free(struct executer_gui_ctx *);
 
 
 enum {
-	EXECUTER_GUI_UPDATE_PROGRESS_CHANGE
+	EXECUTER_GUI_UPDATE_PROGRESS_CHANGE,
+	EXECUTER_GUI_UPDATE_UNKNOWN_PROGRESS
 };
 
 struct executer_gui_update_progress_change {
@@ -75,12 +76,11 @@ struct executer_gui_update_progress_change {
 	unsigned int current_percent;
 };
 
-struct executer_gui_update {
+struct executer_gui_update_data {
 	unsigned int type;
 	union {
 	struct executer_gui_update_progress_change executer_gui_update_progress_change;
 	};
-
 };
 
 
@@ -91,7 +91,7 @@ struct executer_gui_update {
  * on information from the executer these updates are send
  * to the executer GUI
  */
-int executer_gui_update(struct executer_gui_ctx *, struct executer_gui_update *);
+int executer_gui_update(struct executer_gui_ctx *, struct executer_gui_update_data *);
 
 
 
