@@ -1,6 +1,7 @@
 #ifndef EXECUTER_H
 #define EXECUTER_H
 
+#include <unistd.h>
 
 #include "perf-studio.h"
 
@@ -31,6 +32,9 @@ struct executer_gui_ctx {
 
 	/* functional members */
 	struct ps *ps;
+
+	/* if a process is running the pid != 0 */
+	pid_t child_pid;
 
 	/* callback used by executer GUI if the executer
 	 * must be informed (e.g. user clicked "cancel")

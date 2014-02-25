@@ -20,9 +20,9 @@ static GThreadPool *executer_pool;
 struct executer_gui_ctx *executer_gui_ctx;
 
 
-static int execute_raw(const char *program, const char **options)
+static int execute_raw(struct executer_gui_ctx *executer_gui_ctx,
+		       const char *program, const char **options)
 {
-	pid_t pid;
 	int child_status, pipefd[2];
 	char buffer[1024];
 	wordexp_t result;
@@ -52,8 +52,8 @@ static int execute_raw(const char *program, const char **options)
 
 	pipe(pipefd);
 
-	pid = fork();
-	switch (pid) {
+	executer_gui_ctx->child_pid = fork();
+	switch (executer_gui_ctx->child_pid) {
 	case 0:
 		/* close reading end in the child */
 		close(pipefd[0]);
@@ -85,7 +85,7 @@ static int execute_raw(const char *program, const char **options)
 		}
 
 		/* ... we wait here */
-		if (waitpid(pid, &child_status, 0 ) == -1 ) {
+		if (waitpid(executer_gui_ctx->child_pid, &child_status, 0 ) == -1 ) {
 			log_print(LOG_ERROR, "waitpid error");
 		} else {
 			if (WIFEXITED(child_status)) {
