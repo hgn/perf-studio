@@ -33,6 +33,9 @@ struct executer_gui_ctx {
 	/* functional members */
 	struct ps *ps;
 
+	/* the recuring timeout */
+	guint timeout_id;
+
 	/* if a process is running the pid != 0 */
 	pid_t child_pid;
 

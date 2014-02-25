@@ -17,7 +17,7 @@
 static GAsyncQueue *executer_queue;
 static GThreadPool *executer_pool;
 
-struct executer_gui_ctx *executer_gui_ctx;
+//struct executer_gui_ctx *executer_gui_ctx;
 
 
 static int execute_raw(struct executer_gui_ctx *executer_gui_ctx,
@@ -150,23 +150,33 @@ void executer_fini(struct ps *ps)
 }
 
 
-static void executer_gui_finish(void)
+static void executer_gui_finish(struct executer_gui_ctx *executer_gui_ctx)
 {
-	assert(executer_gui_ctx);
+	struct ps *ps;
+
+	/* disable running timeouts */
+	if (executer_gui_ctx->timeout_id) {
+		g_source_remove(executer_gui_ctx->timeout_id);
+		executer_gui_ctx->timeout_id = 0;
+	}
 
 	executer_gui_free(executer_gui_ctx);
+	ps = executer_gui_ctx->ps;
 	g_free(executer_gui_ctx);
 	executer_gui_ctx = NULL;
+	ps->executer_gui_ctx = NULL;
 }
 
-
-guint timeout_id;
 
 gboolean timeout_function(gpointer user_data)
 {
 	unsigned int type;
 	gpointer thread_data;
+	struct executer_gui_ctx *executer_gui_ctx;
 	struct executer_gui_update_data executer_gui_update_data;
+
+	assert(user_data);
+	executer_gui_ctx = user_data;
 
 	memset(&executer_gui_update_data, 0, sizeof(executer_gui_update_data));
 
@@ -191,7 +201,8 @@ gboolean timeout_function(gpointer user_data)
 	switch (type) {
 	case PROGRAM_FINISHED:
 		log_print(LOG_DEBUG, "received program finished");
-		executer_gui_finish();
+		/* FIXME: the programm must be stoped, killed */
+		executer_gui_finish(executer_gui_ctx);
 		return FALSE;
 		break;
 	default:
@@ -212,6 +223,7 @@ int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
 	switch (executer_gui_reply->type) {
 	case EXECUTER_GUI_REPLY_USER_CANCEL:
 		log_print(LOG_DEBUG, "user cancled GUI executer");
+		executer_gui_finish(executer_gui_ctx);
 		break;
 	default:
 		assert(0);
@@ -245,7 +257,7 @@ void execute_module_triggered_analyze(struct module *module)
 		return;
 	}
 
-	if (executer_gui_ctx) {
+	if (ps->executer_gui_ctx) {
 		log_print(LOG_ERROR, "Execution already running - cannot start two");
 		return;
 	}
@@ -253,15 +265,18 @@ void execute_module_triggered_analyze(struct module *module)
 	log_print(LOG_INFO, "Now do analyzed for project!");
 
 	/* we now start the GUI */
-	executer_gui_ctx = g_malloc0(sizeof(*executer_gui_ctx));
-	executer_gui_ctx->ps = module->ps;
-	executer_gui_ctx->reply_cb = gui_reply_cb;
-	executer_gui_init(executer_gui_ctx);
+	ps->executer_gui_ctx = g_malloc0(sizeof(struct executer_gui_ctx));
+	ps->executer_gui_ctx->ps = module->ps;
+	ps->executer_gui_ctx->reply_cb = gui_reply_cb;
+	executer_gui_init(ps->executer_gui_ctx);
 
 	/* push data to run */
 	g_thread_pool_push(executer_pool, GUINT_TO_POINTER (1000), NULL);
 
 	/* now executer a timer to check if the thread is finished */
-	timeout_id = g_timeout_add(250, timeout_function, ps);
+	ps->executer_gui_ctx->timeout_id = g_timeout_add(250, timeout_function, ps->executer_gui_ctx);
+	/* we check that a timeout id is never 0 - if not we must make sure
+	 * that we add another check to test if the timeout is running */
+	assert(ps->executer_gui_ctx->timeout_id);
 }
 

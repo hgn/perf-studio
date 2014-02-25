@@ -337,6 +337,9 @@ struct screen_data {
 	GdkRGBA color[COLOR_MAX];
 };
 
+/* format decl */
+struct executer_gui_ctx;
+
 struct ps {
 	gboolean screen_usable;
 	struct screen s;
@@ -353,6 +356,13 @@ struct ps {
 	 * of project_list
 	 */
 	struct project *active_project;
+
+	/*
+	 * If execution/analyze is running executer_gui_ctx
+	 * is not NULL. The executer is responsible for this
+	 * data structure
+	 */
+	struct executer_gui_ctx *executer_gui_ctx;
 
 	/*
 	 * Every component can register itself to get informed

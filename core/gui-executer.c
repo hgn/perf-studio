@@ -68,7 +68,29 @@ static void gui_add_analyser_content(struct executer_gui_ctx *executer_gui_ctx, 
 }
 
 
-static void gui_add_button_bar(GtkWidget *vbox)
+/* if cancel is clicked we simple signal that to exectuer.
+ * The executer itself is responsible to handle user interaction
+ */
+static gboolean cancel_clicked_cb(gpointer data)
+{
+	struct executer_gui_ctx *executer_gui_ctx;
+	struct executer_gui_reply executer_gui_reply;
+
+	executer_gui_ctx = data;
+	assert(executer_gui_ctx);
+	assert(executer_gui_ctx->reply_cb);
+
+	/* prepare reply message */
+	memset(&executer_gui_reply, 0, sizeof(executer_gui_reply));
+	executer_gui_reply.type = EXECUTER_GUI_REPLY_USER_CANCEL;
+
+	executer_gui_ctx->reply_cb(executer_gui_ctx, &executer_gui_reply);
+
+	return TRUE;
+}
+
+
+static void gui_add_button_bar(struct executer_gui_ctx *executer_gui_ctx, GtkWidget *vbox)
 {
 	GtkWidget *hbox;
 	GtkWidget *cancel_button;
@@ -78,6 +100,9 @@ static void gui_add_button_bar(GtkWidget *vbox)
 
 	/* cancel button */
 	cancel_button = gtk_button_new_with_label("Cancel");
+	g_signal_connect_swapped(G_OBJECT(cancel_button), "clicked",
+				 G_CALLBACK(cancel_clicked_cb), executer_gui_ctx);
+
 	gtk_box_pack_start(GTK_BOX(hbox), cancel_button, TRUE, FALSE, 0);
 
 	/* next button (start with start, next, et cetera) */
@@ -99,7 +124,7 @@ static GtkWidget *executer_main_content(struct executer_gui_ctx *executer_gui_ct
 	gui_add_title(vbox);
 	gui_add_artwork(vbox);
 	gui_add_analyser_content(executer_gui_ctx, vbox);
-	gui_add_button_bar(vbox);
+	gui_add_button_bar(executer_gui_ctx, vbox);
 
 	return vbox;
 }
