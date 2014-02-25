@@ -21,9 +21,9 @@ $(SUBDIRS):
 
 all: $(SUBDIRS)
 
-do_local_clean =						\
+do_local_clean =			\
 	($(print_rm)				\
-	$(RM) cscope*)
+	$(RM) cscope* core.* )
 
 clean: 
 	@for dir in ${SUBDIRS}; do \
