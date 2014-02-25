@@ -70,6 +70,12 @@ void gui_menu_init(struct ps *ps)
 	gtk_menu_shell_append(GTK_MENU_SHELL(projectmenu), project_manage);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), project);
 
+	/* FIXME:
+	 * project statistic missing! Displaying how many gigabytes
+	 * are used by each project and show what can be deleted (clean
+	 * functionality
+	 */
+
 	/* System submenues */
 	systemm         = gtk_menu_item_new_with_mnemonic("_Systems");
 	system_report  = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
