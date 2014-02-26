@@ -71,6 +71,9 @@ static int execute_raw(struct executer_gui_ctx *executer_gui_ctx,
 		/* this descriptor is no longer needed */
 		close(pipefd[1]);
 
+		setvbuf(stdout, NULL, _IOLBF, 0);
+		setvbuf(stderr, NULL, _IOLBF, 0);
+
 		execv(result.we_wordv[0], result.we_wordv);
 		log_print(LOG_ERROR, "Failed to execute program");
 		exit(100);
