@@ -50,6 +50,10 @@ static int execute_raw(struct executer_gui_ctx *executer_gui_ctx,
 		}
 	}
 
+	/* flush current buffer */
+	fflush(stdout);
+	fflush(stderr);
+
 	pipe(pipefd);
 
 	executer_gui_ctx->child_pid = fork();
