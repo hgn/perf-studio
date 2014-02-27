@@ -8,6 +8,8 @@
 #include "shared.h"
 #include "log.h"
 
+#define CODE_ANALYZE_FILENAME "code-magnifier.png"
+
 struct executer_gui_priv_data {
 	GtkWidget *main_window;
 	GtkWidget *progress_bar;
@@ -42,16 +44,34 @@ static void gui_add_artwork(GtkWidget *vbox)
 }
 
 
-static void gui_add_analyser_content(struct executer_gui_ctx *executer_gui_ctx, GtkWidget *vbox)
+static void gui_add_analyser_content(struct executer_gui_ctx *executer_gui_ctx,
+				     GtkWidget *vbox)
 {
+	struct ps *ps;
 	GtkWidget *hbox;
 	GtkWidget *entry;
+	GtkWidget *image;
+	gchar *logo_path;
 	struct executer_gui_priv_data *executer_gui_priv_data;
+
 
 	executer_gui_priv_data = executer_gui_ctx->priv_data;
 	assert(executer_gui_priv_data);
+	assert(executer_gui_ctx->ps);
+
+	ps = executer_gui_ctx->ps;
 
 	hbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+	logo_path = g_build_filename(ps->si.pixmapdir, CODE_ANALYZE_FILENAME, NULL);
+	image = gtk_image_new_from_file(logo_path);
+
+	gtk_box_pack_start(GTK_BOX(hbox), image, TRUE, FALSE, 0);
+
+	g_free(logo_path);
+
+
+
 
 	entry = gtk_entry_new();
 	gtk_entry_set_text(GTK_ENTRY(entry), "Fooo");
@@ -59,9 +79,8 @@ static void gui_add_analyser_content(struct executer_gui_ctx *executer_gui_ctx, 
 
 	executer_gui_priv_data->progress_bar = gtk_progress_bar_new();
 	gtk_progress_bar_pulse(GTK_PROGRESS_BAR(executer_gui_priv_data->progress_bar));
-	//gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_bar), 50);
-	//gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0.5);
-	gtk_box_pack_start(GTK_BOX(hbox), executer_gui_priv_data->progress_bar, TRUE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), executer_gui_priv_data->progress_bar,
+			   TRUE, FALSE, 0);
 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 	gtk_widget_show_all(vbox);
