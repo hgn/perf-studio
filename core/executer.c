@@ -175,6 +175,26 @@ static void executer_gui_finish(struct executer_gui_ctx *executer_gui_ctx)
 }
 
 
+static void executer_gui_next(struct executer_gui_ctx *executer_gui_ctx)
+{
+	struct ps *ps;
+	struct executer_gui_update_data executer_gui_update_data;
+
+	memset(&executer_gui_update_data, 0, sizeof(executer_gui_update_data));
+
+	switch (executer_gui_ctx->state) {
+	case EXECUTER_STATE_WELCOME_SCREEN:
+		executer_gui_update_data.type = EXECUTER_GUI_UPDATE_DISPLAY_ANALYSIS;
+		executer_gui_update(executer_gui_ctx, &executer_gui_update_data);
+		executer_gui_ctx->state = EXECUTER_STATE_PROCESSING;
+		break;
+	default:
+		assert(0);
+		break;
+	}
+}
+
+
 gboolean timeout_function(gpointer user_data)
 {
 	unsigned int type;
@@ -188,8 +208,8 @@ gboolean timeout_function(gpointer user_data)
 	memset(&executer_gui_update_data, 0, sizeof(executer_gui_update_data));
 
 	/*
-	 * Check if data is available from the executed program,
-	 * if not we simple send a update message to the GUI
+	 * check if data is available from the executed program,
+	 * if not we simple send a update message to the gui
 	 * to pulse the progress bar
 	 */
 	log_print(LOG_INFO, "wait for data");
@@ -197,8 +217,11 @@ gboolean timeout_function(gpointer user_data)
 	if (!thread_data) {
 		log_print(LOG_INFO, "no data received");
 		assert(executer_gui_ctx);
-		executer_gui_update_data.type = EXECUTER_GUI_UPDATE_UNKNOWN_PROGRESS;
-		executer_gui_update(executer_gui_ctx, &executer_gui_update_data);
+
+		if (executer_gui_ctx->state == EXECUTER_STATE_PROCESSING) {
+			executer_gui_update_data.type = EXECUTER_GUI_UPDATE_UNKNOWN_PROGRESS;
+			executer_gui_update(executer_gui_ctx, &executer_gui_update_data);
+		}
 		return TRUE;
 	}
 
@@ -231,6 +254,10 @@ int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
 	case EXECUTER_GUI_REPLY_USER_CANCEL:
 		log_print(LOG_DEBUG, "user cancled GUI executer");
 		executer_gui_finish(executer_gui_ctx);
+		break;
+	case EXECUTER_GUI_REPLY_USER_NEXT:
+		log_print(LOG_DEBUG, "user clicked next");
+		executer_gui_next(executer_gui_ctx);
 		break;
 	default:
 		assert(0);
@@ -275,6 +302,7 @@ void execute_module_triggered_analyze(struct module *module)
 	ps->executer_gui_ctx = g_malloc0(sizeof(struct executer_gui_ctx));
 	ps->executer_gui_ctx->ps = module->ps;
 	ps->executer_gui_ctx->reply_cb = gui_reply_cb;
+	ps->executer_gui_ctx->state = EXECUTER_STATE_WELCOME_SCREEN;
 	executer_gui_init(ps->executer_gui_ctx);
 
 	/* push data to run */

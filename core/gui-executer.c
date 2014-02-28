@@ -12,6 +12,8 @@
 
 struct executer_gui_priv_data {
 	GtkWidget *main_window;
+	GtkWidget *content_box;
+	GtkWidget *vbox;
 	GtkWidget *progress_bar;
 };
 
@@ -47,42 +49,22 @@ static void gui_add_artwork(GtkWidget *vbox)
 static void gui_add_analyser_content(struct executer_gui_ctx *executer_gui_ctx,
 				     GtkWidget *vbox)
 {
-	struct ps *ps;
-	GtkWidget *hbox;
 	GtkWidget *entry;
-	GtkWidget *image;
-	gchar *logo_path;
 	struct executer_gui_priv_data *executer_gui_priv_data;
 
 
 	executer_gui_priv_data = executer_gui_ctx->priv_data;
 	assert(executer_gui_priv_data);
-	assert(executer_gui_ctx->ps);
 
-	ps = executer_gui_ctx->ps;
-
-	hbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-
-	logo_path = g_build_filename(ps->si.pixmapdir, CODE_ANALYZE_FILENAME, NULL);
-	image = gtk_image_new_from_file(logo_path);
-
-	gtk_box_pack_start(GTK_BOX(hbox), image, TRUE, FALSE, 0);
-
-	g_free(logo_path);
-
-
-
+	executer_gui_priv_data->content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	/* FIXME, get rid of this assignment, every time */
+	executer_gui_priv_data->vbox = vbox;
 
 	entry = gtk_entry_new();
 	gtk_entry_set_text(GTK_ENTRY(entry), "Fooo");
-	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(executer_gui_priv_data->content_box), entry, TRUE, FALSE, 0);
 
-	executer_gui_priv_data->progress_bar = gtk_progress_bar_new();
-	gtk_progress_bar_pulse(GTK_PROGRESS_BAR(executer_gui_priv_data->progress_bar));
-	gtk_box_pack_start(GTK_BOX(hbox), executer_gui_priv_data->progress_bar,
-			   TRUE, FALSE, 0);
-
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), executer_gui_priv_data->content_box, TRUE, TRUE, 0);
 	gtk_widget_show_all(vbox);
 }
 
@@ -109,6 +91,25 @@ static gboolean cancel_clicked_cb(gpointer data)
 }
 
 
+static gboolean next_clicked_cb(gpointer data)
+{
+	struct executer_gui_ctx *executer_gui_ctx;
+	struct executer_gui_reply executer_gui_reply;
+
+	executer_gui_ctx = data;
+	assert(executer_gui_ctx);
+	assert(executer_gui_ctx->reply_cb);
+
+	/* prepare reply message */
+	memset(&executer_gui_reply, 0, sizeof(executer_gui_reply));
+	executer_gui_reply.type = EXECUTER_GUI_REPLY_USER_NEXT;
+
+	executer_gui_ctx->reply_cb(executer_gui_ctx, &executer_gui_reply);
+
+	return TRUE;
+}
+
+
 static void gui_add_button_bar(struct executer_gui_ctx *executer_gui_ctx, GtkWidget *vbox)
 {
 	GtkWidget *hbox;
@@ -127,6 +128,8 @@ static void gui_add_button_bar(struct executer_gui_ctx *executer_gui_ctx, GtkWid
 	/* next button (start with start, next, et cetera) */
 	general_button = gtk_button_new_with_label("Analyze Program");
 	gtk_box_pack_end(GTK_BOX(hbox), general_button, TRUE, FALSE, 0);
+	g_signal_connect_swapped(G_OBJECT(general_button), "clicked",
+				 G_CALLBACK(next_clicked_cb), executer_gui_ctx);
 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
 	gtk_widget_show_all(hbox);
@@ -226,6 +229,41 @@ static void progress_bar_update_unknown(struct executer_gui_ctx *executer_gui_ct
 }
 
 
+static void display_analysis(struct executer_gui_ctx *executer_gui_ctx)
+{
+	struct ps *ps;
+	gchar *logo_path;
+	struct executer_gui_priv_data *executer_gui_priv_data;
+	GtkWidget *image;
+
+	assert(executer_gui_ctx);
+	assert(executer_gui_ctx->priv_data);
+	assert(executer_gui_ctx->ps);
+
+	executer_gui_priv_data = executer_gui_ctx->priv_data;
+	ps = executer_gui_ctx->ps;
+
+	/* remove old content */
+	gtk_widget_destroy(executer_gui_priv_data->content_box);
+	executer_gui_priv_data->content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+	logo_path = g_build_filename(ps->si.pixmapdir, CODE_ANALYZE_FILENAME, NULL);
+	image = gtk_image_new_from_file(logo_path);
+	g_free(logo_path);
+
+	gtk_box_pack_start(GTK_BOX(executer_gui_priv_data->content_box), image, TRUE, FALSE, 0);
+
+	executer_gui_priv_data->progress_bar = gtk_progress_bar_new();
+	gtk_progress_bar_pulse(GTK_PROGRESS_BAR(executer_gui_priv_data->progress_bar));
+	gtk_box_pack_start(GTK_BOX(executer_gui_priv_data->content_box), executer_gui_priv_data->progress_bar,
+			   TRUE, FALSE, 0);
+
+	gtk_box_pack_start(GTK_BOX(executer_gui_priv_data->vbox), executer_gui_priv_data->content_box, TRUE, TRUE, 0);
+	gtk_widget_show_all(executer_gui_priv_data->vbox);
+}
+
+
+
 int executer_gui_update(struct executer_gui_ctx *executer_gui_ctx,
 			struct executer_gui_update_data *executer_gui_update_data)
 {
@@ -235,6 +273,9 @@ int executer_gui_update(struct executer_gui_ctx *executer_gui_ctx,
 	log_print(LOG_DEBUG, "update GUI");
 
 	switch (executer_gui_update_data->type) {
+	case EXECUTER_GUI_UPDATE_DISPLAY_ANALYSIS:
+		display_analysis(executer_gui_ctx);
+		break;
 	case EXECUTER_GUI_UPDATE_UNKNOWN_PROGRESS:
 		progress_bar_update_unknown(executer_gui_ctx);
 		break;

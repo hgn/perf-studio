@@ -12,11 +12,17 @@ void executer_fini(struct ps *ps);
 
 
 enum {
-	EXECUTER_GUI_REPLY_USER_CANCEL
+	EXECUTER_GUI_REPLY_USER_CANCEL,
+	EXECUTER_GUI_REPLY_USER_NEXT
 };
 
 struct executer_gui_reply {
 	unsigned int type;
+};
+
+enum {
+	EXECUTER_STATE_WELCOME_SCREEN,
+	EXECUTER_STATE_PROCESSING
 };
 
 
@@ -29,6 +35,8 @@ struct executer_gui_reply {
  * used.
  */
 struct executer_gui_ctx {
+
+	int state;
 
 	/* functional members */
 	struct ps *ps;
@@ -75,7 +83,8 @@ void executer_gui_free(struct executer_gui_ctx *);
 
 enum {
 	EXECUTER_GUI_UPDATE_PROGRESS_CHANGE,
-	EXECUTER_GUI_UPDATE_UNKNOWN_PROGRESS
+	EXECUTER_GUI_UPDATE_UNKNOWN_PROGRESS,
+	EXECUTER_GUI_UPDATE_DISPLAY_ANALYSIS
 };
 
 struct executer_gui_update_progress_change {
