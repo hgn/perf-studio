@@ -128,6 +128,9 @@ static void executer_thread(gpointer thread_data, gpointer user_data)
 {
 	log_print(LOG_INFO, "executer thread started");
 
+	(void)thread_data;
+	(void)user_data;
+
 	g_usleep(10000000);
 	log_print(LOG_INFO, "program finished");
 	g_async_queue_push(executer_queue, GINT_TO_POINTER(PROGRAM_FINISHED));
@@ -177,7 +180,6 @@ static void executer_gui_finish(struct executer_gui_ctx *executer_gui_ctx)
 
 static void executer_gui_next(struct executer_gui_ctx *executer_gui_ctx)
 {
-	struct ps *ps;
 	struct executer_gui_update_data executer_gui_update_data;
 
 	memset(&executer_gui_update_data, 0, sizeof(executer_gui_update_data));
@@ -195,7 +197,7 @@ static void executer_gui_next(struct executer_gui_ctx *executer_gui_ctx)
 }
 
 
-gboolean timeout_function(gpointer user_data)
+static gboolean timeout_function(gpointer user_data)
 {
 	unsigned int type;
 	gpointer thread_data;
@@ -244,8 +246,8 @@ gboolean timeout_function(gpointer user_data)
 }
 
 
-int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
-		 struct executer_gui_reply *executer_gui_reply)
+static int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
+			struct executer_gui_reply *executer_gui_reply)
 {
 	assert(executer_gui_ctx);
 	assert(executer_gui_reply);
