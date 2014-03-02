@@ -45,7 +45,7 @@ void gui_menu_init(struct ps *ps)
 
 	/* File submenues */
 	file      = gtk_menu_item_new_with_mnemonic("_File");
-	file_quit = gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, NULL);
+	file_quit = gtk_menu_item_new_with_mnemonic("_Quit");
 	g_signal_connect(G_OBJECT(file_quit), "activate", G_CALLBACK(gtk_main_quit), NULL);
 
 
@@ -78,7 +78,8 @@ void gui_menu_init(struct ps *ps)
 
 	/* System submenues */
 	systemm         = gtk_menu_item_new_with_mnemonic("_Systems");
-	system_report  = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
+	system_report = gtk_menu_item_new_with_mnemonic("_New");
+	//system_report  = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
 
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(systemm), systemmenu);
 	gtk_menu_shell_append(GTK_MENU_SHELL(systemmenu), system_report);
@@ -86,7 +87,8 @@ void gui_menu_init(struct ps *ps)
 
 	/* View submenues */
 	view         = gtk_menu_item_new_with_mnemonic("_View");
-	view_report  = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
+	//view_report  = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
+	view_report =  gtk_menu_item_new_with_mnemonic("_New");
 
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), viewmenu);
 	gtk_menu_shell_append(GTK_MENU_SHELL(viewmenu), view_report);
