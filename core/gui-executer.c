@@ -270,8 +270,6 @@ int executer_gui_update(struct executer_gui_ctx *executer_gui_ctx,
 	assert(executer_gui_ctx);
 	assert(executer_gui_update_data);
 
-	log_print(LOG_DEBUG, "update GUI");
-
 	switch (executer_gui_update_data->type) {
 	case EXECUTER_GUI_UPDATE_DISPLAY_ANALYSIS:
 		display_analysis(executer_gui_ctx);

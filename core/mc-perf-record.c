@@ -6,7 +6,7 @@
 #include "strbuf.h"
 
 struct mc_perf_record_data {
-	/* list of perf events, e.g. -e, --event */
+	/* string of perf events, e.g. -e, --event */
 	struct strbuf event_string;
 
 	/* -a, --all-cpus */
@@ -54,8 +54,6 @@ void mc_perf_record_data_free(struct mc_perf_record_data *mc_perf_record_data)
 void mc_perf_record_data_free_recursive(struct mc_perf_record_data *mc_perf_record_data)
 {
 	assert(mc_perf_record_data);
-
-
 
 	mc_perf_record_data_free(mc_perf_record_data);
 }
@@ -116,3 +114,21 @@ int mc_perf_record_data_check(struct mc_perf_record_data *data)
 	return 0;
 }
 
+
+gchar **mc_perf_record_data_exec_cmd(struct mc_perf_record_data *mc_perf_record_data)
+{
+	const char *cmd;
+	gchar **ret;
+
+	assert(mc_perf_record_data);
+
+	cmd = "/home/pfeifer/src/code/01-own/perf-studio/perf-test";
+
+	ret = g_strsplit(cmd, " ", 12);
+	if (!ret) {
+		log_print(LOG_ERROR, "Cannot construct perf command string");
+		return NULL;
+	}
+
+	return ret;
+}

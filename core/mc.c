@@ -238,7 +238,8 @@ struct mc_store *project_unregister_mc_store(struct project *project)
 	struct mc_store *store;
 
 	if (!project->mc_store) {
-		log_print(LOG_ERROR, "Cannot unregister because no measurement store registered");
+		log_print(LOG_ERROR,
+			  "Cannot unregister because no measurement store registered");
 		return NULL;
 	}
 
@@ -251,4 +252,46 @@ struct mc_store *project_unregister_mc_store(struct project *project)
 }
 
 
+/**
+ * mc_store_update_exec_cmds - iterate over mc_store and generae exec strings
+ *
+ * This function iterates over all registered classes and generates -
+ * if possible - a exeuction string. This string is directly executed
+ * later. If the particular class do not need a execution (e.g. simple
+ * measure start and endtime) that this string is empty.
+ * This function is normally called shortly before the execution begins.
+ *
+ * This function returns 0 if every went fine or a negative value in
+ * the case of an error
+ */
+int mc_store_update_exec_cmds(struct mc_store *mc_store)
+{
+	int ret;
+	GSList *tmp;
+	struct mc_element *mc_element;
 
+	assert(mc_store);
+
+	tmp = mc_store->mc_element_list;
+	while (tmp) {
+		mc_element = tmp->data;
+		assert(mc_element);
+		assert(mc_element->exec_cmd == NULL);
+
+		switch (mc_element->measurement_class) {
+		case MEASUREMENT_CLASS_PERF_RECORD:
+			mc_element->exec_cmd = mc_perf_record_data_exec_cmd(mc_element->mc_element_data);
+			if (!mc_element->exec_cmd) {
+				log_print(LOG_ERROR, "Failed to construct cmd string, strange");
+			}
+			break;
+		default:
+			log_print(LOG_WARNING, "No exec cmd avail");
+			break;
+		}
+
+		tmp = g_slist_next(tmp);
+	}
+
+	return 0;
+}

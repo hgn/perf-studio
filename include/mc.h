@@ -22,6 +22,12 @@ struct mc_element {
 	/* one of MEASUREMENT_CLASS_* */
 	unsigned int measurement_class;
 	void *mc_element_data;
+
+	/* NULL terminated string for execution, if string
+	 * is empty nothin has to performed. This string must
+	 * be freed afterward with g_strfreev()
+	 */
+	gchar **exec_cmd;
 };
 
 
@@ -51,12 +57,12 @@ struct mc_store *mc_store_alloc(void);
 void mc_store_free(struct mc_store *);
 void mc_store_free_recursive(struct mc_store *mc_store);
 int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data) WARN_UNUSED_RESULT;
+int mc_store_update_exec_cmds(struct mc_store *);
 
 
 struct mc_element *mc_element_alloc(void);
 void mc_element_free_recursive(struct mc_element *l);
 void mc_element_free(struct mc_element *l);
-
 
 int project_register_mc_store(struct project *project, struct mc_store *mc_store);
 struct mc_store *project_unregister_mc_store(struct project *project);
@@ -71,5 +77,7 @@ void mc_perf_record_data_callgraph_enable(struct mc_perf_record_data *mc_perf_re
 void mc_perf_record_data_callgraph_disable(struct mc_perf_record_data *mc_perf_record_data);
 void mc_perf_record_data_system_wide_enable(struct mc_perf_record_data *mc_perf_record_data);
 void mc_perf_record_data_system_wide_disable(struct mc_perf_record_data *mc_perf_record_data);
+gchar **mc_perf_record_data_exec_cmd(struct mc_perf_record_data *mc_perf_record_data);
+
 
 #endif /* MC_H */

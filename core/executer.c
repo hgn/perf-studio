@@ -13,6 +13,7 @@
 #include "shared.h"
 #include "gui-event-generator.h"
 #include "log.h"
+#include "mc.h"
 
 static GAsyncQueue *executer_queue;
 static GThreadPool *executer_pool;
@@ -20,35 +21,16 @@ static GThreadPool *executer_pool;
 //struct executer_gui_ctx *executer_gui_ctx;
 
 
-static int execute_raw(struct executer_gui_ctx *executer_gui_ctx,
-		       const char *program, const char **options)
+static int execute_raw_direct(struct executer_gui_ctx *executer_gui_ctx,
+			      const char **cmd)
 {
 	int child_status, pipefd[2];
+        int ret;
 	char buffer[1024];
-	wordexp_t result;
-        int i, ret;
 
 	ret = 0;
 
-	/* Expand the string for the program to run.  */
-	switch (wordexp(program, &result, 0)) {
-	case 0:	/* Successful.  */
-		break;
-	case WRDE_NOSPACE:
-		/* If the error was WRDE_NOSPACE,
-		   then perhaps part of the result was allocated.  */
-		wordfree(&result);
-	default: /* Some other error.  */
-		return -EINVAL;
-	}
-
-	/* Expand the strings specified for the arguments.  */
-	for (i = 0; options[i] != NULL; i++) {
-		if (wordexp (options[i], &result, WRDE_APPEND)) {
-			wordfree (&result);
-			return -EINVAL;
-		}
-	}
+	log_print(LOG_INFO, "execute: %s %s", cmd[0], cmd[0]);
 
 	/* flush current buffer */
 	fflush(stdout);
@@ -74,7 +56,7 @@ static int execute_raw(struct executer_gui_ctx *executer_gui_ctx,
 		setvbuf(stdout, NULL, _IOLBF, 0);
 		setvbuf(stderr, NULL, _IOLBF, 0);
 
-		execv(result.we_wordv[0], result.we_wordv);
+		execv(cmd[0], (char * const*)cmd);
 		log_print(LOG_ERROR, "Failed to execute program");
 		exit(100);
 	case -1:
@@ -88,7 +70,7 @@ static int execute_raw(struct executer_gui_ctx *executer_gui_ctx,
 
 		/* we read all input */
 		while (read(pipefd[0], buffer, sizeof(buffer)) != 0) {
-			log_print(LOG_DEBUG, "child: %s", buffer);
+			log_print(LOG_DEBUG, "child: %s\n", buffer);
 		}
 
 		/* ... we wait here */
@@ -101,13 +83,40 @@ static int execute_raw(struct executer_gui_ctx *executer_gui_ctx,
 				assert(child_ret != 100);
 			}
 		}
+		/* finished program execution, set to 0 */
+		executer_gui_ctx->child_pid = 0;
 		break;
 	}
 
 out:
-	wordfree(&result);
-
 	return ret;
+}
+
+
+static int execute_raw(struct mc_store *mc_store,
+		       struct executer_gui_ctx *executer_gui_ctx)
+{
+	int ret;
+	GSList *tmp;
+	struct mc_element *mc_element;
+
+	assert(mc_store);
+
+	tmp = mc_store->mc_element_list;
+	while (tmp) {
+		mc_element = tmp->data;
+		assert(mc_element);
+		assert(mc_element->exec_cmd);
+
+		ret = execute_raw_direct(executer_gui_ctx, (const char **)mc_element->exec_cmd);
+		if (ret) {
+			log_print(LOG_DEBUG, "failed to execute program, status: %d", ret);
+		}
+
+		tmp = g_slist_next(tmp);
+	}
+
+	return 0;
 }
 
 /*
@@ -126,12 +135,24 @@ enum {
  */
 static void executer_thread(gpointer thread_data, gpointer user_data)
 {
+	int ret;
+	struct ps *ps;
+	struct executer_gui_ctx *executer_gui_ctx;
+
 	log_print(LOG_INFO, "executer thread started");
 
-	(void)thread_data;
-	(void)user_data;
+	ps = user_data;
+	executer_gui_ctx = thread_data;
+	assert(ps && executer_gui_ctx);
 
-	g_usleep(10000000);
+	log_print(LOG_INFO, "program start");
+	assert(ps);
+	assert(ps->active_project);
+	assert(ps->active_project->mc_store);
+	ret = execute_raw(ps->active_project->mc_store, executer_gui_ctx);
+	if (ret) {
+		log_print(LOG_INFO, "failed in program execution");
+	}
 	log_print(LOG_INFO, "program finished");
 	g_async_queue_push(executer_queue, GINT_TO_POINTER(PROGRAM_FINISHED));
 }
@@ -159,8 +180,31 @@ void executer_fini(struct ps *ps)
 	g_async_queue_unref(executer_queue);
 }
 
+#include <sys/types.h>
+#include <signal.h>
 
-static void executer_gui_finish(struct executer_gui_ctx *executer_gui_ctx)
+static void terminate_running_cmd(struct executer_gui_ctx *executer_gui_ctx)
+{
+	int ret;
+
+	assert(executer_gui_ctx);
+
+	if (executer_gui_ctx->child_pid == 0) {
+		log_print(LOG_INFO, "Program not running anymore");
+		return;
+	}
+
+	ret = kill(executer_gui_ctx->child_pid, SIGKILL);
+	if (ret) {
+		log_print(LOG_ERROR, "Could not kill process: %s",
+			  strerror(errno));
+	}
+}
+
+
+
+/* This finish GUI and execution context */
+static void executer_finish(struct executer_gui_ctx *executer_gui_ctx)
 {
 	struct ps *ps;
 
@@ -169,6 +213,9 @@ static void executer_gui_finish(struct executer_gui_ctx *executer_gui_ctx)
 		g_source_remove(executer_gui_ctx->timeout_id);
 		executer_gui_ctx->timeout_id = 0;
 	}
+
+	/* kill process if still running */
+	terminate_running_cmd(executer_gui_ctx);
 
 	executer_gui_free(executer_gui_ctx);
 	ps = executer_gui_ctx->ps;
@@ -214,10 +261,8 @@ static gboolean timeout_function(gpointer user_data)
 	 * if not we simple send a update message to the gui
 	 * to pulse the progress bar
 	 */
-	log_print(LOG_INFO, "wait for data");
 	thread_data = g_async_queue_try_pop(executer_queue);
 	if (!thread_data) {
-		log_print(LOG_INFO, "no data received");
 		assert(executer_gui_ctx);
 
 		if (executer_gui_ctx->state == EXECUTER_STATE_PROCESSING) {
@@ -227,14 +272,12 @@ static gboolean timeout_function(gpointer user_data)
 		return TRUE;
 	}
 
-	log_print(LOG_INFO, "data received");
-
 	type = GPOINTER_TO_UINT(thread_data);
 	switch (type) {
 	case PROGRAM_FINISHED:
 		log_print(LOG_DEBUG, "received program finished");
 		/* FIXME: the programm must be stoped, killed */
-		executer_gui_finish(executer_gui_ctx);
+		executer_finish(executer_gui_ctx);
 		return FALSE;
 		break;
 	default:
@@ -255,7 +298,7 @@ static int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
 	switch (executer_gui_reply->type) {
 	case EXECUTER_GUI_REPLY_USER_CANCEL:
 		log_print(LOG_DEBUG, "user cancled GUI executer");
-		executer_gui_finish(executer_gui_ctx);
+		executer_finish(executer_gui_ctx);
 		break;
 	case EXECUTER_GUI_REPLY_USER_NEXT:
 		log_print(LOG_DEBUG, "user clicked next");
@@ -280,6 +323,7 @@ static int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
  */
 void execute_module_triggered_analyze(struct module *module)
 {
+	int ret;
 	struct ps *ps;
 
 	assert(module);
@@ -298,6 +342,15 @@ void execute_module_triggered_analyze(struct module *module)
 		return;
 	}
 
+	/* prepare command to execute */
+	assert(ps->active_project != NULL);
+	assert(ps->active_project->mc_store != NULL);
+	ret = mc_store_update_exec_cmds(ps->active_project->mc_store);
+	if (ret) {
+		log_print(LOG_ERROR, "Failed to construct excution command");
+		return;
+	}
+
 	log_print(LOG_INFO, "Now do analyzed for project!");
 
 	/* we now start the GUI */
@@ -308,7 +361,7 @@ void execute_module_triggered_analyze(struct module *module)
 	executer_gui_init(ps->executer_gui_ctx);
 
 	/* push data to run */
-	g_thread_pool_push(executer_pool, GUINT_TO_POINTER (1000), NULL);
+	g_thread_pool_push(executer_pool, ps->executer_gui_ctx, NULL);
 
 	/* now executer a timer to check if the thread is finished */
 	ps->executer_gui_ctx->timeout_id = g_timeout_add(250, timeout_function, ps->executer_gui_ctx);
