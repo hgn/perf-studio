@@ -29,6 +29,8 @@ clean:
 	@for dir in ${SUBDIRS}; do \
 					(cd $$dir && $(MAKE) clean) \
 	done
+
+distclean: clean
 	$(Q)$(do_local_clean)
 
 install: all
