@@ -29,6 +29,7 @@ clean:
 	@for dir in ${SUBDIRS}; do \
 					(cd $$dir && $(MAKE) clean) \
 	done
+	$(Q)($(print_rm) $(RM) core.*)
 
 distclean: clean
 	$(Q)$(do_local_clean)
