@@ -1,5 +1,6 @@
 #include "random.h"
 #include "shared.h"
+#include "log.h"
 
 gchar *rand_hex_string(struct ps *ps, gsize length)
 {
@@ -21,7 +22,7 @@ gchar *rand_hex_string(struct ps *ps, gsize length)
 
 void rand_init(struct ps *ps)
 {
-	pr_info(ps, "Initialize random generator");
+	log_print(LOG_INFO, "Initialize random generator");
 	ps->rand = g_rand_new();
 }
 
