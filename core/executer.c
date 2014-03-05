@@ -162,7 +162,7 @@ int executer_init(struct ps *ps)
 {
 	assert(ps);
 
-	log_print(LOG_INFO, "initialize executer threads (%d threads)", 1);
+	log_print(LOG_INFO, "Initialize executer thread pool (%d threads)", 1);
 
 	executer_pool = g_thread_pool_new(executer_thread, ps, 1, FALSE, NULL);
 

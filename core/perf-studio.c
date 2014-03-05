@@ -199,36 +199,35 @@ int main (int ac, char **av)
 
 	ps = ps_new();
 
-	pr_info(ps, "Perf-Studio (C)");
-	pr_info(ps, "Version: %s", VERSION_STRING);
+	log_print(LOG_INFO, "Perf-Studio (C) - Version: %s", VERSION_STRING);
 
 	/* intialize random subsystem - must be early */
 	rand_init(ps);
 
 	ret = parse_cli_options(ps, ac, av);
 	if (ret != 0) {
-		err_msg(ps, "failed to parse command line");
+		log_print(LOG_CRITICAL, "Failed to parse command line arguments");
 		ret = EXIT_FAILURE;
 		goto out;
 	}
 
 	ret = executer_init(ps);
 	if (ret != 0) {
-		log_print(LOG_CRITICAL, "failed to initialize executer");
+		log_print(LOG_CRITICAL, "Failed to initialize executer");
 		ret = EXIT_FAILURE;
 		goto out;
 	}
 
 	ret = load_user_conf_file(ps);
 	if (ret != 0) {
-		err_msg(ps, "failed to parse configuration file");
+		log_print(LOG_CRITICAL, "Failed to load configuration file");
 		ret = EXIT_FAILURE;
 		goto out;
 	}
 
 	ret = load_projects_from_cache(ps);
 	if (ret != 0) {
-		err_msg(ps, "failed to load project configuration file");
+		log_print(LOG_CRITICAL, "Failed to load project configuration file");
 		ret = EXIT_FAILURE;
 		goto out;
 	}
@@ -236,14 +235,14 @@ int main (int ac, char **av)
 
 	ret = register_available_modules(ps);
 	if (ret != 0) {
-		err_msg(ps, "failed to register perf-studio modules");
+		log_print(LOG_CRITICAL, "Failed to register perf-studio modules");
 		ret = EXIT_FAILURE;
 		goto out2;
 	}
 
 	ret = gui_register_artwork(ps);
 	if (ret != 0) {
-		err_msg(ps, "failed to load artwork");
+		log_print(LOG_CRITICAL, "Failed to load artwork");
 		ret = EXIT_FAILURE;
 		goto out3;
 	}
@@ -262,7 +261,7 @@ out2:
 out:
 	rand_free(ps);
 	unregister_all_modules(ps);
-	pr_info(ps, "exiting");
+	log_print(LOG_INFO, "Exiting Perf Studio");
 	ps_free(ps);
 	return ret;
 }

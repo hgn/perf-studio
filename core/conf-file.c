@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -12,6 +13,8 @@
 #include "shared.h"
 #include "project.h"
 #include "conf-file.h"
+#include "log.h"
+#include "file-utils.h"
 
 #define PERF_STUDIO_USER_CONF_DIR "perf-studio"
 #define PERF_STUDIO_USER_GLOBAL_CONF_NAME "config"
@@ -51,13 +54,28 @@ int load_user_conf_file(struct ps *ps)
 	}
 
 
-	ps->conf.common.perf_path = g_key_file_get_string(keyfile, "common", "perf-path", NULL);
-	pr_info(ps, "perf-path: %s", ps->conf.common.perf_path);
+	ps->conf.common.perf_path = g_key_file_get_string(keyfile, "common",
+							  "perf-path", NULL);
+	if (!ps->conf.common.perf_path) {
+		log_print(LOG_INFO, "No perf executable path given"
+			  ", try to determine perf");
+	}
+	tmp = file_utils_find_exec(getenv("PATH"), ps->conf.common.perf_path);
+	if (!tmp) {
+		log_print(LOG_CRITICAL, "Could not find a valid perf installation!");
+		return -EINVAL;
+	}
+	g_free(ps->conf.common.perf_path);
+	ps->conf.common.perf_path = tmp;
+	log_print(LOG_DEBUG, "Path to perf executable: %s", ps->conf.common.perf_path);
 
-	ps->conf.common.username = g_key_file_get_string(keyfile, "common", "username", NULL);
+	ps->conf.common.username = g_key_file_get_string(keyfile, "common",
+							 "username", NULL);
 	pr_info(ps, "username: %s", ps->conf.common.username);
 
-	ps->conf.common.module_paths = g_key_file_get_string_list(keyfile, "common", "module-paths", &length, NULL);
+	ps->conf.common.module_paths = g_key_file_get_string_list(keyfile, "common",
+								  "module-paths",
+								  &length, NULL);
 	iter = ps->conf.common.module_paths;
 	while (iter && *iter) {
 		pr_info(ps, "module-paths: %s", *iter);

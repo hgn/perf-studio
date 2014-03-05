@@ -1,9 +1,11 @@
+#include <stdlib.h>
 #include <errno.h>
 
 #include "perf-studio.h"
 #include "mc.h"
 #include "log.h"
 #include "strbuf.h"
+#include "file-utils.h"
 
 struct mc_perf_record_data {
 	/* string of perf events, e.g. -e, --event */
@@ -118,13 +120,19 @@ int mc_perf_record_data_check(struct mc_perf_record_data *data)
 gchar **mc_perf_record_data_exec_cmd(struct mc_perf_record_data *mc_perf_record_data)
 {
 	const char *cmd;
+	gchar *full_cmd_path;
 	gchar **ret;
 
 	assert(mc_perf_record_data);
 
-	cmd = "/home/pfeifer/src/code/01-own/perf-studio/perf-test";
+	cmd = "./perf-test";
+	full_cmd_path = file_utils_find_exec(getenv("PATH"), cmd);
+	if (!full_cmd_path) {
+		log_print(LOG_CRITICAL, "Could not find the executable: %s", cmd);
+		return NULL;
+	}
 
-	ret = g_strsplit(cmd, " ", 12);
+	ret = g_strsplit(full_cmd_path, " ", 12);
 	if (!ret) {
 		log_print(LOG_ERROR, "Cannot construct perf command string");
 		return NULL;
