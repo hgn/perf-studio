@@ -65,14 +65,24 @@ int log_get_mode(void)
 	return current_log_mode;
 }
 
+static int logger_level = LOG_INFO;
 
-__attribute__((__format__ (__printf__, 6, 0)))
-void _print_log(int loglevel, const char *file, const char *func,
-		const char *clock_time, int line, const char *msg, ...)
+void logger_set_level(int level)
 {
-	char *to_print;
+	assert(level >= 0 && level <=  LOG_INVALID);
+	logger_level = level;
+}
+
+
+__attribute__((__format__ (__printf__, 5, 0)))
+void _print_log(int loglevel, const char *file, const char *func,
+		int line, const char *msg, ...)
+{
 	va_list args;
 	char *buffer;
+
+	if (loglevel > logger_level)
+		return;
 
 	logging_file = stdout;
 
@@ -111,7 +121,10 @@ void _print_log(int loglevel, const char *file, const char *func,
 		fprintf(logging_file, "%s", log_tags[_log_current_mode][loglevel]);
 	printf(COLOR_END);
 
-	fprintf(logging_file, "%s:%s(): %s\n", file, func, buffer);
+	if (logger_level == LOG_DEBUG)
+		fprintf(logging_file, "%s:%04d:%s():", file, line, func);
+
+	fprintf(logging_file, " %s\n", buffer);
 
 	va_end(args);
 }

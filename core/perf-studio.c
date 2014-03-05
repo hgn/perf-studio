@@ -62,6 +62,7 @@ static int parse_cli_options(struct ps *ps, int ac, char **av)
 			break;
 		case 'v':
 			ps->args.msg_level = MSG_LEVEL_DEBUG;
+			logger_set_level(LOG_DEBUG);
 			break;
 		case 'm':
 			ps->args.list_available_modules = TRUE;
