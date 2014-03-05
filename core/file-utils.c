@@ -14,7 +14,7 @@
 #include "log.h"
 
 
-static gboolean is_valid_exec_file(const char *path)
+static gboolean valid_exec_file(const char *path)
 {
 	int ret;
 	struct stat st;
@@ -48,7 +48,7 @@ gchar *file_utils_find_exec(const char *path, const char *cmd)
 		if (cmd[1] == '\0') {
 			return NULL;
 		}
-		if (!is_valid_exec_file(cmd))
+		if (!valid_exec_file(cmd))
 			return NULL;
 		return g_strdup(cmd);
 	}
@@ -58,7 +58,7 @@ gchar *file_utils_find_exec(const char *path, const char *cmd)
 		cwd = getcwd(NULL, 0);
 		tmp_str = g_strdup_printf("%s/%s", cwd, &cmd[2]);
 		free(cwd);
-		if (!is_valid_exec_file(tmp_str)) {
+		if (!valid_exec_file(tmp_str)) {
 			log_print(LOG_ERROR, "not a executable: %s", tmp_str);
 			g_free(tmp_str);
 			return NULL;
@@ -77,7 +77,7 @@ gchar *file_utils_find_exec(const char *path, const char *cmd)
 	if (!strstr(tmp_path, ":")) {
 		/* not a list of path, rater one path */
 		tmp_str = g_strdup_printf("%s/%s", tmp_path, cmd);
-		if (!is_valid_exec_file(tmp_str)) {
+		if (!valid_exec_file(tmp_str)) {
 			log_print(LOG_ERROR, "not a executable: %s", tmp_str);
 			g_free(tmp_str);
 			return NULL;
@@ -88,14 +88,14 @@ gchar *file_utils_find_exec(const char *path, const char *cmd)
 
 	token = strtok(tmp_path, ":");
 	tmp_str = g_strdup_printf("%s/%s", token, cmd);
-	if (is_valid_exec_file(tmp_str)) {
+	if (valid_exec_file(tmp_str)) {
 		return tmp_str;
 	}
 	g_free(tmp_str);
 
 	while ((token = strtok(NULL, ":")) != NULL) {
 		tmp_str = g_strdup_printf("%s/%s", token, cmd);
-		if (is_valid_exec_file(tmp_str)) {
+		if (valid_exec_file(tmp_str)) {
 			return tmp_str;
 		}
 		g_free(tmp_str);

@@ -48,6 +48,9 @@ int load_user_conf_file(struct ps *ps)
 	keyfile = g_key_file_new();
 	flags = G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS;
 
+	log_print(LOG_INFO, "Parse user configuration file [%s]", full_path);
+
+
 	if (!g_key_file_load_from_file(keyfile, full_path, flags, NULL)) {
 		pr_info(ps, "failed to open user configuration file [%s]", full_path);
 		goto out;
@@ -71,23 +74,24 @@ int load_user_conf_file(struct ps *ps)
 
 	ps->conf.common.username = g_key_file_get_string(keyfile, "common",
 							 "username", NULL);
-	pr_info(ps, "username: %s", ps->conf.common.username);
+	log_print(LOG_DEBUG, "Username: %s", ps->conf.common.username);
 
 	ps->conf.common.module_paths = g_key_file_get_string_list(keyfile, "common",
 								  "module-paths",
 								  &length, NULL);
 	iter = ps->conf.common.module_paths;
+	log_print(LOG_DEBUG, "Module paths");
 	while (iter && *iter) {
-		pr_info(ps, "module-paths: %s", *iter);
+		log_print(LOG_DEBUG, "\t%s", *iter);
 		iter++;
 	}
 
 	tmp = g_key_file_get_string(keyfile, "module-conf", "show-experimental-modules", NULL);
 	if (question_true(tmp)) {
-		pr_info(ps, "experimental modules: ACTIVATED");
+		log_print(LOG_INFO, "Experimental modules: enabled");
 		ps->conf.module_conf.show_experimental_modules = TRUE;
 	} else {
-		pr_info(ps, "experimental modules: BANNED");
+		log_print(LOG_INFO,  "experimental modules: disabled");
 		ps->conf.module_conf.show_experimental_modules = FALSE;
 	}
 	g_free(tmp);
@@ -249,7 +253,7 @@ static void load_check_conf(struct ps *ps, const char *file_name, gchar *project
 		goto out;
 	}
 
-	pr_info(ps, "Try to read configuration file: %s", project_path_name);
+	log_print(LOG_DEBUG, "Parse project configuration file [%s]", project_path_name);
 
 	keyfile = g_key_file_new();
 	flags = G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS;
@@ -290,6 +294,8 @@ int load_projects_from_cache(struct ps *ps)
 	const char *file_name;
 	GFileType file_type;
 
+	log_print(LOG_INFO, "Load projects");
+
 	file_path = g_build_filename(g_get_user_cache_dir(),
 			             PERF_STUDIO_USER_CONF_DIR,
 				     PERF_STUDIO_USER_PROJECT_DIR_NAME,
@@ -308,6 +314,7 @@ int load_projects_from_cache(struct ps *ps)
 			file_name = g_file_info_get_name (file_info);
 			file_type = g_file_info_get_file_type (file_info);
 			if (file_type == G_FILE_TYPE_DIRECTORY) {
+				log_print(LOG_INFO, "Project ID: %s", file_name);
 				n_path = g_build_filename(file_path, file_name, NULL);
 				load_check_conf(ps, file_name, n_path);
 				g_free(n_path);
