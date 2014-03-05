@@ -58,6 +58,9 @@ static int parse_cli_options(struct ps *ps, int ac, char **av)
 				ps->args.theme = THEME_DARK;
 			} else if (streq("light", optarg)) {
 				ps->args.theme = THEME_LIGHT;
+			} else {
+				log_print(LOG_CRITICAL, "Theme not supported");
+				exit(EXIT_FAILURE);
 			}
 			break;
 		case 'v':
