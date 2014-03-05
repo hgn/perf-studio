@@ -266,7 +266,6 @@ struct mc_store *project_unregister_mc_store(struct project *project)
  */
 int mc_store_update_exec_cmds(struct mc_store *mc_store)
 {
-	int ret;
 	GSList *tmp;
 	struct mc_element *mc_element;
 
@@ -280,7 +279,8 @@ int mc_store_update_exec_cmds(struct mc_store *mc_store)
 
 		switch (mc_element->measurement_class) {
 		case MEASUREMENT_CLASS_PERF_RECORD:
-			mc_element->exec_cmd = mc_perf_record_data_exec_cmd(mc_element->mc_element_data);
+			mc_element->exec_cmd = mc_perf_record_data_exec_cmd(
+							mc_element->mc_element_data);
 			if (!mc_element->exec_cmd) {
 				log_print(LOG_ERROR, "Failed to construct cmd string, strange");
 			}
