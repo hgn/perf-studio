@@ -16,7 +16,6 @@ void project_unload_current(struct ps *ps);
 void project_register_activate_cb(struct ps *ps, void (*cb)(struct ps *ps));
 void project_register_deactivate_cb(struct ps *ps,  void (*cb)(struct ps *ps));
 
-
 static inline void project_add(struct ps *ps, struct project *project)
 {
 	ps->project_list = g_slist_append(ps->project_list, project);

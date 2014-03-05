@@ -483,6 +483,13 @@ static void module_activate(struct ps *ps, struct module *module)
 	pr_debug(ps, "Module \"%s\" activated", module->name);
 
 	module->activated = 1;
+
+	if (ps->active_project) {
+		/* if the module is activated and a project
+		 * was already loaded we instanly activate the
+		 * project */
+		module->project_activated(module, ps->active_project);
+	}
 }
 
 
