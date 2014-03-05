@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <wordexp.h>
+#include <signal.h>
 
 #include "perf-studio.h"
 #include "executer.h"
@@ -180,8 +180,6 @@ void executer_fini(struct ps *ps)
 	g_async_queue_unref(executer_queue);
 }
 
-#include <sys/types.h>
-#include <signal.h>
 
 static void terminate_running_cmd(struct executer_gui_ctx *executer_gui_ctx)
 {
