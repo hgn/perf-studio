@@ -22,15 +22,18 @@ static GThreadPool *executer_pool;
 
 
 static int execute_raw_direct(struct executer_gui_ctx *executer_gui_ctx,
-			      const char **cmd)
+			      char **cmd)
 {
 	int child_status, pipefd[2];
         int ret;
 	char buffer[1024];
+	gchar *str;
 
 	ret = 0;
 
-	log_print(LOG_INFO, "execute: %s %s", cmd[0], cmd[0]);
+	str = g_strjoinv(" ", cmd);
+	log_print(LOG_INFO, "Execute: %s", str);
+	g_free(str);
 
 	/* flush current buffer */
 	fflush(stdout);
@@ -68,9 +71,9 @@ static int execute_raw_direct(struct executer_gui_ctx *executer_gui_ctx,
 		/* close the write end of the pipe in the parent */
 		close(pipefd[1]);
 
-		/* we read all input */
+		/* we read all input and print to stderr */
 		while (read(pipefd[0], buffer, sizeof(buffer)) != 0) {
-			log_print(LOG_DEBUG, "child: %s\n", buffer);
+			log_print(LOG_INFO, "child: %s", buffer);
 		}
 
 		/* ... we wait here */
@@ -79,7 +82,7 @@ static int execute_raw_direct(struct executer_gui_ctx *executer_gui_ctx,
 		} else {
 			if (WIFEXITED(child_status)) {
 				int child_ret = WEXITSTATUS(child_status);
-				log_print(LOG_DEBUG, "programm exited with status: %d", child_ret);
+				log_print(LOG_INFO, "Programm exited with status: %d", child_ret);
 				assert(child_ret != 100);
 			}
 		}
@@ -108,7 +111,7 @@ static int execute_raw(struct mc_store *mc_store,
 		assert(mc_element);
 		assert(mc_element->exec_cmd);
 
-		ret = execute_raw_direct(executer_gui_ctx, (const char **)mc_element->exec_cmd);
+		ret = execute_raw_direct(executer_gui_ctx, mc_element->exec_cmd);
 		if (ret) {
 			log_print(LOG_DEBUG, "failed to execute program, status: %d", ret);
 		}
