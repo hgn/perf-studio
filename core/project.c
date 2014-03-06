@@ -125,7 +125,8 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 	assert(project->checksum);
 	assert(project->project_refs_path);
 
-	project->project_db_path = g_build_filename(project->project_path, "db", project->checksum, NULL);
+	project->project_db_path = g_build_filename(project->project_path, "db",
+						    project->checksum, NULL);
 
 	if (g_file_test(project->project_db_path, G_FILE_TEST_IS_DIR)) {
 		log_print(LOG_ERROR, "%s already created", project->project_db_path);
@@ -133,7 +134,7 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 		goto out;
 	}
 
-	log_print(LOG_INFO, "Create project db path %s (0755)", project->project_db_path);
+	log_print(LOG_INFO, "Create project DB path %s (0755)", project->project_db_path);
 	ret = g_mkdir(project->project_db_path, 0755);
 	if (ret != 0) {
 		log_print(LOG_ERROR, "Failed to create project db directory %s",

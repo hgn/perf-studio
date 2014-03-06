@@ -129,8 +129,10 @@ gchar **mc_perf_record_data_exec_cmd(struct ps *ps,
 	assert(ps->conf.common.perf_path);
 	assert(mc_perf_record_data);
 
-	strbuf_init(&strbuf, 128);
-	strbuf_addf(&strbuf, "%s ", ps->conf.common.perf_path);
+	strbuf_init(&strbuf, 256);
+	strbuf_addf(&strbuf, "%s record ", ps->conf.common.perf_path);
+
+	strbuf_addf(&strbuf, " -f %s/perf.data ", ps->active_project->project_db_path);
 
 	if (mc_perf_record_data->system_wide)
 		strbuf_addf(&strbuf, "--all-cpus ");
