@@ -162,3 +162,14 @@ out:
 
 	return ret;
 }
+
+
+int mc_perf_record_data_prepare_results(struct ps *ps, struct mc_element *mc_element)
+{
+	assert(ps);
+	assert(mc_element);
+
+	mc_element->data = (void *)0xffffffff;
+
+	return 0;
+}

@@ -3,6 +3,7 @@
 #include "perf-studio.h"
 #include "mc.h"
 #include "log.h"
+#include "module-utils.h"
 
 
 struct mc_element *mc_element_alloc(void)
@@ -301,6 +302,49 @@ int mc_store_update_exec_cmds(struct ps *ps, struct mc_store *mc_store)
 
 		tmp = g_slist_next(tmp);
 	}
+
+	return 0;
+}
+
+
+static void update_exec_results(struct ps *ps, struct mc_element *mc_element)
+{
+	int ret;
+
+	switch (mc_element->measurement_class) {
+	case MEASUREMENT_CLASS_PERF_RECORD:
+		ret = mc_perf_record_data_prepare_results(ps, mc_element);
+		if (ret) {
+			log_print(LOG_ERROR, "Failed to construct cmd string, strange");
+		}
+		break;
+	default:
+		log_print(LOG_WARNING, "No exec cmd avail");
+		break;
+	}
+}
+
+
+int mc_store_update_exec_results(struct ps *ps, struct mc_store *mc_store, struct module *module)
+{
+	GSList *tmp;
+	struct mc_element *mc_element;
+
+	assert(ps);
+	assert(mc_store);
+	assert(module);
+
+	tmp = mc_store->mc_element_list;
+	while (tmp) {
+		mc_element = tmp->data;
+		assert(mc_element);
+
+		update_exec_results(ps, mc_element);
+
+		tmp = g_slist_next(tmp);
+	}
+
+	module_new_data_available(module, mc_store);
 
 	return 0;
 }

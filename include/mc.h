@@ -23,6 +23,14 @@ struct mc_element {
 	unsigned int measurement_class;
 	void *mc_element_data;
 
+	/* Resulting data, This pointer is != NULL if data
+	 * is actually is available. This data must not be
+	 * uptodate (the executable can be newer) or represent
+	 * the last measurement data. The dataset can also be
+	 * true if a older revision is loaded.
+	 */
+	void *data;
+
 	/* NULL terminated string for execution, if string
 	 * is empty nothin has to performed. This string must
 	 * be freed afterward with g_strfreev()
@@ -58,6 +66,7 @@ void mc_store_free(struct mc_store *);
 void mc_store_free_recursive(struct mc_store *mc_store);
 int mc_store_add(struct mc_store *mc_store, enum mc_type mc_type, void *mc_data) WARN_UNUSED_RESULT;
 int mc_store_update_exec_cmds(struct ps *ps, struct mc_store *);
+int mc_store_update_exec_results(struct ps *ps, struct mc_store *mc_store, struct module *module);
 
 
 struct mc_element *mc_element_alloc(void);
@@ -78,6 +87,7 @@ void mc_perf_record_data_callgraph_disable(struct mc_perf_record_data *mc_perf_r
 void mc_perf_record_data_system_wide_enable(struct mc_perf_record_data *mc_perf_record_data);
 void mc_perf_record_data_system_wide_disable(struct mc_perf_record_data *mc_perf_record_data);
 gchar **mc_perf_record_data_exec_cmd(struct ps *ps, struct mc_perf_record_data *mc_perf_record_data);
+int mc_perf_record_data_prepare_results(struct ps *ps, struct mc_element *mc_element);
 
 
 #endif /* MC_H */

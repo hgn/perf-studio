@@ -217,12 +217,26 @@ static int disable_cb(struct module *module)
 }
 
 
-static int update_cb(struct module *module, struct mc_store *mc_store)
+static void update_cb(struct module *module, struct mc_store *mc_store)
 {
-	(void)module;
-	(void)mc_store;
+	GSList *tmp;
+	struct mc_element *mc_element;
 
-	return 0;
+	assert(mc_store);
+	assert(module);
+
+	tmp = mc_store->mc_element_list;
+	while (tmp) {
+		mc_element = tmp->data;
+		assert(mc_element);
+
+		if (mc_element->data) {
+			log_print(LOG_WARNING, "NEW DATA - YEAH");
+		}
+
+		tmp = g_slist_next(tmp);
+	}
+
 }
 
 

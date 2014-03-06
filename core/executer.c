@@ -18,7 +18,6 @@
 static GAsyncQueue *executer_queue;
 static GThreadPool *executer_pool;
 
-//struct executer_gui_ctx *executer_gui_ctx;
 
 
 static int execute_raw_direct(struct executer_gui_ctx *executer_gui_ctx,
@@ -71,7 +70,10 @@ static int execute_raw_direct(struct executer_gui_ctx *executer_gui_ctx,
 		/* close the write end of the pipe in the parent */
 		close(pipefd[1]);
 
-		/* we read all input and print to stderr */
+		/*
+		 * We read all input and print to stderr, later we
+		 * may print the output to a buffer place in window
+		 */
 		while (read(pipefd[0], buffer, sizeof(buffer)) != 0) {
 			log_print(LOG_INFO, "child: %s", buffer);
 		}
@@ -122,6 +124,7 @@ static int execute_raw(struct mc_store *mc_store,
 	return 0;
 }
 
+
 /*
  * If we wan't to marshal integer we must
  * make sure the value is a valid pointer - not
@@ -134,7 +137,9 @@ enum {
 
 /*
  * This function is called if a binary must be analyzed.
- * This funtion blocks until the execution ends.
+ * This funtion blocks until the execution ends. But note:
+ * this function is executed by a separated thread: blocking
+ * is not visable to any object.
  */
 static void executer_thread(gpointer thread_data, gpointer user_data)
 {
@@ -155,6 +160,19 @@ static void executer_thread(gpointer thread_data, gpointer user_data)
 	ret = execute_raw(ps->active_project->mc_store, executer_gui_ctx);
 	if (ret) {
 		log_print(LOG_INFO, "failed in program execution");
+	}
+
+	/* program, finished!
+	 * We now inform the particular mc_store handler to check if the
+	 * data was correct generated and if so to generate the user suitable
+	 * format saved as a member from mc_store. The module is shortly
+	 * informed and will check this data.
+	 */
+	ret = mc_store_update_exec_results(ps, ps->active_project->mc_store,
+					   executer_gui_ctx->module);
+	if (ret) {
+		/* not fatal */
+		log_print(LOG_ERROR, "Failed to construct exec results");
 	}
 	log_print(LOG_INFO, "program finished");
 	g_async_queue_push(executer_queue, GINT_TO_POINTER(PROGRAM_FINISHED));
@@ -202,6 +220,25 @@ static void terminate_running_cmd(struct executer_gui_ctx *executer_gui_ctx)
 	}
 }
 
+
+/*
+ * Execution finished sucessful - now inform
+ * all activated modules that new data is available
+ */
+static void update_modules(struct executer_gui_ctx *executer_gui_ctx)
+{
+	struct ps *ps;
+
+	assert(executer_gui_ctx);
+	assert(executer_gui_ctx->module);
+
+	ps = executer_gui_ctx->ps;
+	assert(ps);
+	assert(ps->active_project);
+	assert(ps->active_project->mc_store);
+
+	module_new_data_available(executer_gui_ctx->module, ps->active_project->mc_store);
+}
 
 
 /* This finish GUI and execution context */
@@ -277,7 +314,7 @@ static gboolean timeout_function(gpointer user_data)
 	switch (type) {
 	case PROGRAM_FINISHED:
 		log_print(LOG_DEBUG, "received program finished");
-		/* FIXME: the programm must be stoped, killed */
+		update_modules(executer_gui_ctx);
 		executer_finish(executer_gui_ctx);
 		return FALSE;
 		break;
@@ -357,6 +394,7 @@ void execute_module_triggered_analyze(struct module *module)
 	/* we now start the GUI */
 	ps->executer_gui_ctx = g_malloc0(sizeof(struct executer_gui_ctx));
 	ps->executer_gui_ctx->ps = module->ps;
+	ps->executer_gui_ctx->module = module;
 	ps->executer_gui_ctx->reply_cb = gui_reply_cb;
 	ps->executer_gui_ctx->state = EXECUTER_STATE_WELCOME_SCREEN;
 	executer_gui_init(ps->executer_gui_ctx);

@@ -41,6 +41,10 @@ struct executer_gui_ctx {
 	/* functional members */
 	struct ps *ps;
 
+	/* the module who triggered
+	 * the execution */
+	struct module *module;
+
 	/* the recuring timeout */
 	guint timeout_id;
 

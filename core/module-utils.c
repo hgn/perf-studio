@@ -120,3 +120,13 @@ void module_set_maturity(struct module *m, int maturity)
 {
 	m->maturity = maturity;
 }
+
+
+void module_new_data_available(struct module *m, struct mc_store *mc_store)
+{
+	assert(m);
+	assert(mc_store);
+	assert(m->update);
+
+	m->update(m, mc_store);
+}

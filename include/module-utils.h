@@ -42,4 +42,18 @@ void module_set_maturity(struct module *module, int level);
  */
 const char *module_maturity_str(struct module *module);
 
+
+/*
+ * Called internally from executer when data is available.
+ * This function multiplex to all registered modules.
+ *
+ * Limitation: this function currently will only inform
+ * the original executer of an event. Further if an event is
+ * used by more then a module (e.g. cacheline missses) then
+ * the multiplexing and logic should be implemented here. At
+ * least a part
+ */
+void module_new_data_available(struct module *m, struct mc_store *mc_store);
+
+
 #endif

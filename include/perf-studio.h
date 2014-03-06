@@ -436,7 +436,7 @@ struct module {
 	 * data in a module specific format, just to
 	 * display the data as quick as possible
 	 */
-	int (*update)(struct module *m, struct mc_store *mc_store);
+	void (*update)(struct module *m, struct mc_store *mc_store);
 
 	/*
 	 * Used by the module to allocate, initialize all
