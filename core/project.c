@@ -22,7 +22,7 @@ static void call_registered_activate_cb(struct ps *ps)
 		void (*activate_callback)(struct ps *ps);
 
 		activate_callback = tmp->data;
-		pr_debug(ps, "Call project activate callback");
+		log_print(LOG_INFO, "Call project activate callback");
 		activate_callback(ps);
 
 		tmp = g_slist_next(tmp);
@@ -72,7 +72,7 @@ static void call_registered_deactivate_cb(struct ps *ps)
 		void (*deactivate_callback)(struct ps *ps);
 
 		deactivate_callback = tmp->data;
-		pr_debug(ps, "Call project deactivate callback");
+		log_print(LOG_INFO, "Call project deactivate callback");
 		deactivate_callback(ps);
 
 		tmp = g_slist_next(tmp);
@@ -92,15 +92,16 @@ static int check_create_refs_path(struct ps *ps, struct project *project)
 	project->project_refs_path = g_build_filename(project->project_path, "refs", NULL);
 
 	if (g_file_test(project->project_refs_path, G_FILE_TEST_IS_DIR)) {
-		pr_info(ps, "%s already created", project->project_refs_path);
+		log_print(LOG_WARNING, "%s already created", project->project_refs_path);
 		ret = 0; /* no failure */
 		goto out;
 	}
 
-	pr_info(ps, "Create refs directory %s", project->project_refs_path);
+	log_print(LOG_VERBOSE, "Create refs directory %s", project->project_refs_path);
 	ret = g_mkdir(project->project_refs_path, 0755);
 	if (ret != 0) {
-		pr_error(ps, "Failed to create refs directory %s", project->project_refs_path);
+		log_print(LOG_ERROR, "Failed to create refs directory %s",
+			  project->project_refs_path);
 		ret = -EINVAL;
 		goto out;
 	}
@@ -127,15 +128,16 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 	project->project_db_path = g_build_filename(project->project_path, "db", project->checksum, NULL);
 
 	if (g_file_test(project->project_db_path, G_FILE_TEST_IS_DIR)) {
-		pr_info(ps, "%s already created", project->project_db_path);
+		log_print(LOG_ERROR, "%s already created", project->project_db_path);
 		ret = 0; /* no failure */
 		goto out;
 	}
 
-	pr_info(ps, "Create project db path %s (0755)", project->project_db_path);
+	log_print(LOG_INFO, "Create project db path %s (0755)", project->project_db_path);
 	ret = g_mkdir(project->project_db_path, 0755);
 	if (ret != 0) {
-		pr_error(ps, "Failed to create project db dir %s", project->project_db_path);
+		log_print(LOG_ERROR, "Failed to create project db directory %s",
+			  project->project_db_path);
 		ret = -EINVAL;
 		goto out;
 	}
@@ -147,7 +149,7 @@ static int check_create_db_path(struct ps *ps, struct project *project)
 
 	ret = symlink(project->project_db_path, refs_path);
 	if (ret != 0) {
-		pr_error(ps, "Could not create symlink (%s) to db", refs_path);
+		log_print(LOG_ERROR, "Could not create symlink (%s) to db", refs_path);
 		goto out2;
 	}
 
@@ -177,15 +179,15 @@ static int check_create_db_parent_dir(struct ps *ps, struct project *project)
 	path = g_build_filename(project->project_path, "db", NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
-		pr_info(ps, "project db directory %s already created", path);
+		log_print(LOG_DEBUG, "Project DB directory \"%s\" already created", path);
 		ret = 0; /* no failure */
 		goto out;
 	}
 
-	pr_info(ps, "Create db parent directory %s", path);
+	log_print(LOG_INFO, "Create db parent directory %s", path);
 	ret = g_mkdir(path, 0755);
 	if (ret != 0) {
-		pr_error(ps, "Failed to create DB parent dir %s", path);
+		log_print(LOG_DEBUG, "Failed to create DB parent directory %s", path);
 		ret = -EINVAL;
 		goto out;
 	}
@@ -212,15 +214,15 @@ static int check_create_db_info(struct ps *ps, struct project *project)
 	path = g_build_filename(project->project_path, "db", project->checksum, "info",  NULL);
 
 	if (g_file_test(path, G_FILE_TEST_IS_REGULAR)) {
-		pr_info(ps, "project conf %s already created", path);
 		ret = 0; /* no failure */
 		goto out;
 	}
 
-	pr_info(ps, "Create db conf file %s", path);
+	log_print(LOG_DEBUG, "Create project configuration file [%s]", path);
+
 	ret = g_creat(path, 0644);
 	if (ret < 0) {
-		pr_error(ps, "Failed to create config in DB dir %s", path);
+		log_print(LOG_ERROR, "Failed to create project configuration [%s]", path);
 		ret = -EINVAL;
 		goto out;
 	}
@@ -267,13 +269,13 @@ void project_purge_all(struct ps *ps)
 	GSList *tmp;
 	struct project *project;
 
-	pr_info(ps, "deregister all loaded project");
+	log_print(LOG_DEBUG, "Deregister all loaded projects");
 
 	tmp = ps->project_list;
 	while (tmp) {
 		project = tmp->data;
-		pr_info(ps, "deregister project");
-		pr_info(ps, "  cmd: \"%s\"", project->cmd);
+		log_print(LOG_DEBUG, "Deregister project:");
+		log_print(LOG_DEBUG, "  command: \"%s\"", project->cmd);
 		project_free(project);
 
 		tmp = g_slist_next(tmp);
@@ -297,7 +299,7 @@ static void project_deactivated_broadcast_modules(struct ps *ps)
 		module = tmp->data;
 		/* we inform only loaded/activated modules */
 		if (module->activated) {
-			log_print(LOG_INFO, "module activated, inform that"
+			log_print(LOG_DEBUG, "Module activated, inform that"
 			    " the project becomes inactive");
 			module->project_unloading(module, ps->active_project);
 		}
@@ -316,7 +318,7 @@ void project_deactivate(struct ps *ps)
 
 	project = ps->active_project;
 
-        pr_info(ps, "deactivate project %s", project->id);
+        log_print(LOG_INFO, "Deactivate project \"%s\"", project->id);
 	project_deactivated_broadcast_modules(ps);
 
 	call_registered_deactivate_cb(ps);
@@ -386,7 +388,7 @@ static void project_activated_broadcast_modules(struct ps *ps)
 	while (tmp) {
 		module = tmp->data;
 		if (module->activated) {
-			log_print(LOG_INFO, "module activated, inform that"
+			log_print(LOG_DEBUG, "Module activated, inform that"
 				  " the project becomes inactive");
 			module->project_activated(module, ps->active_project);
 		}
@@ -409,23 +411,23 @@ void project_activate(struct ps *ps, struct project *project)
 	project->status = PROJECT_STATUS_SOMEHOW_INVALID;
 	ps->active_project->ps = ps;
 
-	pr_info(ps, "activate project %s", project->id);
+	log_print(LOG_INFO, "Activate project \"%s\"", project->id);
 
 	if (!is_absolute_path(project->cmd)) {
-		pr_error(ps, "%s must be a absolute path", project->cmd);
+		log_print(LOG_ERROR, "\"%s\" must be a absolute path", project->cmd);
 		project->status = PROJECT_STATUS_CMD_PATH_INVALID;
 		return;
 	}
 
 	if (!g_file_test(project->cmd, G_FILE_TEST_IS_EXECUTABLE)) {
-		pr_error(ps, "%s is not executable", project->cmd);
+		log_print(LOG_ERROR, "\"%s\" is not executable", project->cmd);
 		project->status = PROJECT_STATUS_CMD_NOT_EXECUTABLE;
 		return;
 	}
 
 	project->checksum = build_checksum(G_CHECKSUM_MD5, project->cmd);
 	assert(project->checksum);
-	pr_info(ps, "md5 checksum for %s: %s", project->cmd, project->checksum);
+	log_print(LOG_DEBUG, "MD5 checksum for %s: %s", project->cmd, project->checksum);
 
 	ret = check_create_db_parent_dir(ps, project);
 	if (ret < 0) {
@@ -438,7 +440,6 @@ void project_activate(struct ps *ps, struct project *project)
 		project->status = PROJECT_STATUS_SOMEHOW_INVALID;
 		return;
 	}
-
 
 	ret = check_create_db_path(ps, project);
 	if (ret < 0) {
@@ -467,22 +468,24 @@ void project_show(struct ps *ps, struct project *p)
 	gchar **tmp;
 	int i = 1;
 
-	pr_info(ps, " id:          %s", p->id);
-	pr_info(ps, " cmd:         %s", p->cmd);
-	pr_info(ps, " description: %s", p->description);
-	pr_info(ps, " cmd-args:    %s", p->cmd_args_full);
+	(void)ps;
+
+	log_print(LOG_DEBUG, " ID:          %s", p->id);
+	log_print(LOG_DEBUG, " Command:     %s", p->cmd);
+	log_print(LOG_DEBUG, " Arguments:   %s", p->cmd_args_full);
+	log_print(LOG_DEBUG, " Description: %s", p->description);
 	tmp = p->cmd_args_splitted;
 	while (tmp && *tmp) {
-		pr_info(ps, " cmd-arg %d:        %s", i, *tmp);
+		log_print(LOG_DEBUG, " Command Argument-%d:        %s", i, *tmp);
 		tmp++; i++;
 	}
-	pr_info(ps, " working directory:   ");
-	pr_info(ps, " environment:         ");
-	pr_info(ps, " nice level:          ");
-	pr_info(ps, " scheduler policy:    ");
-	pr_info(ps, " IO scheduler:        ");
-	pr_info(ps, " project path:      %s", p->project_path);
-	pr_info(ps, " last-used:         %" G_GUINT64_FORMAT, p->last_used_timestamp);
+	log_print(LOG_DEBUG, " Working directory:   ");
+	log_print(LOG_DEBUG, " Environment:         ");
+	log_print(LOG_DEBUG, " Nice level:          ");
+	log_print(LOG_DEBUG, " Scheduler policy:    ");
+	log_print(LOG_DEBUG, " IO scheduler:        ");
+	log_print(LOG_DEBUG, " Project path:      %s", p->project_path);
+	log_print(LOG_DEBUG, " Last-used:         %" G_GUINT64_FORMAT, p->last_used_timestamp);
 
 }
 
