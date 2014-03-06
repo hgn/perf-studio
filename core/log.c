@@ -37,21 +37,28 @@ static const char *log_tags[2][6] =
 #define FG_YELLOW	"\033[33m"
 #define FG_BLUE		"\033[34m"
 #define FG_PURPLE	"\033[35m"
-#define FG_GREEN     "\033[32m"
+#define FG_GREEN	"\033[32m"
 #define TEXT_BOLD	"\033[1m"
 #define COLOR_END	"\033[0m"
 
-static FILE *logging_file;
+static FILE *log_file;
 static int current_log_mode = 1;
 static int  _log_current_mode = 1;
 
 void log_set_logfile(char *filename)
 {
-	if (logging_file) {
-		fclose(logging_file);
+	if (log_file) {
+		fclose(log_file);
 	}
 
-	logging_file = fopen(filename, "a+");
+	log_file = fopen(filename, "a+");
+}
+
+static int verbose = 0;
+
+void log_set_verbose(void)
+{
+	verbose = 1;
 }
 
 
@@ -65,12 +72,12 @@ int log_get_mode(void)
 	return current_log_mode;
 }
 
-static int logger_level = LOG_INFO;
+static int log_level = LOG_INFO;
 
-void logger_set_level(int level)
+void log_set_level(int level)
 {
 	assert(level >= 0 && level <=  LOG_INVALID);
-	logger_level = level;
+	log_level = level;
 }
 
 
@@ -81,10 +88,10 @@ void _print_log(int loglevel, const char *file, const char *func,
 	va_list args;
 	char *buffer;
 
-	if (loglevel > logger_level)
+	if (loglevel > log_level + 2)
 		return;
 
-	logging_file = stdout;
+	log_file = stdout;
 
 	va_start(args, msg);
 
@@ -117,14 +124,14 @@ void _print_log(int loglevel, const char *file, const char *func,
 			printf(FG_PURPLE);
 			break;
 	}
-	if (logging_file)
-		fprintf(logging_file, "%s", log_tags[_log_current_mode][loglevel]);
+	if (log_file)
+		fprintf(log_file, "%s", log_tags[_log_current_mode][loglevel]);
 	printf(COLOR_END);
 
-	if (logger_level == LOG_DEBUG)
-		fprintf(logging_file, "%s:%04d:%s():", file, line, func);
+	if (verbose)
+		fprintf(log_file, "%s:%04d:%s():", file, line, func);
 
-	fprintf(logging_file, " %s\n", buffer);
+	fprintf(log_file, " %s\n", buffer);
 
 	va_end(args);
 }

@@ -62,7 +62,9 @@ int load_user_conf_file(struct ps *ps)
 	if (!ps->conf.common.perf_path) {
 		log_print(LOG_INFO, "No perf executable path given"
 			  ", try to determine perf");
+		ps->conf.common.perf_path = g_strdup("perf");
 	}
+	log_print(LOG_DEBUG, "Search perf(1) executable");
 	tmp = file_utils_find_exec(getenv("PATH"), ps->conf.common.perf_path);
 	if (!tmp) {
 		log_print(LOG_CRITICAL, "Could not find a valid perf installation!");

@@ -64,8 +64,7 @@ static int parse_cli_options(struct ps *ps, int ac, char **av)
 			}
 			break;
 		case 'v':
-			ps->args.msg_level = MSG_LEVEL_DEBUG;
-			logger_set_level(LOG_DEBUG);
+			ps->args.msg_level++;
 			break;
 		case 'm':
 			ps->args.list_available_modules = TRUE;
@@ -83,6 +82,19 @@ static int parse_cli_options(struct ps *ps, int ac, char **av)
 		}
 	}
 
+	switch (ps->args.msg_level) {
+	case 0:
+		log_set_level(DEFAULT_MSG_LEVEL);
+		break;
+	case 1:
+		log_set_level(LOG_DEBUG);
+		break;
+	default:
+		log_set_level(LOG_DEBUG);
+		log_set_verbose();
+		break;
+	}
+
 	return 0;
 }
 
@@ -96,7 +108,7 @@ static struct ps *ps_new(void)
 	ps->screen_usable = FALSE;
 
 	ps->args.list_available_modules = FALSE;
-	ps->args.msg_level = DEFAULT_MSG_LEVEL;
+	ps->args.msg_level = 0;
 
 	ps->module_list = NULL;
 
