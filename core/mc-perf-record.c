@@ -130,6 +130,12 @@ gchar **mc_perf_record_data_exec_cmd(struct ps *ps,
 	assert(mc_perf_record_data);
 	assert(ps->active_project->project_db_path);
 
+	if (strlen(mc_perf_record_data->event_string.buf) < 4) {
+		/* at least "-e <" is exptected ... */
+		log_print(LOG_ERROR, "No event to capture! Haeh?");
+		return NULL;
+	}
+
 	strbuf_init(&strbuf, 256);
 	strbuf_addf(&strbuf, "%s record ", ps->conf.common.perf_path);
 
@@ -140,6 +146,8 @@ gchar **mc_perf_record_data_exec_cmd(struct ps *ps,
 
 	if (mc_perf_record_data->call_graph)
 		strbuf_addf(&strbuf, "--call-graph ");
+
+	strbuf_addf(&strbuf, "%s ", mc_perf_record_data->event_string.buf);
 
 	/* now add the executable */
 	cmd = "../perf-cases/cache-miss/cache-miss";
