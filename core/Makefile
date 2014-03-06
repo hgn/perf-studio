@@ -17,6 +17,7 @@ FILES += kv-list.c
 FILES += strbuf.c
 FILES += log.c
 FILES += file-utils.c
+FILES += glib-addon.c
 
 FILES += gui-main.c
 FILES += gui-amc.c

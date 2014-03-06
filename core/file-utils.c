@@ -42,12 +42,17 @@ gchar *file_utils_find_exec(const char *path, const char *cmd)
 
 	assert(cmd);
 
-
 	if (cmd[0] == '/') {
 		/* absolute path, ignore path argument */
 		if (cmd[1] == '\0') {
 			return NULL;
 		}
+		if (!valid_exec_file(cmd))
+			return NULL;
+		return g_strdup(cmd);
+	}
+
+	if (cmd[0] == '.' && cmd[1] == '.') {
 		if (!valid_exec_file(cmd))
 			return NULL;
 		return g_strdup(cmd);

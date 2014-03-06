@@ -123,23 +123,42 @@ gchar **mc_perf_record_data_exec_cmd(struct ps *ps,
 	const char *cmd;
 	gchar *full_cmd_path;
 	gchar **ret;
+	struct strbuf strbuf;
 
 	assert(ps);
 	assert(ps->conf.common.perf_path);
 	assert(mc_perf_record_data);
 
-	cmd = "./perf-test";
+	strbuf_init(&strbuf, 128);
+	strbuf_addf(&strbuf, "%s ", ps->conf.common.perf_path);
+
+	if (mc_perf_record_data->system_wide)
+		strbuf_addf(&strbuf, "--all-cpus ");
+
+	if (mc_perf_record_data->call_graph)
+		strbuf_addf(&strbuf, "--call-graph ");
+
+	/* now add the executable */
+	cmd = "../perf-cases/cache-miss/cache-miss";
 	full_cmd_path = file_utils_find_exec(getenv("PATH"), cmd);
 	if (!full_cmd_path) {
 		log_print(LOG_CRITICAL, "Could not find the executable: %s", cmd);
-		return NULL;
+		ret = NULL;
+		goto out;
 	}
 
-	ret = g_strsplit(full_cmd_path, " ", 12);
+	strbuf_addf(&strbuf, "%s", full_cmd_path);
+	g_free(full_cmd_path);
+
+	ret = g_strsplit(strbuf.buf, " ", 48);
 	if (!ret) {
 		log_print(LOG_ERROR, "Cannot construct perf command string");
-		return NULL;
+		ret = NULL;
+		goto out;
 	}
+
+out:
+	strbuf_release(&strbuf);
 
 	return ret;
 }
