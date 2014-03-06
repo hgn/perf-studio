@@ -15,13 +15,23 @@
 #include "log.h"
 #include "mc.h"
 
+/*
+ * If we wan't to marshall integer we must
+ * make sure the value is a valid pointer - not
+ * a NULL pointer.
+ */
+enum {
+	PROGRAM_FINISHED = 1
+};
+
+
 static GAsyncQueue *executer_queue;
 static GThreadPool *executer_pool;
 
 
 
-static int execute_raw_direct(struct executer_gui_ctx *executer_gui_ctx,
-			      char **cmd)
+static int execute_measurement(struct executer_gui_ctx *executer_gui_ctx,
+			       char **cmd)
 {
 	int child_status, pipefd[2];
         int ret;
@@ -84,7 +94,8 @@ static int execute_raw_direct(struct executer_gui_ctx *executer_gui_ctx,
 		} else {
 			if (WIFEXITED(child_status)) {
 				int child_ret = WEXITSTATUS(child_status);
-				log_print(LOG_INFO, "Programm exited with status: %d", child_ret);
+				log_print(LOG_INFO, "Programm exited with status: %d",
+					  child_ret);
 				assert(child_ret != 100);
 			}
 		}
@@ -98,8 +109,8 @@ out:
 }
 
 
-static int execute_raw(struct mc_store *mc_store,
-		       struct executer_gui_ctx *executer_gui_ctx)
+static int execute_all_measurements(struct mc_store *mc_store,
+				    struct executer_gui_ctx *executer_gui_ctx)
 {
 	int ret;
 	GSList *tmp;
@@ -113,7 +124,7 @@ static int execute_raw(struct mc_store *mc_store,
 		assert(mc_element);
 		assert(mc_element->exec_cmd);
 
-		ret = execute_raw_direct(executer_gui_ctx, mc_element->exec_cmd);
+		ret = execute_measurement(executer_gui_ctx, mc_element->exec_cmd);
 		if (ret) {
 			log_print(LOG_DEBUG, "failed to execute program, status: %d", ret);
 		}
@@ -123,16 +134,6 @@ static int execute_raw(struct mc_store *mc_store,
 
 	return 0;
 }
-
-
-/*
- * If we wan't to marshal integer we must
- * make sure the value is a valid pointer - not
- * a NULL pointer.
- */
-enum {
-	PROGRAM_FINISHED = 1
-};
 
 
 /*
@@ -157,7 +158,7 @@ static void executer_thread(gpointer thread_data, gpointer user_data)
 	assert(ps);
 	assert(ps->active_project);
 	assert(ps->active_project->mc_store);
-	ret = execute_raw(ps->active_project->mc_store, executer_gui_ctx);
+	ret = execute_all_measurements(ps->active_project->mc_store, executer_gui_ctx);
 	if (ret) {
 		log_print(LOG_INFO, "failed in program execution");
 	}
@@ -364,11 +365,11 @@ static int gui_reply_cb(struct executer_gui_ctx *executer_gui_ctx,
 
 	switch (executer_gui_reply->type) {
 	case EXECUTER_GUI_REPLY_USER_CANCEL:
-		log_print(LOG_DEBUG, "user cancled GUI executer");
+		log_print(LOG_DEBUG, "User cancled GUI executer");
 		executer_finish(executer_gui_ctx);
 		break;
 	case EXECUTER_GUI_REPLY_USER_NEXT:
-		log_print(LOG_DEBUG, "user clicked next");
+		log_print(LOG_DEBUG, "User clicked next");
 		executer_gui_next(executer_gui_ctx);
 		break;
 	default:
@@ -400,7 +401,8 @@ void execute_module_triggered_analyze(struct module *module)
 	ps = module->ps;
 
 	if (!ps->active_project) {
-		log_print(LOG_INFO, "No project loaded - cannot do analyzes for project none");
+		log_print(LOG_INFO, "No project loaded - cannot"
+			  " do analyzes for project none");
 		return;
 	}
 
