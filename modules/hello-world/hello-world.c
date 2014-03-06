@@ -217,10 +217,10 @@ static int disable_cb(struct module *module)
 }
 
 
-static int update_cb(struct module *module, enum update_type update_type, ...)
+static int update_cb(struct module *module, struct mc_store *mc_store)
 {
 	(void)module;
-	(void)update_type;
+	(void)mc_store;
 
 	return 0;
 }

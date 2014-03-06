@@ -400,20 +400,6 @@ enum {
 	MODULE_GROUP_MAX
 };
 
-enum update_type {
-	UPDATE_TYPE_PERF_DATA_PATH,
-	/*
-	 * note that several path to perf.data files can
-	 * be provided. Just to do a more accurate event
-	 * sampling because of performance register pressure.
-	 * This decision is enforced by the core. E.g if two
-	 * other modules took seperate measurements. There is
-	 * no need to measure the data one more time just to
-	 * collect the data in one perf.data
-	 */
-	UPDATE_TYPE_PERF_DATA_PATHS,
-};
-
 
 enum {
 	MODULE_MATURITY_STABLE,
@@ -450,7 +436,7 @@ struct module {
 	 * data in a module specific format, just to
 	 * display the data as quick as possible
 	 */
-	int (*update)(struct module *m, enum update_type update_type, ...);
+	int (*update)(struct module *m, struct mc_store *mc_store);
 
 	/*
 	 * Used by the module to allocate, initialize all
