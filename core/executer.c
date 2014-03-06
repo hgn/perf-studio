@@ -343,7 +343,7 @@ void execute_module_triggered_analyze(struct module *module)
 	/* prepare command to execute */
 	assert(ps->active_project != NULL);
 	assert(ps->active_project->mc_store != NULL);
-	ret = mc_store_update_exec_cmds(ps->active_project->mc_store);
+	ret = mc_store_update_exec_cmds(ps, ps->active_project->mc_store);
 	if (ret) {
 		log_print(LOG_ERROR, "Failed to construct excution command");
 		return;

@@ -117,12 +117,15 @@ int mc_perf_record_data_check(struct mc_perf_record_data *data)
 }
 
 
-gchar **mc_perf_record_data_exec_cmd(struct mc_perf_record_data *mc_perf_record_data)
+gchar **mc_perf_record_data_exec_cmd(struct ps *ps,
+		struct mc_perf_record_data *mc_perf_record_data)
 {
 	const char *cmd;
 	gchar *full_cmd_path;
 	gchar **ret;
 
+	assert(ps);
+	assert(ps->conf.common.perf_path);
 	assert(mc_perf_record_data);
 
 	cmd = "./perf-test";
