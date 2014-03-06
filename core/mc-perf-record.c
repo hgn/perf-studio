@@ -128,6 +128,7 @@ gchar **mc_perf_record_data_exec_cmd(struct ps *ps,
 	assert(ps);
 	assert(ps->conf.common.perf_path);
 	assert(mc_perf_record_data);
+	assert(ps->active_project->project_db_path);
 
 	strbuf_init(&strbuf, 256);
 	strbuf_addf(&strbuf, "%s record ", ps->conf.common.perf_path);
@@ -170,6 +171,8 @@ int mc_perf_record_data_prepare_results(struct ps *ps, struct mc_element *mc_ele
 {
 	assert(ps);
 	assert(mc_element);
+	assert(ps->conf.common.perf_path);
+	assert(ps->active_project->project_db_path);
 
 	mc_element->data = (void *)0xffffffff;
 
