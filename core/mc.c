@@ -252,6 +252,22 @@ struct mc_store *project_unregister_mc_store(struct project *project)
 }
 
 
+static void update_exec_cmd(struct mc_element *mc_element)
+{
+	switch (mc_element->measurement_class) {
+	case MEASUREMENT_CLASS_PERF_RECORD:
+		mc_element->exec_cmd = mc_perf_record_data_exec_cmd(mc_element->mc_element_data);
+		if (!mc_element->exec_cmd) {
+			log_print(LOG_ERROR, "Failed to construct cmd string, strange");
+		}
+		break;
+	default:
+		log_print(LOG_WARNING, "No exec cmd avail");
+		break;
+	}
+}
+
+
 /**
  * mc_store_update_exec_cmds - iterate over mc_store and generae exec strings
  *
@@ -277,18 +293,7 @@ int mc_store_update_exec_cmds(struct mc_store *mc_store)
 		assert(mc_element);
 		assert(mc_element->exec_cmd == NULL);
 
-		switch (mc_element->measurement_class) {
-		case MEASUREMENT_CLASS_PERF_RECORD:
-			mc_element->exec_cmd = mc_perf_record_data_exec_cmd(
-							mc_element->mc_element_data);
-			if (!mc_element->exec_cmd) {
-				log_print(LOG_ERROR, "Failed to construct cmd string, strange");
-			}
-			break;
-		default:
-			log_print(LOG_WARNING, "No exec cmd avail");
-			break;
-		}
+		update_exec_cmd(mc_element);
 
 		tmp = g_slist_next(tmp);
 	}
