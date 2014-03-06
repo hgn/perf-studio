@@ -19,8 +19,6 @@ struct mc_perf_record_data {
 };
 
 
-
-
 static struct mc_perf_record_data *mc_perf_record_data_alloc(void)
 {
 	return g_malloc0(sizeof(struct mc_perf_record_data));

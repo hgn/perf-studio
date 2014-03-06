@@ -237,7 +237,34 @@ static void update_modules(struct executer_gui_ctx *executer_gui_ctx)
 	assert(ps->active_project);
 	assert(ps->active_project->mc_store);
 
-	module_new_data_available(executer_gui_ctx->module, ps->active_project->mc_store);
+	module_new_data_available(executer_gui_ctx->module,
+				  ps->active_project->mc_store);
+}
+
+
+static void free_cmd_strings(struct executer_gui_ctx *executer_gui_ctx)
+{
+	GSList *tmp;
+	struct ps *ps;
+	struct mc_store *mc_store;
+	struct mc_element *mc_element;
+
+	assert(executer_gui_ctx);
+	ps = executer_gui_ctx->ps;
+	assert(ps->active_project);
+	assert(ps->active_project->mc_store);
+
+	mc_store = ps->active_project->mc_store;
+
+	tmp = mc_store->mc_element_list;
+	while (tmp) {
+		mc_element = tmp->data;
+		assert(mc_element);
+		assert(mc_element->exec_cmd);
+		g_strfreev(mc_element->exec_cmd);
+		mc_element->exec_cmd = NULL;
+		tmp = g_slist_next(tmp);
+	}
 }
 
 
@@ -254,6 +281,8 @@ static void executer_finish(struct executer_gui_ctx *executer_gui_ctx)
 
 	/* kill process if still running */
 	terminate_running_cmd(executer_gui_ctx);
+
+	free_cmd_strings(executer_gui_ctx);
 
 	executer_gui_free(executer_gui_ctx);
 	ps = executer_gui_ctx->ps;
@@ -403,7 +432,8 @@ void execute_module_triggered_analyze(struct module *module)
 	g_thread_pool_push(executer_pool, ps->executer_gui_ctx, NULL);
 
 	/* now executer a timer to check if the thread is finished */
-	ps->executer_gui_ctx->timeout_id = g_timeout_add(250, timeout_function, ps->executer_gui_ctx);
+	ps->executer_gui_ctx->timeout_id = g_timeout_add(250, timeout_function,
+							 ps->executer_gui_ctx);
 	/* we check that a timeout id is never 0 - if not we must make sure
 	 * that we add another check to test if the timeout is running */
 	assert(ps->executer_gui_ctx->timeout_id);

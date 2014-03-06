@@ -6,7 +6,6 @@
 #include "log.h"
 #include "mc.h"
 
-
 #define MODULE_NAME "Hello World"
 #define MODULE_DESCRIPTION "print hello world"
 
@@ -86,6 +85,7 @@ static struct mc_perf_record_data *hello_mc_create_perf_record_data(void)
 	return mc_perf_record_data;
 }
 
+
 static void hello_mc_store_create(struct module *module,
 			          struct hello_world_priv *hwp)
 {
@@ -116,6 +116,7 @@ static void hello_mc_store_create(struct module *module,
 	 * called via module->data->mc_store */
 	hwp->mc_store = mc_store;
 }
+
 
 void hello_mc_store_free_recursive(struct mc_store *mc_store)
 {
