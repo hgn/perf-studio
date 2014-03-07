@@ -137,18 +137,21 @@ gchar **mc_perf_record_data_exec_cmd(struct ps *ps,
 	strbuf_init(&strbuf, 256);
 	strbuf_addf(&strbuf, "%s record ", ps->conf.common.perf_path);
 
-	strbuf_addf(&strbuf, " -f %s/perf.data ", ps->active_project->project_db_path);
+	strbuf_addf(&strbuf, " -o %s/perf.data ", ps->active_project->project_db_path);
 
 	if (mc_perf_record_data->system_wide)
 		strbuf_addf(&strbuf, "--all-cpus ");
 
 	if (mc_perf_record_data->call_graph)
-		strbuf_addf(&strbuf, "--call-graph ");
+		strbuf_addf(&strbuf, "--call-graph dwarf ");
 
 	strbuf_addf(&strbuf, "%s ", mc_perf_record_data->event_string.buf);
 
+	/* after this delimiter no more perf options can be added */
+	//strbuf_addf(&strbuf, "-- ");
+
 	/* now add the executable */
-	cmd = "../perf-cases/cache-miss/cache-miss";
+	cmd = "/home/pfeifer/src/code/01-own/perf-cases/cache-miss/matrix-mult";
 	full_cmd_path = file_utils_find_exec(getenv("PATH"), cmd);
 	if (!full_cmd_path) {
 		log_print(LOG_CRITICAL, "Could not find the executable: %s", cmd);

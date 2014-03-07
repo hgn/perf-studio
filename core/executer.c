@@ -37,6 +37,7 @@ static int execute_measurement(struct executer_gui_ctx *executer_gui_ctx,
         int ret;
 	char buffer[1024];
 	gchar *str;
+	char *newenviron[] = { NULL };
 
 	ret = 0;
 
@@ -68,8 +69,10 @@ static int execute_measurement(struct executer_gui_ctx *executer_gui_ctx,
 		setvbuf(stdout, NULL, _IOLBF, 0);
 		setvbuf(stderr, NULL, _IOLBF, 0);
 
-		execv(cmd[0], (char * const*)cmd);
-		log_print(LOG_ERROR, "Failed to execute program");
+		//execv(cmd[0], (char * const*)cmd);
+		fprintf(stderr, "CMD: %s\n", cmd[0]);
+		execve(cmd[0], cmd, environ);
+		log_print(LOG_ERROR, "Failed to execute program: %s", strerror(errno));
 		exit(100);
 	case -1:
 		log_print(LOG_ERROR, "Failed to fork");
