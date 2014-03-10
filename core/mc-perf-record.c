@@ -137,7 +137,7 @@ gchar **mc_perf_record_data_exec_cmd(struct ps *ps,
 	strbuf_init(&strbuf, 256);
 	strbuf_addf(&strbuf, "%s record ", ps->conf.common.perf_path);
 
-	strbuf_addf(&strbuf, " -o %s/perf.data ", ps->active_project->project_db_path);
+	strbuf_addf(&strbuf, "-o %s/perf.data ", ps->active_project->project_db_path);
 
 	if (mc_perf_record_data->system_wide)
 		strbuf_addf(&strbuf, "--all-cpus ");
